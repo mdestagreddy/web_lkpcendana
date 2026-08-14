@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { publicApi } from '../../services/api';
 import { ArrowLeft, Layers, UserPlus } from 'lucide-react';
+import Image from '../../components/Image';
 import './ProgramDetail.css';
 
 export default function ProgramDetail() {
@@ -31,7 +32,7 @@ export default function ProgramDetail() {
                 <div className="program-header">
                     <div className="program-image-wrapper">
                         {program.image_url ? (
-                            <img src={program.image_url} alt={program.title} className="program-image" loading="lazy" onError={(e) => { e.target.style.display = 'none'; }} />
+                            <Image src={program.image_url} alt={program.title} className="program-image" loading="lazy" onError={(e) => { e.target.style.display = 'none'; }} />
                         ) : (
                             <div className="program-image-placeholder">Tidak ada gambar</div>
                         )}

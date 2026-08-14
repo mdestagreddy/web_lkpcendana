@@ -1,9 +1,9 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_BACKEND || 'http://localhost:5000';
 
 let isRedirecting = false;
 
 async function request(path, options = {}) {
-    const url = `${API_BASE_URL}${path}`;
+    const url = `${API_BASE_URL}/api${path}`;
     const config = {
         headers: {
             'Content-Type': 'application/json',

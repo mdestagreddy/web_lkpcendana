@@ -2,6 +2,7 @@
 import { publicApi } from '../../services/api';
 import { useState, useEffect } from 'react';
 import { Star, Wifi, MessageSquare, ArrowRight, Building2, User } from 'lucide-react';
+import Image from '../../components/Image';
 import './Home.css';
 
 export default function Home() {
@@ -78,7 +79,7 @@ export default function Home() {
         <div className="home">
             <div className="header-image">
                 {headerImage ? (
-                    <img
+                    <Image
                         src={windowWidth >= 1080 ? headerImage : (headerImageMobile || headerImage)}
                         alt={siteName}
                         onError={(e) => {
@@ -116,7 +117,7 @@ export default function Home() {
                                 <div key={program.id} className="program-card featured">
                                     <div className="program-image-wrapper">
                                         {program.image_url ? (
-                                            <img src={program.image_url} alt={program.title} className="program-image" loading="lazy" onError={(e) => { e.target.style.display = 'none'; }} />
+                                            <Image src={program.image_url} alt={program.title} className="program-image" loading="lazy" onError={(e) => { e.target.style.display = 'none'; }} />
                                         ) : (
                                             <div className="program-image-placeholder">Tidak ada gambar</div>
                                         )}
@@ -140,7 +141,7 @@ export default function Home() {
                                 <div key={program.id} className="program-card">
                                     <div className="program-image-wrapper">
                                         {program.image_url ? (
-                                            <img src={program.image_url} alt={program.title} className="program-image" loading="lazy" onError={(e) => { e.target.style.display = 'none'; }} />
+                                            <Image src={program.image_url} alt={program.title} className="program-image" loading="lazy" onError={(e) => { e.target.style.display = 'none'; }} />
                                         ) : (
                                             <div className="program-image-placeholder">Tidak ada gambar</div>
                                         )}
@@ -164,7 +165,7 @@ export default function Home() {
                             {testimonials.map(item => (
                                 <div key={item.id} className="testimonial-card">
                                     {item.foto ? (
-                                        <img src={item.foto} alt={item.nama} className="testimonial-photo" />
+                                        <Image src={item.foto} alt={item.nama} className="testimonial-photo" />
                                     ) : (
                                         <div className="testimonial-avatar">
                                             <User size={40} strokeWidth={1.5} />

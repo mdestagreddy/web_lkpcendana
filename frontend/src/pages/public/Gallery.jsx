@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { publicApi } from '../../services/api';
 import { LayoutGrid, Filter } from 'lucide-react';
+import Image from '../../components/Image';
 import './Gallery.css';
 
 export default function Gallery() {
@@ -50,7 +51,7 @@ export default function Gallery() {
                                 {brokenImages[item.id] ? (
                                     <div className="gallery-placeholder">Tidak ada gambar</div>
                                 ) : (
-                                    <img
+                                    <Image
                                         src={item.thumbnail_url || item.image_url}
                                         alt={item.alt_text || item.caption}
                                         onError={() => {

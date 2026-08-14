@@ -3,6 +3,7 @@ import { publicApi } from '../services/api';
 import { useState, useEffect } from 'react';
 import { Home, GraduationCap, Users, Image, ClipboardList, Info, Phone, Shield, Menu, X, Sun, Moon, Monitor, FileText } from 'lucide-react';
 import { useTheme } from '../context/useTheme';
+import AppImage from './Image';
 import './Navbar.css';
 
 export default function Navbar({ menuOpen, onToggleSidebar }) {
@@ -36,7 +37,7 @@ export default function Navbar({ menuOpen, onToggleSidebar }) {
                 </button>
                 <Link to="/" className="navbar-brand">
                     {settings.logo_image ? (
-                        <img src={settings.logo_image} alt={siteName} className="navbar-logo" />
+                        <AppImage src={settings.logo_image} alt={siteName} className="navbar-logo" />
                     ) : (
                         siteName
                     )}

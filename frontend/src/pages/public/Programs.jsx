@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { publicApi } from '../../services/api';
 import { Search, Tag, Signal, ArrowRight } from 'lucide-react';
+import Image from '../../components/Image';
 import './Programs.css';
 
 export default function Programs() {
@@ -52,7 +53,7 @@ export default function Programs() {
                             <div key={program.id} className="program-card">
                                 <div className="program-image-wrapper">
                                     {program.image_url ? (
-                                        <img src={program.image_url} alt={program.title} className="program-image" loading="lazy" onError={(e) => { e.target.style.display = 'none'; }} />
+                                        <Image src={program.image_url} alt={program.title} className="program-image" loading="lazy" onError={(e) => { e.target.style.display = 'none'; }} />
                                     ) : (
                                         <div className="program-image-placeholder">Tidak ada gambar</div>
                                     )}

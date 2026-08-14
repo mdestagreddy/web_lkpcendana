@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { adminApi } from '../../services/api';
 import ImageUpload from '../../components/ImageUpload';
+import Image from '../../components/Image';
 import { Plus, Save, X, Pencil, Trash2 } from 'lucide-react';
 import CustomCheckbox from '../../components/CustomCheckbox';
 import './AdminCRUD.css';
@@ -110,7 +111,7 @@ export default function AdminGallery() {
                             {brokenImages[item.id] ? (
                                 <div className="gallery-placeholder">Tidak ada gambar</div>
                             ) : item.image_url ? (
-                                <img src={item.image_url} alt={item.alt_text || item.caption || 'Galeri'} loading="lazy" onError={() => setBrokenImages(prev => ({ ...prev, [item.id]: true }))} />
+                                <Image src={item.image_url} alt={item.alt_text || item.caption || 'Galeri'} loading="lazy" onError={() => setBrokenImages(prev => ({ ...prev, [item.id]: true }))} />
                             ) : (
                                 <div className="gallery-placeholder">Tidak ada gambar</div>
                             )}

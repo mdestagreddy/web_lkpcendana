@@ -156,7 +156,7 @@ async function processImage(file, params) {
             console.warn('Failed to delete temp file:', unlinkErr.message);
         }
 
-        const fileUrl = `${baseUrl}/uploads/${processedFilename}`;
+        const fileUrl = `uploads/${processedFilename}`;
 
         const outputMetadata = await image.metadata();
         const actualWidth = outputMetadata.width;

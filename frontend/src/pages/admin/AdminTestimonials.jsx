@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { adminApi } from '../../services/api';
 import ImageUpload from '../../components/ImageUpload';
+import Image from '../../components/Image';
 import { Plus, Save, X, Pencil, Trash2, User } from 'lucide-react';
 import CustomCheckbox from '../../components/CustomCheckbox';
 import './AdminCRUD.css';
@@ -106,7 +107,7 @@ export default function AdminTestimonials() {
                             <div className="generic-card-title">
                                 <div className="admin-testimonial-header">
                                     {item.foto ? (
-                                        <img src={item.foto} alt={item.nama} className="admin-testimonial-photo" />
+                                        <Image src={item.foto} alt={item.nama} className="admin-testimonial-photo" />
                                     ) : (
                                         <div className="admin-testimonial-avatar"><User size={20} /></div>
                                     )}

@@ -3,6 +3,7 @@ import { publicApi } from '../../services/api';
 import { User } from 'lucide-react';
 import { FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa';
 import { SiX } from 'react-icons/si';
+import Image from '../../components/Image';
 import './Instructors.css';
 
 export default function Instructors() {
@@ -27,7 +28,7 @@ export default function Instructors() {
                         <div key={instructor.id} className="instructor-card">
                             <div className="instructor-photo">
                                 {instructor.foto ? (
-                                    <img src={instructor.foto} alt={instructor.nama} />
+                                    <Image src={instructor.foto} alt={instructor.nama} />
                                 ) : (
                                     <div className="placeholder"><User size={48} strokeWidth={1} /></div>
                                 )}

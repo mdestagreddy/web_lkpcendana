@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { publicApi } from '../../services/api';
 import { ArrowLeft, Calendar, Tag } from 'lucide-react';
+import Image from '../../components/Image';
 import './PostDetail.css';
 
 export default function PostDetail() {
@@ -38,7 +39,7 @@ export default function PostDetail() {
                     </header>
                     {post.featured_image && (
                         <div className="post-detail-image">
-                            <img src={post.featured_image} alt={post.title} onError={(e) => { e.target.style.display = 'none'; }} />
+                            <Image src={post.featured_image} alt={post.title} onError={(e) => { e.target.style.display = 'none'; }} />
                         </div>
                     )}
                     <div className="post-detail-content" dangerouslySetInnerHTML={{ __html: post.content || '' }} />

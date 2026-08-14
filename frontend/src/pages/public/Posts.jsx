@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { publicApi } from '../../services/api';
 import { Calendar, Tag, ArrowRight } from 'lucide-react';
+import Image from '../../components/Image';
 import './Posts.css';
 
 export default function Posts() {
@@ -45,7 +46,7 @@ export default function Posts() {
                             <article key={post.id} className="post-card">
                                 {post.featured_image && (
                                     <div className="post-image-wrapper">
-                                        <img src={post.featured_image} alt={post.title} className="post-image" loading="lazy" onError={(e) => { e.target.style.display = 'none'; }} />
+                                        <Image src={post.featured_image} alt={post.title} className="post-image" loading="lazy" onError={(e) => { e.target.style.display = 'none'; }} />
                                     </div>
                                 )}
                                 <div className="post-body">

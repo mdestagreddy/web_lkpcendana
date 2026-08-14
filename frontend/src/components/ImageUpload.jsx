@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Camera, MoveHorizontal, MoveVertical, Gauge, Image, Upload, Trash2, FileText } from 'lucide-react';
+import ImageComponent from './Image';
 import './ImageUpload.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -98,7 +99,7 @@ export default function ImageUpload({
 
             <div className="upload-preview">
                 {preview ? (
-                    <img src={preview} alt="Preview" />
+                    <ImageComponent src={preview} alt="Preview" />
                 ) : (
                     <div className="upload-placeholder">
                         <Camera size={48} strokeWidth={1} />
