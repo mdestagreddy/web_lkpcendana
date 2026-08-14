@@ -9,7 +9,7 @@ function runSqlFile(filePath) {
     return new Promise((resolve, reject) => {
         const sqlQuery = fs.readFileSync(filePath, 'utf8').replace(/^\uFEFF/, '');
         const connection = mysql.createConnection({
-            host: process.env.DB_HOST || 'localhost',
+            host: process.env.DB_HOST || '127.0.0.1', 
             port: process.env.DB_PORT || 3306,
             user: process.env.DB_USER || 'root',
             password: process.env.DB_PASS || 'root',
