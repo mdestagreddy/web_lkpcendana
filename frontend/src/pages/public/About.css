@@ -1,0 +1,189 @@
+﻿.about-page {
+    padding: 3rem 2rem;
+    min-height: 100vh;
+    background: #f8fafc;
+}
+
+.about-page h1 {
+    text-align: center;
+    margin-bottom: 3rem;
+    font-size: 2.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--blue-900);
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.about-page h1::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--orange-500), var(--yellow-400));
+    border-radius: 2px;
+    margin: 0.75rem auto 0;
+}
+
+.about-section {
+    background: var(--bg-white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.6s ease-out backwards;
+}
+
+.about-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--blue-700), var(--blue-500), var(--orange-500));
+}
+
+.about-section h2 {
+    color: var(--orange-500);
+    margin-bottom: 1.25rem;
+    font-weight: 800;
+    font-size: 1.35rem;
+}
+
+.about-section p,
+.about-section li {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    font-size: 0.95rem;
+}
+
+.about-section .institution-desc {
+    margin-bottom: 1.5rem;
+    line-height: 1.8;
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.about-section .institution-desc.welcome-message {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--blue-900);
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(249, 115, 22, 0.05));
+    border-left: 4px solid var(--orange-500);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    background: var(--bg-light);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    color: var(--text-secondary);
+}
+
+.info-item svg {
+    color: var(--orange-500);
+    margin-top: 0.15rem;
+    flex-shrink: 0;
+}
+
+.info-item strong {
+    display: block;
+    color: var(--blue-900);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.25rem;
+}
+
+.info-item p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.about-section ol {
+    padding-left: 1.5rem;
+}
+
+.about-section ol li {
+    margin-bottom: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.instructors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.75rem;
+    margin-top: 1.5rem;
+}
+
+.instructor-card {
+    background: var(--bg-white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+}
+
+.instructor-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: #cbd5e1;
+}
+
+.instructor-card h3 {
+    color: var(--blue-900);
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.role {
+    color: var(--orange-500);
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+    .about-page {
+        padding: 2rem 0 1rem 0;
+    }
+
+    .about-section {
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+    }
+}
+
+[data-theme="dark"] .about-page {
+    background: #0f172a;
+}
+
+[data-theme="dark"] .about-section:hover {
+    border-color: #475569;
+}
+
+[data-theme="dark"] .instructor-card:hover {
+    border-color: #475569;
+}

@@ -1,0 +1,115 @@
+.custom-color-picker {
+    background: #ffffff;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 0.6rem;
+    box-shadow: var(--shadow-md);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.color-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 4px;
+}
+
+.color-swatch {
+    width: 20px;
+    height: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.15s ease;
+    display: block;
+}
+
+.color-swatch:hover {
+    transform: scale(1.2);
+    border-color: rgba(0, 0, 0, 0.3);
+}
+
+.color-picker-custom {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-top: 0.4rem;
+    border-top: 1px solid var(--border-light);
+}
+
+.color-picker-custom-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.color-picker-custom-label input[type="color"] {
+    width: 24px;
+    height: 24px;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    padding: 0;
+    cursor: pointer;
+    background: transparent;
+}
+
+.color-picker-reset {
+    margin-left: auto;
+    padding: 0.35rem 0.7rem;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+}
+
+@media (max-width: 640px) {
+    .custom-color-picker {
+        left: 0 !important;
+        transform: none !important;
+    }
+
+    .color-picker-grid {
+        grid-template-columns: repeat(8, 1fr);
+    }
+}
+
+[data-theme="dark"] .custom-color-picker {
+    background: #1e293b;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .color-swatch {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .color-swatch:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+[data-theme="dark"] .color-picker-custom {
+    border-top-color: #334155;
+}
+
+[data-theme="dark"] .color-picker-custom-label {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .color-picker-custom-label input[type="color"] {
+    border-color: #334155;
+}
+
+[data-theme="dark"] .color-picker-reset {
+    background: linear-gradient(135deg, var(--blue-500), var(--blue-700));
+}

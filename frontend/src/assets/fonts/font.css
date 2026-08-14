@@ -1,0 +1,38 @@
+@font-face {
+    font-family: "Canva Sans";
+    font-weight: 400;
+    font-style: normal;
+    src: url('Canva Sans/CanvaSans-Regular.otf');
+}
+@font-face {
+    font-family: "Canva Sans";
+    font-weight: 400;
+    font-style: italic;
+    src: url('Canva Sans/CanvaSans-RegularItalic.otf');
+}
+
+@font-face {
+    font-family: "Canva Sans";
+    font-weight: 500;
+    font-style: normal;
+    src: url('Canva Sans/CanvaSans-Medium.otf');
+}
+@font-face {
+    font-family: "Canva Sans";
+    font-weight: 500;
+    font-style: italic;
+    src: url('Canva Sans/CanvaSans-MediumItalic.otf');
+}
+
+@font-face {
+    font-family: "Canva Sans";
+    font-weight: 600;
+    font-style: normal;
+    src: url('Canva Sans/CanvaSans-Bold.otf');
+}
+@font-face {
+    font-family: "Canva Sans";
+    font-weight: 600;
+    font-style: italic;
+    src: url('Canva Sans/CanvaSans-BoldItalic.otf');
+}

@@ -1,0 +1,116 @@
+﻿.footer {
+    background: var(--bg-white);
+    border-top: 1px solid var(--border-light);
+    padding: 4rem 0 1.5rem;
+    margin-top: auto;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2.5rem;
+}
+
+.footer-section h3 {
+    color: var(--blue-700);
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    font-weight: 800;
+}
+
+.footer-section h4 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.footer-section p {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    font-size: 0.95rem;
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section ul li {
+    margin-bottom: 0.6rem;
+}
+
+.footer-section a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: var(--transition);
+    display: inline-block;
+}
+
+.footer-section a:hover {
+    color: var(--orange-500);
+    transform: translateX(4px);
+}
+
+.social-links {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.social-links a {
+    padding: 0.5rem 1rem;
+    background: #f8fafc;
+    border: 1px solid var(--border-light);
+    border-radius: 999px;
+    font-size: 0.875rem;
+    transition: var(--transition);
+    color: var(--text-secondary);
+}
+
+.social-links a:hover {
+    background: #fff7ed;
+    border-color: var(--orange-500);
+    color: var(--orange-500);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.15);
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 2rem;
+    margin-top: 2.5rem;
+    border-top: 1px solid var(--border-light);
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+    .footer {
+        padding: 1rem 0 1.5rem;
+    }
+
+    .footer-bottom {
+        padding-top: 1.5rem;
+    }
+}
+
+[data-theme="dark"] .footer {
+    background: #1e293b;
+    border-top-color: #334155;
+}
+
+[data-theme="dark"] .social-links a {
+    background: #0f172a;
+}
+
+[data-theme="dark"] .social-links a:hover {
+    background: #1e293b;
+    border-color: #fdba74;
+    color: #fdba74;
+}

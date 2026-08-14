@@ -1,0 +1,276 @@
+﻿.programs-page {
+    padding: 3rem 2rem;
+    min-height: 100vh;
+    background: #f8fafc;
+}
+
+.programs-page h1 {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    font-size: 2.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--blue-900);
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.programs-page h1::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--orange-500), var(--yellow-400));
+    border-radius: 2px;
+    margin: 0.75rem auto 0;
+}
+
+.programs-page .filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.programs-page .filters select,
+.programs-page .filters input {
+    padding: 0.7rem 1.25rem;
+    border: 1px solid var(--border-light);
+    border-radius: 999px;
+    font-size: 0.95rem;
+    background: var(--bg-white);
+    color: var(--text-primary);
+    outline: none;
+    transition: var(--transition);
+    font-family: inherit;
+    box-shadow: var(--shadow-sm);
+}
+
+.programs-page .filters select {
+    padding-right: 2.5rem;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat !important;
+    background-position: right 0.9rem center !important;
+    background-size: 16px !important;
+}
+
+.programs-page .filters select:focus,
+.programs-page .filters input:focus {
+    border-color: var(--blue-700);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.programs-page .filters select option {
+    background: #ffffff;
+    color: var(--text-primary);
+}
+
+.programs-page .search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+    width: 200px;
+    max-width: 280px;
+}
+
+.programs-page .search-input-wrapper svg {
+    position: absolute;
+    left: 1rem;
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.programs-page .search-input-wrapper input {
+    width: 100%;
+    padding-left: 2.5rem;
+    padding-right: 1rem;
+}
+
+.programs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.75rem;
+}
+
+.program-card {
+    background: var(--bg-white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.program-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--blue-700), var(--blue-500), var(--orange-500));
+}
+
+.program-image-wrapper {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+    margin-bottom: 1rem;
+}
+
+.program-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.program-image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.program-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-md);
+    border-color: #cbd5e1;
+}
+
+.badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--orange-500), var(--orange-400));
+    color: #fff;
+    padding: 0.3rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    margin-right: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.level-badge {
+    display: inline-block;
+    background: #eff6ff;
+    color: var(--blue-700);
+    padding: 0.3rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    border: 1px solid #bfdbfe;
+    font-weight: 600;
+}
+
+.program-card h3 {
+    margin: 0.75rem 0;
+    color: var(--blue-900);
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.program-card p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.program-meta {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.75rem;
+    border-radius: 999px;
+    text-decoration: none;
+    margin-top: 0.75rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: var(--transition);
+    background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.35);
+    filter: brightness(1.1);
+}
+
+@media (max-width: 768px) {
+    .programs-page {
+        padding: 2rem 0 1rem 0;
+    }
+
+    .programs-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    .program-card {
+        border-radius: var(--radius-md) !important;
+    }
+
+    .programs-page .filters {
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 0rem !important;
+    }
+    .programs-page .filters select,
+    .programs-page .filters input {
+        width: 100%;
+        max-width: 400px;
+    }
+    .programs-page .search-input-wrapper {
+        width: 100%;
+        max-width: 400px;
+        flex: 1 1 auto;
+    }
+}
+
+[data-theme="dark"] .programs-page {
+    background: #0f172a;
+}
+
+[data-theme="dark"] .filters select option {
+    background: #1e293b;
+}
+
+[data-theme="dark"] .filters select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23f1f5f9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.9rem center !important;
+    background-size: 16px !important;
+}
+
+[data-theme="dark"] .program-card:hover {
+    border-color: #475569;
+}
+
+[data-theme="dark"] .level-badge {
+    background: #1e3a5f;
+    color: #93c5fd;
+    border-color: #2563eb;
+}
+
+[data-theme="dark"] .program-image-placeholder {
+    background: linear-gradient(135deg, #1e293b, #334155);
+    color: #94a3b8;
+}

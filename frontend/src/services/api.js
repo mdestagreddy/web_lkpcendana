@@ -1,0 +1,361 @@
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+let isRedirecting = false;
+
+async function request(path, options = {}) {
+    const url = `${API_BASE_URL}${path}`;
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers,
+        },
+        ...options,
+    };
+
+    if (options.isAdmin) {
+        const token = localStorage.getItem('admin_token');
+        if (token) {
+            config.headers['Authorization'] = `Bearer ${token}`;
+        }
+        delete config.isAdmin;
+    }
+
+    const response = await fetch(url, config);
+    const data = await response.json();
+
+    if (response.status === 401 && options.isAdmin) {
+        localStorage.removeItem('admin_token');
+        localStorage.removeItem('admin_user');
+
+        if (!isRedirecting) {
+            isRedirecting = true;
+            window.location.href = '/admin/login';
+        }
+
+        return;
+    }
+
+    if (!response.ok) {
+        const error = new Error(data.error || 'Permintaan gagal');
+        error.status = response.status;
+        error.data = data;
+        throw error;
+    }
+    return data;
+}
+
+export const publicApi = {
+    login: (credentials) => request('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(credentials),
+    }),
+
+    uploadImage: (formData) => {
+        const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
+        const url = `${API_BASE_URL}/upload/upload`;
+
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+            body: formData,
+        }).then(res => {
+            if (!res.ok) {
+                return res.json().then(data => {
+                    const error = new Error(data.error || 'Upload failed');
+                    error.status = res.status;
+                    error.data = data;
+                    throw error;
+                });
+            }
+            return res.json();
+        });
+    },
+
+    getPrograms: (params = {}) => {
+        const query = new URLSearchParams();
+        Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                query.append(key, value);
+            }
+        });
+        const qs = query.toString();
+        return request(`/public/programs${qs ? `?${qs}` : ''}`);
+    },
+
+    getProgram: (id) => request(`/public/programs/${id}`),
+
+    getProgramModules: (id) => request(`/public/programs/${id}/modules`),
+
+    getFeaturedPrograms: () => request('/public/programs/featured'),
+
+    getInstructors: () => request('/public/instructors'),
+
+    getInstructor: (id) => request(`/public/instructors/${id}`),
+
+    getTestimonials: (params = {}) => {
+        const query = new URLSearchParams();
+        Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                query.append(key, value);
+            }
+        });
+        const qs = query.toString();
+        return request(`/public/testimonials${qs ? `?${qs}` : ''}`);
+    },
+
+    getGallery: (params = {}) => {
+        const query = new URLSearchParams();
+        Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                query.append(key, value);
+            }
+        });
+        const qs = query.toString();
+        return request(`/public/gallery${qs ? `?${qs}` : ''}`);
+    },
+
+    getInstitution: () => request('/public/institution'),
+
+    getVisionMission: () => request('/public/vision-mission'),
+
+    getSiteSettings: () => request('/public/site-settings'),
+
+    getPosts: (params = {}) => {
+        const query = new URLSearchParams();
+        Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                query.append(key, value);
+            }
+        });
+        const qs = query.toString();
+        return request(`/public/posts${qs ? `?${qs}` : ''}`);
+    },
+
+    getPost: (id) => request(`/public/posts/${id}`),
+
+    getCategories: () => request('/public/categories'),
+
+    getOrgChart: () => request('/public/org-chart'),
+
+    getPrivacyPolicy: () => request('/public/privacy-policy'),
+};
+
+export const adminApi = {
+    programs: {
+        list: () => request('/admin/programs', { isAdmin: true }),
+        create: (data) => request('/admin/programs', {
+            method: 'POST',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        update: (id, data) => request(`/admin/programs/${id}`, {
+            method: 'PUT',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        delete: (id) => request(`/admin/programs/${id}`, {
+            method: 'DELETE',
+            isAdmin: true,
+        }),
+    },
+
+    programModules: {
+        list: (programId) => request(`/admin/programs/${programId}/modules`, { isAdmin: true }),
+        create: (programId, data) => request(`/admin/programs/${programId}/modules`, {
+            method: 'POST',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        update: (programId, moduleId, data) => request(`/admin/programs/${programId}/modules/${moduleId}`, {
+            method: 'PUT',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        delete: (programId, moduleId) => request(`/admin/programs/${programId}/modules/${moduleId}`, {
+            method: 'DELETE',
+            isAdmin: true,
+        }),
+    },
+
+    instructors: {
+        list: () => request('/admin/instructors', { isAdmin: true }),
+        create: (data) => request('/admin/instructors', {
+            method: 'POST',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        update: (id, data) => request(`/admin/instructors/${id}`, {
+            method: 'PUT',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        delete: (id) => request(`/admin/instructors/${id}`, {
+            method: 'DELETE',
+            isAdmin: true,
+        }),
+    },
+
+    testimonials: {
+        list: () => request('/admin/testimonials', { isAdmin: true }),
+        create: (data) => request('/admin/testimonials', {
+            method: 'POST',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        update: (id, data) => request(`/admin/testimonials/${id}`, {
+            method: 'PUT',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        delete: (id) => request(`/admin/testimonials/${id}`, {
+            method: 'DELETE',
+            isAdmin: true,
+        }),
+    },
+
+    gallery: {
+        list: () => request('/admin/gallery', { isAdmin: true }),
+        create: (data) => request('/admin/gallery', {
+            method: 'POST',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        update: (id, data) => request(`/admin/gallery/${id}`, {
+            method: 'PUT',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        delete: (id) => request(`/admin/gallery/${id}`, {
+            method: 'DELETE',
+            isAdmin: true,
+        }),
+    },
+
+    users: {
+        list: () => request('/admin/users', { isAdmin: true }),
+        create: (data) => request('/admin/users', {
+            method: 'POST',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        update: (id, data) => request(`/admin/users/${id}`, {
+            method: 'PUT',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        delete: (id) => request(`/admin/users/${id}`, {
+            method: 'DELETE',
+            isAdmin: true,
+        }),
+    },
+
+    institutionInfo: {
+        list: () => request('/admin/institution-info', { isAdmin: true }),
+        update: (key, data) => request(`/admin/institution-info/${key}`, {
+            method: 'PUT',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+    },
+
+    visionMission: {
+        list: () => request('/admin/vision-mission', { isAdmin: true }),
+        create: (data) => request('/admin/vision-mission', {
+            method: 'POST',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        update: (id, data) => request(`/admin/vision-mission/${id}`, {
+            method: 'PUT',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        delete: (id) => request(`/admin/vision-mission/${id}`, {
+            method: 'DELETE',
+            isAdmin: true,
+        }),
+    },
+
+    siteSettings: {
+        list: () => request('/admin/site-settings', { isAdmin: true }),
+        update: (key, data) => request(`/admin/site-settings/${key}`, {
+            method: 'PUT',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+    },
+
+    posts: {
+        list: () => request('/admin/posts', { isAdmin: true }),
+        create: (data) => request('/admin/posts', {
+            method: 'POST',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        update: (id, data) => request(`/admin/posts/${id}`, {
+            method: 'PUT',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        delete: (id) => request(`/admin/posts/${id}`, {
+            method: 'DELETE',
+            isAdmin: true,
+        }),
+    },
+
+    categories: {
+        list: () => request('/admin/categories', { isAdmin: true }),
+        create: (data) => request('/admin/categories', {
+            method: 'POST',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        update: (id, data) => request(`/admin/categories/${id}`, {
+            method: 'PUT',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        delete: (id) => request(`/admin/categories/${id}`, {
+            method: 'DELETE',
+            isAdmin: true,
+        }),
+    },
+
+    orgChart: {
+        list: () => request('/admin/org-chart', { isAdmin: true }),
+        create: (data) => request('/admin/org-chart', {
+            method: 'POST',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        update: (id, data) => request(`/admin/org-chart/${id}`, {
+            method: 'PUT',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        delete: (id) => request(`/admin/org-chart/${id}`, {
+            method: 'DELETE',
+            isAdmin: true,
+        }),
+    },
+
+    privacyPolicies: {
+        list: () => request('/admin/privacy-policies', { isAdmin: true }),
+        create: (data) => request('/admin/privacy-policies', {
+            method: 'POST',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        update: (id, data) => request(`/admin/privacy-policies/${id}`, {
+            method: 'PUT',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        delete: (id) => request(`/admin/privacy-policies/${id}`, {
+            method: 'DELETE',
+            isAdmin: true,
+        }),
+    },
+};
