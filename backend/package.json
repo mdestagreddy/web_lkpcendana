@@ -7,7 +7,7 @@
     "dev": "nodemon index.js",
     "start": "node index.js",
     "setup-db": "node src/config/setup_database.js",
-    "add-sql": "node src/config/setup_database.js"
+    "add-sql": "node src/config/setup_database.js add"
   },
   "keywords": [],
   "author": "",

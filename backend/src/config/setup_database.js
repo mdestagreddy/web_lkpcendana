@@ -53,6 +53,17 @@ async function runAddSql(environment) {
 module.exports = { setupDatabase, runAddSql };
 
 if (require.main === module) {
-    const env = process.argv[2] || 'development';
-    runAddSql(env).then(success => process.exit(success ? 0 : 1));
+    const command = process.argv[2];
+    if (command === 'add') {
+        const env = process.argv[3] || 'development';
+        runAddSql(env).then(success => process.exit(success ? 0 : 1));
+    } else {
+        setupDatabase().then(setupSuccess => {
+            if (setupSuccess) {
+                console.log('Menjalankan add.sql setelah setup...');
+                return runAddSql(process.argv[2] || 'development');
+            }
+            process.exit(1);
+        }).then(addSuccess => process.exit(addSuccess ? 0 : 1));
+    }
 }
