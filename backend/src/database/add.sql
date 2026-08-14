@@ -4,7 +4,7 @@
 INSERT IGNORE INTO institution_info (key_name, value) VALUES
 ('name', 'LKP Cendana'),
 ('address', 'Jalan Cendana No. 07 Samarinda, Kalimantan Timur'),
-('phone', '0541 769763'),
+('phone', '0813-4621-7133'),
 ('email', 'cendanatraining@gmail.com'),
 ('established_year', '2003'),
 ('accreditation', 'A from BAN-PNF'),
@@ -14,7 +14,7 @@ INSERT IGNORE INTO site_settings (key_name, value) VALUES
 ('facebook_url', 'https://facebook.com/lpk.cendana.5'),
 ('instagram_url', 'https://instagram.com/lkpcendana'),
 ('twitter_url', 'https://twitter.com/lkpcendana'),
-('youtube_url', 'https://youtube.com/@cendanalpk9125'),
+('youtube_url', 'https://www.youtube.com/@cendanatraining9510'),
 ('header_image', ''),
 ('logo_image', '');
 
