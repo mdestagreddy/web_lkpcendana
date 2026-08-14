@@ -27,7 +27,7 @@ export default function AdminDashboard() {
         }).catch(() => setLoading(false));
     }, []);
 
-    if (loading) return <div className="container"><p>Memuat...</p></div>;
+    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
 
     const statCards = [
         { label: 'Program', value: stats.programs, link: '/admin/programs', accent: 'var(--accent-1)', icon: GraduationCap },

@@ -41,7 +41,7 @@ export default function AdminOrgChart() {
         adminApi.orgChart.delete(id).then(load).catch(() => {});
     }
 
-    if (loading) return <div className="container"><p>Memuat...</p></div>;
+    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
 
     return (
         <div className="admin-crud">

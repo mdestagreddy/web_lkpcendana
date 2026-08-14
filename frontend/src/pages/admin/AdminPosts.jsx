@@ -79,7 +79,7 @@ export default function AdminPosts() {
         adminApi.posts.delete(id).then(load).catch(err => setError(err?.data?.error || err?.message || 'Gagal menghapus postingan'));
     }
 
-    if (loading) return <div className="container"><p>Memuat...</p></div>;
+    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
 
     return (
         <div className="admin-crud">

@@ -131,3 +131,32 @@ h4 svg {
         transform: translateY(0);
     }
 }
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    gap: 12px;
+    width: 100%;
+}
+
+.loading::before {
+    content: '';
+    width: 22px;
+    height: 22px;
+    border: 3px solid var(--border-light);
+    border-top-color: var(--blue-500);
+    border-radius: 50%;
+    animation: spin 0.75s linear infinite;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}

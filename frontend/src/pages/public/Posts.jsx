@@ -36,7 +36,7 @@ export default function Posts() {
                 </div>
 
                 {loading ? (
-                    <p>Memuat...</p>
+                    <p className="loading">Memuat...</p>
                 ) : posts.length === 0 ? (
                     <p className="no-posts">Belum ada artikel yang dipublikasikan.</p>
                 ) : (

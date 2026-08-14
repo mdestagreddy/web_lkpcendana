@@ -67,7 +67,7 @@ export default function Home() {
         };
     }, []);
 
-    if (loading) return <div className="container"><p>Memuat...</p></div>;
+    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
 
     const headerImage = settings.header_image || '';
     const headerImageMobile = settings.header_image_mobile || '';

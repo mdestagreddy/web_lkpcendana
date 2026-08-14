@@ -35,7 +35,7 @@ export default function PrivacyPolicy() {
         }).catch(() => setLoading(false));
     }, []);
 
-    if (loading) return <div className="container"><p>Memuat...</p></div>;
+    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
     if (!policy) return <div className="container"><p>Kebijakan privasi tidak ditemukan</p></div>;
 
     return (

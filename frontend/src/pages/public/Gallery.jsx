@@ -42,7 +42,7 @@ export default function Gallery() {
                 </div>
 
                 {loading ? (
-                    <p>Memuat...</p>
+                    <p className="loading">Memuat...</p>
                 ) : (
                     <div className="gallery-grid">
                         {items.map(item => (

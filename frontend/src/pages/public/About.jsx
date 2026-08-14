@@ -22,7 +22,7 @@ export default function About() {
         }).catch(() => setLoading(false));
     }, []);
 
-    if (loading) return <div className="container"><p>Memuat...</p></div>;
+    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
 
     const vision = visionMission.filter(vm => vm.type === 'vision');
     const missions = visionMission.filter(vm => vm.type === 'mission');

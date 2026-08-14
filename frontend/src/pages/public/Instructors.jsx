@@ -16,7 +16,7 @@ export default function Instructors() {
         }).catch(() => setLoading(false));
     }, []);
 
-    if (loading) return <div className="container"><p>Memuat...</p></div>;
+    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
 
     return (
         <div className="instructors-page">

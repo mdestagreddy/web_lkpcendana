@@ -45,7 +45,7 @@ export default function Programs() {
                 </div>
 
                 {loading ? (
-                    <p>Memuat...</p>
+                    <p className="loading">Memuat...</p>
                 ) : (
                     <div className="programs-grid">
                         {programs.map(program => (

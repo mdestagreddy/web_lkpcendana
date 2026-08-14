@@ -21,7 +21,7 @@ export default function ProgramDetail() {
         }).catch(() => setLoading(false));
     }, [id]);
 
-    if (loading) return <div className="container"><p>Memuat...</p></div>;
+    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
     if (!program) return <div className="container"><p>Program tidak ditemukan</p></div>;
 
     return (

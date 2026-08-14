@@ -37,7 +37,7 @@ function AdminLayoutInner() {
     }, [sidebarOpen]);
 
     if (loading) {
-        return <div className="admin-layout"><main className="admin-content"><p>Memuat...</p></main></div>;
+        return <div className="admin-layout"><main className="admin-content"><p className="loading">Memuat...</p></main></div>;
     }
 
     if (!user) {
