@@ -1,7 +1,7 @@
 ﻿import { Link, useLocation } from 'react-router-dom';
 import { publicApi } from '../services/api';
 import { useState, useEffect } from 'react';
-import { Home, GraduationCap, Users, Image, ClipboardList, Info, Phone, Shield, Menu, X, Sun, Moon, Monitor, FileText } from 'lucide-react';
+import { Home, GraduationCap, Users, Image, ClipboardList, Info, Phone, Shield, Menu, X, Sun, Moon, Monitor, FileText, Star } from 'lucide-react';
 import { useTheme } from '../context/useTheme';
 import AppImage from './Image';
 import './Navbar.css';
@@ -56,6 +56,7 @@ export default function Navbar({ menuOpen, onToggleSidebar }) {
                         <li><Link to="/instructors" className={isActive('/instructors')} onClick={() => menuOpen && onToggleSidebar()}><Users size={18} /> <span className="nav-label">Instruktur</span></Link></li>
                         <li><Link to="/gallery" className={isActive('/gallery')} onClick={() => menuOpen && onToggleSidebar()}><Image size={18} /> <span className="nav-label">Galeri</span></Link></li>
                         <li><Link to="/posts" className={isActive('/posts')} onClick={() => menuOpen && onToggleSidebar()}><FileText size={18} /> <span className="nav-label">Artikel</span></Link></li>
+                        <li><Link to="/reviews" className={isActive('/reviews')} onClick={() => menuOpen && onToggleSidebar()}><Star size={18} /> <span className="nav-label">Ulasan</span></Link></li>
                         <li><Link to="/registration" className={isActive('/registration')} onClick={() => menuOpen && onToggleSidebar()}><ClipboardList size={18} /> <span className="nav-label">Pendaftaran</span></Link></li>
                         <li><Link to="/about" className={isActive('/about')} onClick={() => menuOpen && onToggleSidebar()}><Info size={18} /> <span className="nav-label">Tentang Kami</span></Link></li>
                         <li><Link to="/contact" className={isActive('/contact')} onClick={() => menuOpen && onToggleSidebar()}><Phone size={18} /> <span className="nav-label">Kontak</span></Link></li>

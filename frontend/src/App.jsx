@@ -27,6 +27,8 @@ import AdminCategories from './pages/admin/AdminCategories';
 import AdminOrgChart from './pages/admin/AdminOrgChart';
 import AdminPrivacyPolicies from './pages/admin/AdminPrivacyPolicies';
 import AdminLogin from './pages/admin/AdminLogin';
+import Reviews from './pages/public/Reviews';
+import AdminReviews from './pages/admin/AdminReviews';
 import './App.css';
 
 export default function App() {
@@ -46,12 +48,14 @@ export default function App() {
                             <Route path="privacy-policy" element={<PrivacyPolicy />} />
                             <Route path="posts" element={<Posts />} />
                             <Route path="posts/:id" element={<PostDetail />} />
+                            <Route path="reviews" element={<Reviews />} />
                         </Route>
                         <Route path="/admin" element={<AdminLayout />}>
                             <Route index element={<AdminDashboard />} />
                             <Route path="programs" element={<AdminPrograms />} />
                             <Route path="instructors" element={<AdminInstructors />} />
                             <Route path="testimonials" element={<AdminTestimonials />} />
+                            <Route path="reviews" element={<AdminReviews />} />
                             <Route path="gallery" element={<AdminGallery />} />
                             <Route path="users" element={<AdminUsers />} />
                             <Route path="institution" element={<AdminInstitution />} />

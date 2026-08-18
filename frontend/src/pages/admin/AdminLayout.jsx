@@ -3,7 +3,7 @@ import { Outlet, NavLink, useNavigate, Navigate, useLocation } from 'react-route
 import { useAuth } from '../../context/useAuth';
 import { useTheme } from '../../context/useTheme';
 import { ThemeProvider } from '../../context/ThemeContext';
-import { LayoutDashboard, GraduationCap, Users, MessageSquare, Image, UserCog, Building2, Target, Settings, FileText, Tag, GitBranch, Shield, LogOut, Sun, Moon, Monitor } from 'lucide-react';
+import { LayoutDashboard, GraduationCap, Users, MessageSquare, Star, Image, UserCog, Building2, Target, Settings, FileText, Tag, GitBranch, Shield, LogOut, Sun, Moon, Monitor } from 'lucide-react';
 import './AdminLayout.css';
 
 function AdminLayoutInner() {
@@ -66,6 +66,7 @@ function AdminLayoutInner() {
                     <NavLink to="/admin/programs" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setSidebarOpen(false)}><GraduationCap size={18} /> Program</NavLink>
                     <NavLink to="/admin/instructors" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setSidebarOpen(false)}><Users size={18} /> Instruktur</NavLink>
                     <NavLink to="/admin/testimonials" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setSidebarOpen(false)}><MessageSquare size={18} /> Testimoni</NavLink>
+                    <NavLink to="/admin/reviews" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setSidebarOpen(false)}><Star size={18} /> Ulasan</NavLink>
                     <NavLink to="/admin/gallery" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setSidebarOpen(false)}><Image size={18} /> Galeri</NavLink>
                     <NavLink to="/admin/users" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setSidebarOpen(false)}><UserCog size={18} /> Pengguna</NavLink>
                     <NavLink to="/admin/institution" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setSidebarOpen(false)}><Building2 size={18} /> Institusi</NavLink>

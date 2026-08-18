@@ -1,0 +1,302 @@
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { publicApi, API_BASE_URL } from '../../services/api';
+import { Star, Send, Loader2, Camera, X } from 'lucide-react';
+import './Reviews.css';
+
+export default function Reviews() {
+    const [reviews, setReviews] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
+    const [captchaId, setCaptchaId] = useState(null);
+    const [captchaSvg, setCaptchaSvg] = useState('');
+    const [captchaInput, setCaptchaInput] = useState('');
+    const [previewImages, setPreviewImages] = useState([]);
+    const [uploadingImages, setUploadingImages] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const fileInputRef = useRef(null);
+    const isiRef = useRef(null);
+
+    const [form, setForm] = useState({ nama: '', email: '', rating: 5, isi: '', images: [] });
+
+    useEffect(() => { loadReviews(); }, []);
+
+    const autoResize = useCallback(() => {
+        const el = isiRef.current;
+        if (!el) return;
+        el.style.height = 'auto';
+        el.style.height = `${Math.min(el.scrollHeight, 400)}px`;
+    }, []);
+
+    useEffect(() => { autoResize(); }, [form.isi, autoResize]);
+
+    function loadReviews() {
+        setLoading(true);
+        publicApi.getReviews().then(data => {
+            setReviews(data);
+            setLoading(false);
+        }).catch(() => setLoading(false));
+    }
+
+    useEffect(() => {
+        if (!captchaId) loadCaptcha();
+    }, [captchaId]);
+
+    function loadCaptcha() {
+        publicApi.getCaptcha().then(data => {
+            setCaptchaId(data.captchaId);
+            setCaptchaSvg(data.svg);
+            setCaptchaInput('');
+        }).catch(() => {});
+    }
+
+    function handleFileChange(e) {
+        const files = Array.from(e.target.files || []);
+        if (files.length === 0) return;
+        setPreviewImages(prev => [...prev, ...files]);
+    }
+
+    function removeImage(index) {
+        setPreviewImages(prev => prev.filter((_, i) => i !== index));
+    }
+
+    async function uploadReviewImages() {
+        if (previewImages.length === 0) return [];
+        setUploadingImages(true);
+        const uploaded = [];
+        try {
+            for (const file of previewImages) {
+                const formData = new FormData();
+                formData.append('images', file);
+                const res = await fetch(`${API_BASE_URL}/upload/review`, {
+                    method: 'POST',
+                    body: formData,
+                });
+                if (!res.ok) throw new Error('Upload failed');
+                const data = await res.json();
+                if (data.images && data.images.length > 0) {
+                    uploaded.push(...data.images);
+                }
+            }
+        } catch {
+            uploaded.length = 0;
+        } finally {
+            setUploadingImages(false);
+        }
+        return uploaded;
+    }
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+        setError('');
+        setSuccess('');
+
+        if (!captchaInput || !captchaId) {
+            setError('Silakan isi kode captcha');
+            return;
+        }
+
+        setSubmitting(true);
+        let uploadedImageUrls = [];
+        try {
+            if (previewImages.length > 0) {
+                uploadedImageUrls = await uploadReviewImages();
+                if (uploadedImageUrls.length === 0 && previewImages.length > 0) {
+                    setError('Gagal mengunggah gambar. Silakan coba lagi.');
+                    setSubmitting(false);
+                    return;
+                }
+            }
+
+            await publicApi.createReview({
+                nama: form.nama,
+                email: form.email || undefined,
+                rating: parseInt(form.rating),
+                isi: form.isi,
+                images: uploadedImageUrls,
+                captchaId,
+                captchaText: captchaInput,
+            });
+
+            setSuccess('Ulasan berhasil dikirim dan sedang menunggu persetujuan admin.');
+            setForm({ nama: '', email: '', rating: 5, isi: '', images: [] });
+            setPreviewImages([]);
+            setCaptchaId(null);
+            loadReviews();
+        } catch (err) {
+            setError(err.message || 'Gagal mengirim ulasan. Silakan coba lagi.');
+        } finally {
+            setSubmitting(false);
+        }
+    }
+
+    function renderStars(rating, interactive = false) {
+        return Array.from({ length: 5 }, (_, i) => (
+            <button
+                key={i}
+                type={interactive ? 'button' : 'button'}
+                className={`star-btn ${interactive ? 'interactive' : ''} ${i < rating ? 'filled' : ''}`}
+                onClick={interactive ? () => setForm({ ...form, rating: i + 1 }) : undefined}
+                disabled={!interactive}
+            >
+                <Star size={interactive ? 28 : 18} fill={i < rating ? 'currentColor' : 'none'} />
+            </button>
+        ));
+    }
+
+    function formatDate(dateStr) {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    return (
+        <div className="reviews-page">
+            <div className="container">
+                <h1>Ulasan</h1>
+                <p className="page-subtitle">Bagikan pengalaman Anda di LKP Cendana</p>
+
+                {success && <div className="alert alert-success">{success}</div>}
+                {error && <div className="alert alert-error">{error}</div>}
+
+                <div className="reviews-layout">
+                    <div className="reviews-list-section">
+                        <h2>Ulasan dari Peserta</h2>
+                        {loading ? (
+                            <p className="loading"><Loader2 className="spin" size={24} /> Memuat ulasan...</p>
+                        ) : reviews.length === 0 ? (
+                            <p className="empty-message">Belum ada ulasan. Jadilah yang pertama!</p>
+                        ) : (
+                            <div className="reviews-list">
+                                {reviews.map(review => (
+                                    <div key={review.id} className="review-card">
+                                        <div className="review-card-header">
+                                            <div className="review-avatar">
+                                                {review.nama?.charAt(0)?.toUpperCase() || 'U'}
+                                            </div>
+                                            <div className="review-meta">
+                                                <h4>{review.nama}</h4>
+                                                <div className="review-stars-small">{renderStars(review.rating)}</div>
+                                                <span className="review-date">{formatDate(review.created_at)}</span>
+                                            </div>
+                                        </div>
+                                        <p className="review-text">{review.isi}</p>
+                                {(() => {
+                                    let imgs = review.images;
+                                    if (typeof imgs === 'string') {
+                                        try { imgs = JSON.parse(imgs); } catch { imgs = []; }
+                                    }
+                                    return (imgs && imgs.length > 0) ? (
+                                        <div className="review-images">
+                                            {imgs.map((img, idx) => (
+                                                <img key={idx} src={img} alt={`Ulasan gambar ${idx + 1}`} loading="lazy" />
+                                            ))}
+                                        </div>
+                                    ) : null;
+                                })()}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="review-form-section">
+                        <h2>Tulis Ulasan</h2>
+                        <form onSubmit={handleSubmit} className="review-form">
+                            <div className="form-group">
+                                <label htmlFor="nama">Nama *</label>
+                                <input
+                                    id="nama"
+                                    placeholder="Nama lengkap Anda"
+                                    value={form.nama}
+                                    onChange={e => setForm({ ...form, nama: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="email">Email (opsional)</label>
+                                <input
+                                    id="email"
+                                    type="email"
+                                    placeholder="email@contoh.com"
+                                    value={form.email}
+                                    onChange={e => setForm({ ...form, email: e.target.value })}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Rating *</label>
+                                <div className="star-rating">{renderStars(form.rating, true)}</div>
+                                <span className="rating-label">{form.rating} / 5</span>
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="isi">Ulasan *</label>
+                                <textarea
+                                    ref={isiRef}
+                                    id="isi"
+                                    placeholder="Ceritakan pengalaman Anda..."
+                                    value={form.isi}
+                                    onChange={e => setForm({ ...form, isi: e.target.value })}
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>Gambar (opsional, maks 5)</label>
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    onChange={handleFileChange}
+                                    style={{ display: 'none' }}
+                                />
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary upload-btn"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    disabled={uploadingImages || previewImages.length >= 5}
+                                >
+                                    <Camera size={16} /> {uploadingImages ? 'Mengunggah...' : `Tambah Gambar (${previewImages.length}/5)`}
+                                </button>
+                                {previewImages.length > 0 && (
+                                    <div className="image-previews">
+                                        {previewImages.map((file, idx) => (
+                                            <div key={idx} className="image-preview">
+                                                <img src={URL.createObjectURL(file)} alt={`Preview ${idx + 1}`} />
+                                                <button type="button" className="remove-img" onClick={() => removeImage(idx)}>
+                                                    <X size={12} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="captcha">Kode Captcha *</label>
+                                <div className="captcha-container">
+                                    {captchaSvg ? (
+                                        <div className="captcha-display" dangerouslySetInnerHTML={{ __html: captchaSvg }} />
+                                    ) : (
+                                        <div className="captcha-loading">Memuat captcha...</div>
+                                    )}
+                                    <button type="button" className="btn btn-small btn-secondary" onClick={loadCaptcha} title="Muat ulang captcha">
+                                        <Send size={14} /> Refresh
+                                    </button>
+                                </div>
+                                <input
+                                    id="captcha"
+                                    placeholder="Masukkan kode captcha"
+                                    value={captchaInput}
+                                    onChange={e => setCaptchaInput(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <button type="submit" className="btn btn-primary submit-btn" disabled={submitting}>
+                                {submitting ? <><Loader2 size={16} className="spin" /> Mengirim...</> : <><Send size={16} /> Kirim Ulasan</>}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}

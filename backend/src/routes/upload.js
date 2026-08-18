@@ -3,6 +3,7 @@ const router = express.Router();
 const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs');
+const multer = require('multer');
 const upload = require('../middleware/upload');
 const { authMiddleware } = require('../middleware/auth');
 
@@ -105,6 +106,30 @@ router.post('/upload/batch', authMiddleware, upload.array('files', 10), async (r
     } catch (err) {
         console.error('Batch image processing error:', err);
         res.status(500).json({ error: 'Failed to process images: ' + err.message });
+    }
+});
+
+const publicReviewUpload = multer({
+    storage: upload.storage,
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: upload.fileFilter,
+});
+
+router.post('/upload/review', publicReviewUpload.array('images', 5), async (req, res) => {
+    if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ error: 'No files uploaded' });
+    }
+
+    try {
+        const results = [];
+        for (const file of req.files) {
+            const result = await processImage(file, req.body);
+            results.push(result.url);
+        }
+        res.json({ message: 'Review images uploaded successfully', images: results });
+    } catch (err) {
+        console.error('Review image upload error:', err);
+        res.status(500).json({ error: 'Failed to upload review images: ' + err.message });
     }
 });
 

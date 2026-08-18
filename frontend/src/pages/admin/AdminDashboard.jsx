@@ -1,7 +1,7 @@
 ﻿import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminApi } from '../../services/api';
-import { GraduationCap, Users, MessageSquare, UserCog, FileText, Image } from 'lucide-react';
+import { GraduationCap, Users, MessageSquare, Star, UserCog, FileText, Image } from 'lucide-react';
 import './AdminDashboard.css';
 
 export default function AdminDashboard() {
@@ -16,9 +16,10 @@ export default function AdminDashboard() {
             adminApi.users.list(),
             adminApi.posts.list(),
             adminApi.gallery.list(),
+            adminApi.reviews.list(),
         ].map(p => p.catch(() => []));
 
-        Promise.all(requests).then(([programs, instructors, testimonials, users, posts, gallery]) => {
+        Promise.all(requests).then(([programs, instructors, testimonials, users, posts, gallery, reviews]) => {
             setStats({
                 programs: programs.length,
                 instructors: instructors.length,
@@ -26,6 +27,7 @@ export default function AdminDashboard() {
                 users: users.length,
                 posts: posts.length,
                 gallery: gallery.length,
+                reviews: reviews.length,
             });
             setLoading(false);
         }).catch(() => setLoading(false));
@@ -37,6 +39,7 @@ export default function AdminDashboard() {
         { label: 'Program', value: stats.programs, link: '/admin/programs', accent: 'var(--accent-1)', icon: GraduationCap },
         { label: 'Instruktur', value: stats.instructors, link: '/admin/instructors', accent: 'var(--accent-2)', icon: Users },
         { label: 'Testimoni', value: stats.testimonials, link: '/admin/testimonials', accent: 'var(--accent-3)', icon: MessageSquare },
+        { label: 'Ulasan', value: stats.reviews, link: '/admin/reviews', accent: '#f59e0b', icon: Star },
         { label: 'Pengguna', value: stats.users, link: '/admin/users', accent: 'var(--accent-2)', icon: UserCog },
         { label: 'Artikel', value: stats.posts, link: '/admin/posts', accent: 'var(--accent-3)', icon: FileText },
         { label: 'Galeri', value: stats.gallery, link: '/admin/gallery', accent: 'var(--accent-1)', icon: Image },

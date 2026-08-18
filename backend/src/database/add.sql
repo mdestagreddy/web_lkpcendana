@@ -98,3 +98,8 @@ INSERT IGNORE INTO categories (name, slug, description) VALUES
 
 INSERT IGNORE INTO privacy_policies (content, version, effective_date, is_current) VALUES
 ('Kebijakan Privasi Cendana Training Center. Terakhir diperbarui: 27 Januari 2024.', '1.0', '2024-01-27', 1);
+
+INSERT IGNORE INTO reviews (nama, email, rating, isi, images, is_active) VALUES
+('Andi Prasetyo', 'andi@example.com', 5, 'Pelatihan yang sangat bermanfaat! Instruktur sangat kompeten dan materi sesuai kebutuhan dunia kerja.', NULL, 1),
+('Siti Nurhaliza', 'siti@example.com', 4, 'Fasilitas lengkap dan nyaman. Materi pelatihan mudah dipahami.', NULL, 1),
+('Budi Santoso', 'budi@example.com', 5, 'Sangat membantu meningkatkan kemampuan saya. Recommended!', NULL, 1);

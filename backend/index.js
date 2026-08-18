@@ -6,6 +6,8 @@ const publicRoutes = require('./src/routes/public');
 const adminRoutes = require('./src/routes/admin');
 const authRoutes = require('./src/routes/auth');
 const uploadRoutes = require('./src/routes/upload');
+const publicReviewRoutes = require('./src/routes/reviews');
+const adminReviewRoutes = require('./src/routes/admin-reviews');
 
 const port = process.env.SERVER_PORT || 5000;
 
@@ -32,7 +34,9 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
+app.use('/api/public/reviews', publicReviewRoutes);
 app.use('/api/public', publicRoutes);
+app.use('/api/admin', adminReviewRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/upload', uploadRoutes);

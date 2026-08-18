@@ -142,6 +142,37 @@ export const publicApi = {
     getOrgChart: () => request('/public/org-chart'),
 
     getPrivacyPolicy: () => request('/public/privacy-policy'),
+
+    getCaptcha: () => request('/public/reviews/captcha'),
+
+    getReviews: (params = {}) => {
+        const query = new URLSearchParams();
+        Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                query.append(key, value);
+            }
+        });
+        const qs = query.toString();
+        return request(`/public/reviews${qs ? `?${qs}` : ''}`);
+    },
+
+    createReview: (data) => {
+        const url = `${API_BASE_URL}/api/public/reviews`;
+        return fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        }).then(async res => {
+            const result = await res.json();
+            if (!res.ok) {
+                const error = new Error(result.error || 'Gagal mengirim ulasan');
+                error.status = res.status;
+                error.data = result;
+                throw error;
+            }
+            return result;
+        });
+    },
 };
 
 export const adminApi = {
@@ -356,6 +387,33 @@ export const adminApi = {
             body: JSON.stringify(data),
         }),
         delete: (id) => request(`/admin/privacy-policies/${id}`, {
+            method: 'DELETE',
+            isAdmin: true,
+        }),
+    },
+
+    reviews: {
+        list: (params = {}) => {
+            const query = new URLSearchParams();
+            Object.entries(params).forEach(([key, value]) => {
+                if (value !== undefined && value !== null && value !== '') {
+                    query.append(key, value);
+                }
+            });
+            const qs = query.toString();
+            return request(`/admin/reviews${qs ? `?${qs}` : ''}`, { isAdmin: true });
+        },
+        create: (data) => request('/admin/reviews', {
+            method: 'POST',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        update: (id, data) => request(`/admin/reviews/${id}`, {
+            method: 'PUT',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        delete: (id) => request(`/admin/reviews/${id}`, {
             method: 'DELETE',
             isAdmin: true,
         }),
