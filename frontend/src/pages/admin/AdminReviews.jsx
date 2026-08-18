@@ -21,7 +21,14 @@ export default function AdminReviews() {
 
     function load() {
         setLoading(true);
-        adminApi.reviews.list().then(data => { setItems(data); setLoading(false); }).catch(() => setLoading(false));
+        adminApi.reviews.list().then(data => {
+            console.log('[AdminReviews] Loaded data:', data);
+            setItems(data);
+            setLoading(false);
+        }).catch(err => {
+            console.error('[AdminReviews] Load error:', err);
+            setLoading(false);
+        });
     }
 
     function handleSubmit(e) {
@@ -42,7 +49,11 @@ export default function AdminReviews() {
         setEditing(item);
         let imagesArr = [];
         if (item.images) {
-            try { imagesArr = JSON.parse(item.images); } catch { imagesArr = []; }
+            if (Array.isArray(item.images)) {
+                imagesArr = item.images;
+            } else if (typeof item.images === 'string') {
+                try { imagesArr = JSON.parse(item.images); } catch { imagesArr = []; }
+            }
         }
         setForm({
             nama: item.nama || '',
@@ -151,7 +162,11 @@ export default function AdminReviews() {
                 {items.map(item => {
                     let imgs = [];
                     if (item.images) {
-                        try { imgs = JSON.parse(item.images); } catch { imgs = []; }
+                        if (Array.isArray(item.images)) {
+                            imgs = item.images;
+                        } else if (typeof item.images === 'string') {
+                            try { imgs = JSON.parse(item.images); } catch { imgs = []; }
+                        }
                     }
                     return (
                         <div key={item.id} className="generic-card">

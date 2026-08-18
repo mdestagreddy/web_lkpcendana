@@ -68,21 +68,30 @@ export default function Reviews() {
             for (const file of previewImages) {
                 const formData = new FormData();
                 formData.append('images', file);
-                const res = await fetch(`${API_BASE_URL}/upload/review`, {
+                const res = await fetch(`${API_BASE_URL}/api/upload/review`, {
                     method: 'POST',
                     body: formData,
                 });
-                if (!res.ok) throw new Error('Upload failed');
+                if (!res.ok) {
+                    const txt = await res.text();
+                    throw new Error(`Upload failed ${res.status}: ${txt}`);
+                }
                 const data = await res.json();
+                console.log('[Review] Upload response:', data);
                 if (data.images && data.images.length > 0) {
                     uploaded.push(...data.images);
+                } else if (data.url) {
+                    uploaded.push(data.url);
                 }
             }
-        } catch {
+        } catch (err) {
+            console.error('[Review] Upload review images error:', err);
+            setError(err.message || 'Gagal mengunggah gambar. Silakan coba lagi.');
             uploaded.length = 0;
         } finally {
             setUploadingImages(false);
         }
+        console.log('[Review] Uploaded URLs:', uploaded);
         return uploaded;
     }
 
@@ -117,6 +126,7 @@ export default function Reviews() {
                 captchaId,
                 captchaText: captchaInput,
             });
+            console.log('[Review] Created with images:', uploadedImageUrls);
 
             setSuccess('Ulasan berhasil dikirim dan sedang menunggu persetujuan admin.');
             setForm({ nama: '', email: '', rating: 5, isi: '', images: [] });

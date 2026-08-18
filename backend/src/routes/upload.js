@@ -15,7 +15,7 @@ router.post('/upload', authMiddleware, upload.single('file'), async (req, res) =
     }
 
     try {
-        const result = await processImage(req.file, req.body);
+        const result = await processImage(req.file, req.body, req);
         res.json({
             message: 'File uploaded successfully',
             url: result.url,
@@ -99,7 +99,7 @@ router.post('/upload/batch', authMiddleware, upload.array('files', 10), async (r
     try {
         const results = [];
         for (const file of req.files) {
-            const result = await processImage(file, req.body);
+            const result = await processImage(file, req.body, req);
             results.push(result);
         }
         res.json({ message: 'Files uploaded successfully', files: results });
@@ -110,12 +110,22 @@ router.post('/upload/batch', authMiddleware, upload.array('files', 10), async (r
 });
 
 const publicReviewUpload = multer({
-    storage: upload.storage,
+    storage: multer.diskStorage({
+        destination: function (req, file, cb) {
+            cb(null, uploadDir);
+        },
+        filename: function (req, file, cb) {
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+            const ext = path.extname(file.originalname).toLowerCase();
+            cb(null, `${uniqueSuffix}${ext}`);
+        }
+    }),
     limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter: upload.fileFilter,
 });
 
-router.post('/upload/review', publicReviewUpload.array('images', 5), async (req, res) => {
+router.post('/review', publicReviewUpload.array('images', 5), async (req, res) => {
+    console.log('Review upload received:', { files: (req.files || []).map(f => ({ name: f.originalname, size: f.size, filename: f.filename })), bodyKeys: Object.keys(req.body || {}) });
     if (!req.files || req.files.length === 0) {
         return res.status(400).json({ error: 'No files uploaded' });
     }
@@ -123,7 +133,7 @@ router.post('/upload/review', publicReviewUpload.array('images', 5), async (req,
     try {
         const results = [];
         for (const file of req.files) {
-            const result = await processImage(file, req.body);
+            const result = await processImage(file, req.body, req);
             results.push(result.url);
         }
         res.json({ message: 'Review images uploaded successfully', images: results });
@@ -133,7 +143,7 @@ router.post('/upload/review', publicReviewUpload.array('images', 5), async (req,
     }
 });
 
-async function processImage(file, params) {
+async function processImage(file, params, req) {
     const {
         resize_width,
         resize_height,
@@ -195,7 +205,7 @@ async function processImage(file, params) {
         const actualWidth = outputMetadata.width;
         const actualHeight = outputMetadata.height;
 
-        const protocol = req.protocol;
+        const protocol = (req.protocol === 'https' || req.secure) ? 'https' : 'http';
         const host = req.get('host');
         const fileUrl = `${protocol}://${host}/uploads/${processedFilename}`;
 

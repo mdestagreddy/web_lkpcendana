@@ -31,6 +31,7 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
     const { nama, email, rating, isi, images, captchaId, captchaText } = req.body;
+    console.log('[Review] Create request:', { nama, email, rating, images, captchaId });
 
     if (!nama || !isi) {
         return res.status(400).json({ error: 'Nama dan isi ulasan wajib diisi' });
