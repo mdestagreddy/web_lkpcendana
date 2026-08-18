@@ -1,7 +1,7 @@
 ﻿import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminApi } from '../../services/api';
-import { GraduationCap, Users, MessageSquare, UserCog, FileText } from 'lucide-react';
+import { GraduationCap, Users, MessageSquare, UserCog, FileText, Image } from 'lucide-react';
 import './AdminDashboard.css';
 
 export default function AdminDashboard() {
@@ -9,19 +9,23 @@ export default function AdminDashboard() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        Promise.all([
+        const requests = [
             adminApi.programs.list(),
             adminApi.instructors.list(),
             adminApi.testimonials.list(),
             adminApi.users.list(),
             adminApi.posts.list(),
-        ]).then(([programs, instructors, testimonials, users, posts]) => {
+            adminApi.gallery.list(),
+        ].map(p => p.catch(() => []));
+
+        Promise.all(requests).then(([programs, instructors, testimonials, users, posts, gallery]) => {
             setStats({
                 programs: programs.length,
                 instructors: instructors.length,
                 testimonials: testimonials.length,
                 users: users.length,
                 posts: posts.length,
+                gallery: gallery.length,
             });
             setLoading(false);
         }).catch(() => setLoading(false));
@@ -35,6 +39,7 @@ export default function AdminDashboard() {
         { label: 'Testimoni', value: stats.testimonials, link: '/admin/testimonials', accent: 'var(--accent-3)', icon: MessageSquare },
         { label: 'Pengguna', value: stats.users, link: '/admin/users', accent: 'var(--accent-2)', icon: UserCog },
         { label: 'Artikel', value: stats.posts, link: '/admin/posts', accent: 'var(--accent-3)', icon: FileText },
+        { label: 'Galeri', value: stats.gallery, link: '/admin/gallery', accent: 'var(--accent-1)', icon: Image },
     ];
 
     return (
