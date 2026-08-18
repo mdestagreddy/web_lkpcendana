@@ -10,7 +10,7 @@ export default function Image({
 }) {
     if (!src) return null;
 
-    const isAbsoluteUrl = src.startsWith('http://') || src.startsWith('https://');
+    const isAbsoluteUrl = src.startsWith('http://') || src.startsWith('https://') || src.startsWith('data:');
 
     let imgSrc = src;
     if (!isAbsoluteUrl) {

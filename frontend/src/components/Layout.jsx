@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useLayoutEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { ThemeProvider } from '../context/ThemeContext';
 import Navbar from './Navbar';
 import Footer from './Footer';
-import { publicApi } from '../services/api';
+import { publicApi, API_BASE_URL } from '../services/api';
 import './Layout.css';
 
 export default function Layout() {
@@ -24,19 +24,57 @@ export default function Layout() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [location.pathname]);
 
-    useEffect(() => {
-        publicApi.getSiteSettings().then(data => {
-            const faviconUrl = data.favicon || '';
-            if (faviconUrl) {
-                let link = document.querySelector("link[rel~='icon']");
-                if (!link) {
-                    link = document.createElement('link');
-                    link.rel = 'icon';
-                    document.head.appendChild(link);
-                }
-                link.href = faviconUrl;
+    useLayoutEffect(() => {
+        publicApi.getSiteSettings().then(raw => {
+            console.log('[Favicon] raw site settings:', raw);
+            const data = Array.isArray(raw) ? Object.fromEntries(raw.map(item => [item.key_name, item.value])) : raw;
+            console.log('[Favicon] normalized site settings:', data);
+
+            const favicon = data.favicon || '';
+            if (!favicon) {
+                console.log('[Favicon] empty favicon url, keeping default');
+                return;
             }
-        }).catch(() => {});
+
+            const normalized = favicon.trim();
+            let faviconUrl;
+            if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(normalized)) {
+                faviconUrl = normalized;
+            } else if (normalized.startsWith('/')) {
+                faviconUrl = normalized;
+            } else {
+                faviconUrl = `/uploads/${normalized}`;
+            }
+
+            const href = faviconUrl.startsWith('http')
+                ? `${faviconUrl}?v=${encodeURIComponent(favicon)}`
+                : `${API_BASE_URL}${faviconUrl}?v=${encodeURIComponent(favicon)}`;
+
+            console.log('[Favicon] will set to:', href);
+
+            const img = new Image();
+            img.onload = () => {
+                document.querySelectorAll('link[rel*="icon"]').forEach(el => el.remove());
+
+                const link = document.createElement('link');
+                link.rel = 'icon';
+                link.href = href;
+
+                const ext = faviconUrl.split('.').pop()?.split(/[?#]/)[0]?.toLowerCase();
+                if (ext === 'png') link.type = 'image/png';
+                else if (ext === 'svg') link.type = 'image/svg+xml';
+                else if (ext === 'webp') link.type = 'image/webp';
+
+                document.head.appendChild(link);
+                console.log('[Favicon] applied:', href);
+            };
+            img.onerror = () => {
+                console.warn('[Favicon] failed to load custom favicon, keeping default');
+            };
+            img.src = href;
+        }).catch(err => {
+            console.error('[Favicon] failed to load site settings:', err);
+        });
     }, []);
 
     return (

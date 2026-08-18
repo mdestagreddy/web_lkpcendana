@@ -7,7 +7,6 @@ const upload = require('../middleware/upload');
 const { authMiddleware } = require('../middleware/auth');
 
 const uploadDir = path.join(__dirname, '../../uploads');
-const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.SERVER_PORT || 5000}`;
 
 router.post('/upload', authMiddleware, upload.single('file'), async (req, res) => {
     if (!req.file) {
@@ -39,14 +38,20 @@ router.delete('/upload', authMiddleware, (req, res) => {
         return res.status(400).json({ error: 'URL gambar wajib diisi' });
     }
 
+    let filename;
     try {
-        const filename = path.basename(new URL(url).pathname);
-        const filePath = path.join(uploadDir, filename);
+        filename = path.basename(new URL(url).pathname);
+    } catch {
+        filename = path.basename(url);
+    }
 
-        if (!fs.existsSync(filePath)) {
-            return res.status(404).json({ error: 'File tidak ditemukan' });
-        }
+    const filePath = path.join(uploadDir, filename);
 
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ error: 'File tidak ditemukan' });
+    }
+
+    try {
         fs.unlinkSync(filePath);
         res.json({ message: 'Gambar berhasil dihapus', filename });
     } catch (err) {
@@ -62,16 +67,21 @@ router.post('/delete', authMiddleware, (req, res) => {
         return res.status(400).json({ error: 'URL gambar wajib diisi' });
     }
 
+    let filename;
     try {
-        let filename = path.basename(new URL(url).pathname);
-        filename = decodeURIComponent(filename);
-        const filePath = path.join(uploadDir, filename);
+        filename = path.basename(new URL(url).pathname);
+    } catch {
+        filename = path.basename(url);
+    }
+    filename = decodeURIComponent(filename);
+    const filePath = path.join(uploadDir, filename);
 
-        if (!fs.existsSync(filePath)) {
-            console.warn('Delete image: file not found', { url, filename, filePath });
-            return res.status(404).json({ error: 'File tidak ditemukan', filename, filePath });
-        }
+    if (!fs.existsSync(filePath)) {
+        console.warn('Delete image: file not found', { url, filename, filePath });
+        return res.status(404).json({ error: 'File tidak ditemukan', filename, filePath });
+    }
 
+    try {
         fs.unlinkSync(filePath);
         res.json({ message: 'Gambar berhasil dihapus', filename });
     } catch (err) {
@@ -156,11 +166,13 @@ async function processImage(file, params) {
             console.warn('Failed to delete temp file:', unlinkErr.message);
         }
 
-        const fileUrl = `uploads/${processedFilename}`;
-
         const outputMetadata = await image.metadata();
         const actualWidth = outputMetadata.width;
         const actualHeight = outputMetadata.height;
+
+        const protocol = req.protocol;
+        const host = req.get('host');
+        const fileUrl = `${protocol}://${host}/uploads/${processedFilename}`;
 
         return {
             filename: processedFilename,

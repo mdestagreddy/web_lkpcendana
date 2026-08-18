@@ -29,10 +29,14 @@ function normalizePublishedAt(value) {
 
 router.use(authMiddleware);
 
-async function generateThumbnail(imageUrl) {
+async function generateThumbnail(imageUrl, req) {
     try {
-        const urlPath = new URL(imageUrl).pathname;
-        const filename = path.basename(urlPath);
+        let filename;
+        try {
+            filename = path.basename(new URL(imageUrl).pathname);
+        } catch {
+            filename = path.basename(imageUrl);
+        }
         const sourcePath = path.join(__dirname, '../../uploads', filename);
         if (!fs.existsSync(sourcePath)) return null;
         const ext = path.extname(filename);
@@ -42,8 +46,12 @@ async function generateThumbnail(imageUrl) {
             .resize({ width: 480, fit: 'inside', withoutEnlargement: true })
             .jpeg({ quality: 80, progressive: true })
             .toFile(thumbPath);
-        const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.SERVER_PORT || 5000}`;
-        return `${baseUrl}/uploads/${thumbName}`;
+        if (req) {
+            const protocol = req.protocol;
+            const host = req.get('host');
+            return `${protocol}://${host}/uploads/${thumbName}`;
+        }
+        return thumbName;
     } catch (err) {
         console.error('Thumbnail generation error:', err);
         return null;
@@ -210,17 +218,17 @@ router.post('/gallery', async (req, res) => {
     if (!kategori || !image_url) return res.status(400).json({ error: 'kategori and image_url are required' });
     let finalThumbnail = thumbnail_url;
     if (!finalThumbnail) {
-        finalThumbnail = await generateThumbnail(image_url);
+        finalThumbnail = await generateThumbnail(image_url, req);
     } else if (finalThumbnail) {
         try {
             const urlPath = new URL(finalThumbnail).pathname;
             const filename = path.basename(urlPath);
             const thumbPath = path.join(__dirname, '../../uploads', filename);
             if (!fs.existsSync(thumbPath)) {
-                finalThumbnail = await generateThumbnail(image_url);
+                finalThumbnail = await generateThumbnail(image_url, req);
             }
         } catch {
-            finalThumbnail = await generateThumbnail(image_url);
+            finalThumbnail = await generateThumbnail(image_url, req);
         }
     }
     db.query(
@@ -237,17 +245,17 @@ router.put('/gallery/:id', async (req, res) => {
     const { kategori, caption, image_url, thumbnail_url, alt_text, sort_order, is_active } = req.body;
     let finalThumbnail = thumbnail_url;
     if (!finalThumbnail) {
-        finalThumbnail = await generateThumbnail(image_url);
+        finalThumbnail = await generateThumbnail(image_url, req);
     } else if (finalThumbnail) {
         try {
             const urlPath = new URL(finalThumbnail).pathname;
             const filename = path.basename(urlPath);
             const thumbPath = path.join(__dirname, '../../uploads', filename);
             if (!fs.existsSync(thumbPath)) {
-                finalThumbnail = await generateThumbnail(image_url);
+                finalThumbnail = await generateThumbnail(image_url, req);
             }
         } catch {
-            finalThumbnail = await generateThumbnail(image_url);
+            finalThumbnail = await generateThumbnail(image_url, req);
         }
     }
     db.query(

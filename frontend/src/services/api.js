@@ -1,5 +1,7 @@
 const API_BASE_URL = import.meta.env.VITE_BACKEND || 'http://localhost:5000';
 
+export { API_BASE_URL };
+
 let isRedirecting = false;
 
 async function request(path, options = {}) {

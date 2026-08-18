@@ -16,7 +16,8 @@ INSERT IGNORE INTO site_settings (key_name, value) VALUES
 ('twitter_url', 'https://twitter.com/lkpcendana'),
 ('youtube_url', 'https://www.youtube.com/@cendanatraining9510'),
 ('header_image', ''),
-('logo_image', '');
+('logo_image', ''),
+('favicon', '');
 
 INSERT IGNORE INTO vision_mission (type, content, sort_order) VALUES
 ('vision', 'Mewujudkan Lembaga yang Unggul, Berkualitas, Mandiri dengan lulusan yang mampu bersaing di dunia kerja', 1),
