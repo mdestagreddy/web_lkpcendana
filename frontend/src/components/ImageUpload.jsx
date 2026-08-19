@@ -14,6 +14,7 @@ export default function ImageUpload({
     const [uploading, setUploading] = useState(false);
     const [preview, setPreview] = useState(value || '');
     const [error, setError] = useState('');
+    const [dragOver, setDragOver] = useState(false);
     const [settings, setSettings] = useState({
         custom_filename: '',
         resize_width: '',
@@ -91,19 +92,72 @@ export default function ImageUpload({
         }
     }
 
+    function handleDragEnter(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+            setDragOver(true);
+        }
+    }
+
+    function handleDragLeave(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+            setDragOver(false);
+        }
+    }
+
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragOver(false);
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreview(reader.result);
+                setError('');
+            };
+            reader.readAsDataURL(file);
+            if (fileInputRef.current) {
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                fileInputRef.current.files = dataTransfer.files;
+            }
+        }
+    }
+
+    function handleDragEnd() {
+        setDragOver(false);
+    }
+
     return (
         <div className="image-upload">
             {label && <label className="upload-label">{label}</label>}
 
             {error && <div className="upload-error">{error}</div>}
 
-            <div className="upload-preview">
+            <div
+                className={`upload-preview${dragOver ? ' drag-over' : ''}`}
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+                onDragEnd={handleDragEnd}
+            >
                 {preview ? (
                     <ImageComponent src={preview} alt="Preview" />
                 ) : (
                     <div className="upload-placeholder">
                         <Camera size={48} strokeWidth={1} />
                         <p>Belum ada gambar</p>
+                        <p className="upload-drag-hint">Drag & drop gambar di sini</p>
                     </div>
                 )}
             </div>

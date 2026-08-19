@@ -1035,21 +1035,6 @@
     color: #64748b;
 }
 
-.image-previews-admin {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    margin-top: 0.5rem;
-}
-
-.image-previews-admin img {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border-light);
-}
-
 .star-rating {
     display: flex;
     gap: 0.25rem;

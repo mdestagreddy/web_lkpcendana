@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { adminApi } from '../../services/api';
 import { Plus, Save, X, Pencil, Trash2, Star } from 'lucide-react';
 import CustomCheckbox from '../../components/CustomCheckbox';
+import MultiImageUpload from '../../components/MultiImageUpload';
 import './AdminCRUD.css';
 
 export default function AdminReviews() {
@@ -86,18 +87,6 @@ export default function AdminReviews() {
         ));
     }
 
-    function handleImagesChange(e) {
-        const val = e.target.value;
-        if (!val.trim()) { setForm({ ...form, images: [] }); return; }
-        try {
-            const parsed = JSON.parse(val);
-            setForm({ ...form, images: Array.isArray(parsed) ? parsed : [] });
-        } catch {
-            const arr = val.split(',').map(s => s.trim()).filter(Boolean);
-            setForm({ ...form, images: arr });
-        }
-    }
-
     return (
         <div className="admin-crud">
             <h1>Ulasan</h1>
@@ -130,21 +119,12 @@ export default function AdminReviews() {
                 <div className="form-section">
                     <h3 className="form-section-title">Gambar &amp; Pengaturan</h3>
                     <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                        <label htmlFor="images">URL Gambar (pisahkan dengan koma, JSON array juga bisa)</label>
-                        <textarea
-                            id="images"
-                            placeholder='https://example.com/img1.jpg, https://example.com/img2.jpg'
-                            value={form.images.join(', ')}
-                            onChange={handleImagesChange}
-                            rows={2}
+                        <MultiImageUpload
+                            label="Gambar Ulasan"
+                            value={form.images}
+                            onChange={images => setForm({ ...form, images })}
+                            disabled={false}
                         />
-                        {form.images.length > 0 && (
-                            <div className="image-previews-admin">
-                                {form.images.map((url, idx) => (
-                                    <img key={idx} src={url} alt={`Review img ${idx + 1}`} />
-                                ))}
-                            </div>
-                        )}
                     </div>
                     <div className="form-group">
                         <CustomCheckbox id="is_active" checked={form.is_active} onChange={is_active => setForm({ ...form, is_active })}>
