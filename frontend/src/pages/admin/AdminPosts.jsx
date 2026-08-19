@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { adminApi } from '../../services/api';
 import { Plus, Save, X, Pencil, Trash2 } from 'lucide-react';
 import TextEditor from '../../components/TextEditor';
+import Image from '../../components/Image';
 import './AdminCRUD.css';
 
 export default function AdminPosts() {
@@ -158,6 +159,13 @@ export default function AdminPosts() {
             <div className={`items-list${items.length === 0 ? ' is-empty' : ''}`}>
                 {items.map(item => (
                     <div key={item.id} className="generic-card">
+                        <div className="admin-post-thumb">
+                            {item.featured_image ? (
+                                <Image src={item.featured_image} alt={item.title} />
+                            ) : (
+                                <div className="admin-post-thumb-placeholder">Tidak ada gambar</div>
+                            )}
+                        </div>
                         <div className="generic-card-header">
                             <div className="generic-card-title">
                                 <h3>{item.title}</h3>
