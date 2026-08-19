@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { adminApi } from '../../services/api';
 import ImageUpload from '../../components/ImageUpload';
-import { Plus, Save, X, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Save, X, Pencil, Trash2, User } from 'lucide-react';
 import { FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa';
 import { SiX } from 'react-icons/si';
+import Image from '../../components/Image';
 import CustomCheckbox from '../../components/CustomCheckbox';
 import './AdminCRUD.css';
 
@@ -125,6 +126,13 @@ export default function AdminInstructors() {
             <div className={`items-list${items.length === 0 ? ' is-empty' : ''}`}>
                 {items.map(item => (
                     <div key={item.id} className="generic-card">
+                        <div className="admin-instructor-photo">
+                            {item.foto ? (
+                                <Image src={item.foto} alt={item.nama} />
+                            ) : (
+                                <div className="admin-instructor-avatar"><User size={28} strokeWidth={1.5} /></div>
+                            )}
+                        </div>
                         <div className="generic-card-header">
                             <div className="generic-card-title">
                                 <h3>{item.nama}</h3>
