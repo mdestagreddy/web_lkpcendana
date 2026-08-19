@@ -148,7 +148,9 @@ export default function AdminPrograms() {
                 </div>
             </form>
 
-            <div className="items-list">
+            {items.length === 0 && <p className="items-empty">Tidak ada data Program</p>}
+
+            <div className={`items-list${items.length === 0 ? ' is-empty' : ''}`}>
                 {items.map(item => (
                     <div key={item.id} className="program-card">
                         <div className="program-card-header">

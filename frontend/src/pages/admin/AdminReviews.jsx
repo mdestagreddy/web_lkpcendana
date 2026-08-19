@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { adminApi } from '../../services/api';
-import { Plus, Save, X, Pencil, Trash2, Star } from 'lucide-react';
+import { Plus, Save, X, Pencil, Trash2, Star, Calendar } from 'lucide-react';
 import CustomCheckbox from '../../components/CustomCheckbox';
 import MultiImageUpload from '../../components/MultiImageUpload';
 import './AdminCRUD.css';
@@ -16,6 +16,7 @@ export default function AdminReviews() {
         isi: '',
         images: [],
         is_active: true,
+        created_at: '',
     });
 
     useEffect(() => { load(); }, []);
@@ -42,7 +43,7 @@ export default function AdminReviews() {
     }
 
     function resetForm() {
-        setForm({ nama: '', email: '', rating: 5, isi: '', images: [], is_active: true });
+        setForm({ nama: '', email: '', rating: 5, isi: '', images: [], is_active: true, created_at: '' });
         setEditing(null);
     }
 
@@ -63,6 +64,7 @@ export default function AdminReviews() {
             isi: item.isi || '',
             images: imagesArr,
             is_active: item.is_active !== false,
+            created_at: item.created_at ? new Date(item.created_at).toISOString().slice(0, 10) : '',
         });
     }
 
@@ -87,6 +89,12 @@ export default function AdminReviews() {
         ));
     }
 
+    function formatDate(dateStr) {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
     return (
         <div className="admin-crud">
             <h1>Ulasan</h1>
@@ -100,6 +108,11 @@ export default function AdminReviews() {
                     <div className="form-group">
                         <label htmlFor="email">Email</label>
                         <input id="email" type="email" placeholder="email@contoh.com" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="created_at">Tanggal Unggah</label>
+                        <input id="created_at" type="date" value={form.created_at} onChange={e => setForm({ ...form, created_at: e.target.value })} />
+                        <span className="form-help">Kosongkan untuk gunakan tanggal hari ini.</span>
                     </div>
                 </div>
 
@@ -138,7 +151,9 @@ export default function AdminReviews() {
                     {editing && <button type="button" onClick={resetForm} className="btn btn-secondary"><X size={16} /> Batal</button>}
                 </div>
             </form>
-            <div className="items-list">
+            {items.length === 0 && <p className="items-empty">Tidak ada data Ulasan</p>}
+
+            <div className={`items-list${items.length === 0 ? ' is-empty' : ''}`}>
                 {items.map(item => {
                     let imgs = [];
                     if (item.images) {
@@ -170,6 +185,7 @@ export default function AdminReviews() {
                             <div className="generic-card-meta">
                                 {imgs.length > 0 && <span className="badge badge-info">📷 {imgs.length} gambar</span>}
                                 <span className={`badge badge-status ${item.is_active ? 'active' : 'inactive'}`}>{item.is_active ? 'Aktif' : 'Nonaktif'}</span>
+                                {item.created_at && <span className="badge badge-date"><Calendar size={14} /> {formatDate(item.created_at)}</span>}
                             </div>
                         </div>
                     );

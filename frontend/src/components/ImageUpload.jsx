@@ -84,7 +84,32 @@ export default function ImageUpload({
             });
     }
 
-    function handleRemove() {
+    async function handleRemove() {
+        const currentUrl = preview;
+        const token = localStorage.getItem('admin_token');
+
+        if (currentUrl) {
+            try {
+                const res = await fetch(`${API_BASE_URL}/upload/upload`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url: currentUrl }),
+                });
+
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    throw new Error(data.error || `Gagal menghapus gambar (status ${res.status})`);
+                }
+            } catch (err) {
+                console.error('Delete error:', err);
+                setError(err.message || 'Gagal menghapus gambar');
+                return;
+            }
+        }
+
         setPreview('');
         onChange('');
         if (fileInputRef.current) {

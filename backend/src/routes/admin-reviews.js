@@ -21,15 +21,15 @@ router.get('/reviews', (req, res) => {
 });
 
 router.post('/reviews', (req, res) => {
-    const { nama, email, rating, isi, images, is_active } = req.body;
+    const { nama, email, rating, isi, images, is_active, created_at } = req.body;
     if (!nama || !isi) return res.status(400).json({ error: 'nama and isi are required' });
     let imagesJson = null;
     if (images && Array.isArray(images)) {
         imagesJson = JSON.stringify(images.filter(url => typeof url === 'string' && url.trim()));
     }
     db.query(
-        'INSERT INTO reviews (nama, email, rating, isi, images, is_active) VALUES (?, ?, ?, ?, ?, ?)',
-        [nama, email || null, rating || 5, isi, imagesJson, is_active !== false ? 1 : 0],
+        'INSERT INTO reviews (nama, email, rating, isi, images, is_active, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [nama, email || null, rating || 5, isi, imagesJson, is_active !== false ? 1 : 0, created_at || null],
         (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
             res.status(201).json({ id: result.insertId, message: 'Review created successfully' });
@@ -38,7 +38,7 @@ router.post('/reviews', (req, res) => {
 });
 
 router.put('/reviews/:id', (req, res) => {
-    const { nama, email, rating, isi, images, is_active } = req.body;
+    const { nama, email, rating, isi, images, is_active, created_at } = req.body;
     if (rating !== undefined && (rating < 1 || rating > 5)) {
         return res.status(400).json({ error: 'Rating must be between 1 and 5' });
     }
@@ -47,8 +47,8 @@ router.put('/reviews/:id', (req, res) => {
         imagesJson = JSON.stringify(images.filter(url => typeof url === 'string' && url.trim()));
     }
     db.query(
-        'UPDATE reviews SET nama = ?, email = ?, rating = ?, isi = ?, images = ?, is_active = ? WHERE id = ?',
-        [nama || null, email || null, rating || 5, isi || null, imagesJson, is_active !== false ? 1 : 0, req.params.id],
+        'UPDATE reviews SET nama = ?, email = ?, rating = ?, isi = ?, images = ?, is_active = ?, created_at = ? WHERE id = ?',
+        [nama || null, email || null, rating || 5, isi || null, imagesJson, is_active !== false ? 1 : 0, created_at || null, req.params.id],
         (err) => {
             if (err) return res.status(500).json({ error: err.message });
             res.json({ message: 'Review updated successfully' });

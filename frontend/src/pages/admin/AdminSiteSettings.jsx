@@ -90,6 +90,8 @@ export default function AdminSiteSettings() {
 
     if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
 
+    const filteredSettings = items.filter(item => !['logo_image', 'header_image', 'header_image_mobile', 'favicon'].includes(item.key_name));
+
     return (
         <div className="admin-crud">
             <h1>Pengaturan Situs</h1>
@@ -131,21 +133,25 @@ export default function AdminSiteSettings() {
                     <button type="submit" className="btn btn-primary">{editing ? <><Save size={16} /> Perbarui</> : <><Plus size={16} /> Buat/Perbarui</>}</button>
                     {editing && <button type="button" onClick={resetForm} className="btn btn-secondary"><X size={16} /> Batal</button>}
                 </form>
-                <div className="items-list">
-                    {items.filter(item => !['logo_image', 'header_image', 'header_image_mobile', 'favicon'].includes(item.key_name)).map(item => (
-                        <div key={item.id} className="generic-card">
-                            <div className="generic-card-header">
-                                <div className="generic-card-title">
-                                    <h3>{item.key_name}</h3>
-                                    <span className="generic-card-sub">{item.value}</span>
-                                </div>
-                                <div className="generic-card-actions">
-                                    <button onClick={() => startEdit(item)} className="btn btn-small btn-primary"><Pencil size={14} /> Edit</button>
+                {filteredSettings.length === 0 ? (
+                    <p className="items-empty">Tidak ada data Pengaturan</p>
+                ) : (
+                    <div className="items-list">
+                        {filteredSettings.map(item => (
+                            <div key={item.id} className="generic-card">
+                                <div className="generic-card-header">
+                                    <div className="generic-card-title">
+                                        <h3>{item.key_name}</h3>
+                                        <span className="generic-card-sub">{item.value}</span>
+                                    </div>
+                                    <div className="generic-card-actions">
+                                        <button onClick={() => startEdit(item)} className="btn btn-small btn-primary"><Pencil size={14} /> Edit</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

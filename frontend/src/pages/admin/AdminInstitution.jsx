@@ -152,7 +152,9 @@ export default function AdminInstitution() {
                     {editing && <button type="button" onClick={resetForm} className="btn btn-secondary" disabled={saving}><X size={16} /> Batal</button>}
                 </div>
             </form>
-            <div className="items-list">
+            {items.length === 0 && <p className="items-empty">Tidak ada data Institusi</p>}
+
+            <div className={`items-list${items.length === 0 ? ' is-empty' : ''}`}>
                 {items.map(item => (
                     <div key={item.id} className="item-card">
                         <div className="item-info">

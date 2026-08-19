@@ -53,7 +53,32 @@ export default function MultiImageUpload({ value = [], onChange, label = 'Gambar
         }
     }
 
-    function handleRemove(index) {
+    async function handleRemove(index) {
+        const urlToRemove = images[index];
+        const token = localStorage.getItem('admin_token');
+
+        if (urlToRemove) {
+            try {
+                const res = await fetch(`${API_BASE_URL}/upload/upload`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url: urlToRemove }),
+                });
+
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    throw new Error(data.error || `Gagal menghapus gambar (status ${res.status})`);
+                }
+            } catch (err) {
+                console.error('Delete error:', err);
+                setError(err.message || 'Gagal menghapus gambar');
+                return;
+            }
+        }
+
         const next = images.filter((_, i) => i !== index);
         onChange(next);
     }

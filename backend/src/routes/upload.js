@@ -45,11 +45,12 @@ router.delete('/upload', authMiddleware, (req, res) => {
     } catch {
         filename = path.basename(url);
     }
-
+    filename = decodeURIComponent(filename);
     const filePath = path.join(uploadDir, filename);
 
     if (!fs.existsSync(filePath)) {
-        return res.status(404).json({ error: 'File tidak ditemukan' });
+        console.warn('Delete image: file not found', { url, filename, filePath });
+        return res.status(404).json({ error: 'File tidak ditemukan', filename, filePath });
     }
 
     try {
@@ -207,7 +208,8 @@ async function processImage(file, params, req) {
 
         const protocol = (req.protocol === 'https' || req.secure) ? 'https' : 'http';
         const host = req.get('host');
-        const fileUrl = `${protocol}://${host}/uploads/${processedFilename}`;
+        const encodedFilename = encodeURIComponent(processedFilename);
+        const fileUrl = `${protocol}://${host}/uploads/${encodedFilename}`;
 
         return {
             filename: processedFilename,

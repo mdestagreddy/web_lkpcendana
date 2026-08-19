@@ -153,7 +153,9 @@ export default function AdminPosts() {
                     {editing && <button type="button" onClick={resetForm} className="btn btn-secondary"><X size={16} /> Batal</button>}
                 </div>
             </form>
-            <div className="items-list">
+            {items.length === 0 && <p className="items-empty">Tidak ada data Artikel</p>}
+
+            <div className={`items-list${items.length === 0 ? ' is-empty' : ''}`}>
                 {items.map(item => (
                     <div key={item.id} className="generic-card">
                         <div className="generic-card-header">
