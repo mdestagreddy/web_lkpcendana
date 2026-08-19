@@ -576,6 +576,7 @@
     font-family: inherit;
     outline: none;
     overscroll-behavior: contain;
+    position: relative;
 }
 
 .editor-content.is-empty::before {
@@ -583,6 +584,10 @@
     color: var(--text-muted);
     pointer-events: none;
     display: block;
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
 }
 
 .editor-content h2 {
