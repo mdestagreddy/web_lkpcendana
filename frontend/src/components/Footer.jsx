@@ -33,8 +33,8 @@ export default function Footer() {
                     )}
                     {(institution.phone || institution.email) && (
                         <p>
-                            <div>{institution.phone && <><Phone size={16} style={{ marginRight: 8, verticalAlign: 'text-bottom', flexShrink: 0 }} />{institution.phone}</>}</div>
-                            <div>{institution.email && <><Mail size={16} style={{ marginRight: 8, verticalAlign: 'text-bottom', flexShrink: 0 }} />{institution.email}</>}</div>
+                            {institution.phone && <><Phone size={16} style={{ marginRight: 8, verticalAlign: 'text-bottom', flexShrink: 0 }} />{institution.phone}</>}<br />
+                            {institution.email && <><Mail size={16} style={{ marginRight: 8, verticalAlign: 'text-bottom', flexShrink: 0 }} />{institution.email}</>}
                         </p>
                     )}
                 </div>

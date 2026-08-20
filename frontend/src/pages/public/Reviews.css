@@ -347,13 +347,18 @@
     to { transform: rotate(360deg); }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
     .reviews-page h1 {
         font-size: 1.5rem;
     }
 
+    .review-card {
+        border-radius: var(--radius-md);
+    }
+
     .review-form-section {
         position: static;
+        border-radius: var(--radius-md);
     }
 }
 

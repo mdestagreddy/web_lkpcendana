@@ -26,9 +26,7 @@ export default function Layout() {
 
     useLayoutEffect(() => {
         publicApi.getSiteSettings().then(raw => {
-            console.log('[Favicon] raw site settings:', raw);
             const data = Array.isArray(raw) ? Object.fromEntries(raw.map(item => [item.key_name, item.value])) : raw;
-            console.log('[Favicon] normalized site settings:', data);
 
             const favicon = data.favicon || '';
             if (!favicon) {
@@ -50,8 +48,6 @@ export default function Layout() {
                 ? `${faviconUrl}?v=${encodeURIComponent(favicon)}`
                 : `${API_BASE_URL}${faviconUrl}?v=${encodeURIComponent(favicon)}`;
 
-            console.log('[Favicon] will set to:', href);
-
             const img = new Image();
             img.onload = () => {
                 document.querySelectorAll('link[rel*="icon"]').forEach(el => el.remove());
@@ -66,10 +62,6 @@ export default function Layout() {
                 else if (ext === 'webp') link.type = 'image/webp';
 
                 document.head.appendChild(link);
-                console.log('[Favicon] applied:', href);
-            };
-            img.onerror = () => {
-                console.warn('[Favicon] failed to load custom favicon, keeping default');
             };
             img.src = href;
         }).catch(err => {
