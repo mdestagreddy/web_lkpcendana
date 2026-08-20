@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { publicApi, API_BASE_URL } from '../../services/api';
 import { Star, Send, Loader2, Camera, X } from 'lucide-react';
+import ImageLightbox from '../../components/ImageLightbox';
 import './Reviews.css';
 
 export default function Reviews() {
@@ -197,11 +198,7 @@ export default function Reviews() {
                                         try { imgs = JSON.parse(imgs); } catch { imgs = []; }
                                     }
                                     return (imgs && imgs.length > 0) ? (
-                                        <div className="review-images">
-                                            {imgs.map((img, idx) => (
-                                                <img key={idx} src={img} alt={`Ulasan gambar ${idx + 1}`} loading="lazy" />
-                                            ))}
-                                        </div>
+                                        <ImageLightbox images={imgs} />
                                     ) : null;
                                 })()}
                                     </div>

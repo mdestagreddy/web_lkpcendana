@@ -3,6 +3,7 @@ import { adminApi } from '../../services/api';
 import { Plus, Save, X, Pencil, Trash2, Star, Calendar } from 'lucide-react';
 import CustomCheckbox from '../../components/CustomCheckbox';
 import MultiImageUpload from '../../components/MultiImageUpload';
+import ImageLightbox from '../../components/ImageLightbox';
 import './AdminCRUD.css';
 
 export default function AdminReviews() {
@@ -24,11 +25,9 @@ export default function AdminReviews() {
     function load() {
         setLoading(true);
         adminApi.reviews.list().then(data => {
-            console.log('[AdminReviews] Loaded data:', data);
             setItems(data);
             setLoading(false);
-        }).catch(err => {
-            console.error('[AdminReviews] Load error:', err);
+        }).catch(() => {
             setLoading(false);
         });
     }
@@ -92,7 +91,7 @@ export default function AdminReviews() {
     function formatDate(dateStr) {
         if (!dateStr) return '';
         const d = new Date(dateStr);
-        return d.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        return d.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
     }
 
     return (
@@ -176,11 +175,7 @@ export default function AdminReviews() {
                             </div>
                             <p className="generic-card-desc">{item.isi}</p>
                             {imgs.length > 0 && (
-                                <div className="admin-review-images">
-                                    {imgs.map((url, idx) => (
-                                        <img key={idx} src={url} alt={`Review ${item.id} - ${idx + 1}`} loading="lazy" />
-                                    ))}
-                                </div>
+                                <ImageLightbox images={imgs} />
                             )}
                             <div className="generic-card-meta">
                                 {imgs.length > 0 && <span className="badge badge-info">📷 {imgs.length} gambar</span>}
