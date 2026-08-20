@@ -1,8 +1,7 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
-import Captions from 'yet-another-react-lightbox/plugins/captions';
-import 'yet-another-react-lightbox/plugins/captions.css';
 import Zoom from 'yet-another-react-lightbox/plugins/zoom';
 import { ZoomIn } from 'lucide-react';
 
@@ -17,14 +16,22 @@ function resolveImageUrl(src) {
 export default function ImageLightbox({ items }) {
     const [open, setOpen] = useState(false);
     const [index, setIndex] = useState(0);
+    const [viewIndex, setViewIndex] = useState(0);
 
-    const slides = items
-        .map(item => typeof item === 'string' ? { src: item } : item)
-        .map(item => ({ src: resolveImageUrl(item.src), title: item.author, description: item.text }))
-        .filter(slide => slide.src);
+    const slides = useMemo(() => {
+        return items
+            .map(item => typeof item === 'string' ? { src: item } : item)
+            .map(item => ({ src: resolveImageUrl(item.src), author: item.author, text: item.text }))
+            .filter(slide => slide.src);
+    }, [items]);
+
+    const currentSlide = useMemo(() => {
+        return open && slides[viewIndex] ? slides[viewIndex] : null;
+    }, [open, viewIndex, slides]);
 
     const handleClick = useCallback((idx) => {
         setIndex(idx);
+        setViewIndex(idx);
         setOpen(true);
     }, []);
 
@@ -54,7 +61,7 @@ export default function ImageLightbox({ items }) {
                         onClick={() => handleClick(idx)}
                         title="Lihat gambar ukuran penuh"
                     >
-                        <img src={slide.src} alt={slide.title ? `Ulasan oleh ${slide.title}` : `Ulasan gambar ${idx + 1}`} loading="lazy" />
+                        <img src={slide.src} alt={slide.author ? `Ulasan oleh ${slide.author}` : `Ulasan gambar ${idx + 1}`} loading="lazy" />
                         <span className="lightbox-overlay">
                             <ZoomIn size={20} />
                         </span>
@@ -66,10 +73,11 @@ export default function ImageLightbox({ items }) {
                 close={() => setOpen(false)}
                 slides={slides}
                 index={index}
-                plugins={[Captions, Zoom]}
+                plugins={[Zoom]}
                 zoom={{ scrollToZoom: true, wheelZoomDistanceFactor: 80, maxZoom: 8, maxZoomPixelRatio: 8, pinchZoomV4: true }}
-                noScroll={{ disabled: false }}
+                animation={{ swipe: 250, navigation: 250, easing: { swipe: 'ease-out', navigation: 'ease-in-out', fade: 'ease' } }}
                 carousel={{ padding: '72px' }}
+                on={{ view: ({ index: idx }) => { setViewIndex(idx); } }}
                 styles={{
                     container: {
                         '--yarl__color_backdrop': 'rgba(15, 23, 42, 0.55)',
@@ -79,28 +87,21 @@ export default function ImageLightbox({ items }) {
                     slide: {
                         alignItems: 'center',
                         justifyContent: 'center',
-                    },
-                    captionsTitleContainer: {
-                        background: 'rgba(15, 23, 42, 0.7)',
-                        backdropFilter: 'blur(8px)',
-                        WebkitBackdropFilter: 'blur(8px)',
-                    },
-                    captionsTitle: {
-                        color: '#f1f5f9',
-                        fontSize: '0.95rem',
-                        fontWeight: 700,
-                    },
-                    captionsDescriptionContainer: {
-                        background: 'rgba(15, 23, 42, 0.65)',
-                        backdropFilter: 'blur(8px)',
-                        WebkitBackdropFilter: 'blur(8px)',
-                    },
-                    captionsDescription: {
-                        color: '#e2e8f0',
-                        fontSize: '0.85rem',
+                        paddingBottom: '120px',
                     },
                 }}
             />
+            {open && currentSlide && typeof document !== 'undefined' && createPortal(
+                <div className="lightbox-captions" aria-live="polite">
+                    {currentSlide?.author && (
+                        <div className="lightbox-caption-title">{currentSlide.author}</div>
+                    )}
+                    {currentSlide?.text && (
+                        <div className="lightbox-caption-desc">{currentSlide.text}</div>
+                    )}
+                </div>,
+                document.body
+            )}
         </>
     );
 }

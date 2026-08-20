@@ -160,3 +160,43 @@ h4 svg {
     flex-shrink: 0;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
+
+.lightbox-captions {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 24px;
+    z-index: 99999;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+    padding: 0 24px;
+}
+.lightbox-caption-title {
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #f1f5f9;
+    font-size: 0.95rem;
+    font-weight: 700;
+    padding: 8px 18px;
+    border-radius: 999px;
+    max-width: 90%;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+.lightbox-caption-desc {
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #e2e8f0;
+    font-size: 0.85rem;
+    padding: 8px 18px;
+    border-radius: 12px;
+    max-width: 90%;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
