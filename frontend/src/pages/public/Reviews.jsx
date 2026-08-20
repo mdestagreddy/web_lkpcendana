@@ -198,7 +198,7 @@ export default function Reviews() {
                                         try { imgs = JSON.parse(imgs); } catch { imgs = []; }
                                     }
                                     return (imgs && imgs.length > 0) ? (
-                                        <ImageLightbox images={imgs} />
+                                        <ImageLightbox items={imgs.map(src => ({ src, author: review.nama, text: review.isi }))} />
                                     ) : null;
                                 })()}
                                     </div>

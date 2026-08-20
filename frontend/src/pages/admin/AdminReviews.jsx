@@ -175,7 +175,7 @@ export default function AdminReviews() {
                             </div>
                             <p className="generic-card-desc">{item.isi}</p>
                             {imgs.length > 0 && (
-                                <ImageLightbox images={imgs} />
+                                <ImageLightbox items={imgs.map(url => ({ src: url, author: item.nama, text: item.isi }))} />
                             )}
                             <div className="generic-card-meta">
                                 {imgs.length > 0 && <span className="badge badge-info">📷 {imgs.length} gambar</span>}
