@@ -87,7 +87,7 @@ export default function ImageLightbox({ items }) {
                     slide: {
                         alignItems: 'center',
                         justifyContent: 'center',
-                        paddingBottom: '120px',
+                        paddingBottom: '128px',
                     },
                 }}
             />
