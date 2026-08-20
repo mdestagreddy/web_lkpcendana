@@ -161,6 +161,10 @@ h4 svg {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+.lightbox-trigger.hidden {
+    display: none;
+}
+
 .lightbox-captions {
     position: fixed;
     left: 0;
@@ -177,8 +181,8 @@ h4 svg {
 }
 .lightbox-caption-title {
     background: rgba(15, 23, 42, 0.75);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     color: #f1f5f9;
     font-size: 0.95rem;
     font-weight: 700;
@@ -190,8 +194,8 @@ h4 svg {
 }
 .lightbox-caption-desc {
     background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     color: #e2e8f0;
     font-size: 0.85rem;
     padding: 8px 18px;

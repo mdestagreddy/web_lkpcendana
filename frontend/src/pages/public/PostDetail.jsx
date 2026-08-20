@@ -3,20 +3,73 @@ import { useParams, Link } from 'react-router-dom';
 import { publicApi } from '../../services/api';
 import { ArrowLeft, Calendar, Tag } from 'lucide-react';
 import Image from '../../components/Image';
+import ImageLightbox from '../../components/ImageLightbox';
 import './PostDetail.css';
 
 export default function PostDetail() {
     const { id } = useParams();
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [articleImages, setArticleImages] = useState([]);
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [lightboxIndex, setLightboxIndex] = useState(0);
 
     useEffect(() => {
         setLoading(true);
         publicApi.getPost(id).then(data => {
             setPost(data);
             setLoading(false);
+            if (data && data.content) {
+                const imgs = extractImagesFromHtml(data.content);
+                setArticleImages(imgs);
+            }
         }).catch(() => setLoading(false));
     }, [id]);
+
+    const extractImagesFromHtml = (html) => {
+        if (!html || typeof html !== 'string') return [];
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const results = [];
+        const imgTags = doc.querySelectorAll('img');
+        imgTags.forEach(img => {
+            const src = img.getAttribute('src');
+            if (!src || src.startsWith('data:')) return;
+            const figure = img.closest('figure');
+            const caption = figure ? (figure.querySelector('figcaption')?.textContent?.trim() || '') : '';
+            results.push({ src, caption });
+        });
+        return results;
+    };
+
+    const handleContentClick = (e) => {
+        const target = e.target;
+        if (target.tagName === 'IMG' && !target.closest('.post-detail-image')) {
+            const src = target.getAttribute('src');
+            if (!src || src.startsWith('data:')) return;
+            const idx = articleImages.findIndex(item => item.src === src);
+            if (idx >= 0) {
+                setLightboxIndex(idx);
+                setLightboxOpen(true);
+            }
+        }
+    };
+
+    const renderContent = () => {
+        if (!post || !post.content) return null;
+        let html = post.content;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const imgTags = doc.querySelectorAll('img');
+        imgTags.forEach(img => {
+            const src = img.getAttribute('src');
+            if (src && !src.startsWith('data:')) {
+                img.style.cursor = 'zoom-in';
+                img.setAttribute('data-lightbox', 'true');
+            }
+        });
+        return doc.body.innerHTML;
+    };
 
     if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
     if (!post) return <div className="container"><p>Artikel tidak ditemukan.</p></div>;
@@ -42,8 +95,16 @@ export default function PostDetail() {
                             <Image src={post.featured_image} alt={post.title} onError={(e) => { e.target.style.display = 'none'; }} />
                         </div>
                     )}
-                    <div className="post-detail-content" dangerouslySetInnerHTML={{ __html: post.content || '' }} />
+                    <div className="post-detail-content" onClick={handleContentClick} dangerouslySetInnerHTML={{ __html: renderContent() || post.content || '' }} />
                 </article>
+                {articleImages.length > 0 && (
+                    <ImageLightbox
+                        open={lightboxOpen}
+                        index={lightboxIndex}
+                        onClose={() => setLightboxOpen(false)}
+                        items={articleImages.map(item => ({ src: item.src, author: post.title, text: item.caption || 'Artikel' }))}
+                    />
+                )}
             </div>
         </div>
     );

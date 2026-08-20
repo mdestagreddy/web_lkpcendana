@@ -13,10 +13,13 @@ function resolveImageUrl(src) {
     return `${API_BASE_URL}/uploads/${src}`;
 }
 
-export default function ImageLightbox({ items }) {
-    const [open, setOpen] = useState(false);
-    const [index, setIndex] = useState(0);
+export default function ImageLightbox({ items, open: controlledOpen, onClose, index: controlledIndex, hidden }) {
+    const [internalOpen, setInternalOpen] = useState(false);
+    const [internalIndex, setInternalIndex] = useState(0);
     const [viewIndex, setViewIndex] = useState(0);
+
+    const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+    const index = controlledIndex !== undefined ? controlledIndex : internalIndex;
 
     const slides = useMemo(() => {
         return items
@@ -29,11 +32,19 @@ export default function ImageLightbox({ items }) {
         return open && slides[viewIndex] ? slides[viewIndex] : null;
     }, [open, viewIndex, slides]);
 
+    const handleClose = useCallback(() => {
+        if (onClose) {
+            onClose();
+        } else {
+            setInternalOpen(false);
+        }
+    }, [onClose]);
+
     const handleClick = useCallback((idx) => {
-        setIndex(idx);
+        if (controlledIndex === undefined) setInternalIndex(idx);
         setViewIndex(idx);
-        setOpen(true);
-    }, []);
+        if (controlledOpen === undefined) setInternalOpen(true);
+    }, [controlledIndex, controlledOpen]);
 
     useEffect(() => {
         if (!open) return;
@@ -52,7 +63,7 @@ export default function ImageLightbox({ items }) {
 
     return (
         <>
-            <div className="review-images lightbox-trigger">
+            <div className={`review-images lightbox-trigger${hidden ? " hidden" : ""}`}>
                 {slides.map((slide, idx) => (
                     <button
                         key={idx}
@@ -70,7 +81,7 @@ export default function ImageLightbox({ items }) {
             </div>
             <Lightbox
                 open={open}
-                close={() => setOpen(false)}
+                close={handleClose}
                 slides={slides}
                 index={index}
                 plugins={[Zoom]}
@@ -81,8 +92,8 @@ export default function ImageLightbox({ items }) {
                 styles={{
                     container: {
                         '--yarl__color_backdrop': 'rgba(15, 23, 42, 0.55)',
-                        backdropFilter: 'blur(14px)',
-                        WebkitBackdropFilter: 'blur(14px)',
+                        backdropFilter: 'blur(4px)',
+                        WebkitBackdropFilter: 'blur(4px)',
                     },
                     slide: {
                         alignItems: 'center',

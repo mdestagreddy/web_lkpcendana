@@ -22,6 +22,8 @@
     display: flex;
     flex-direction: column;
     background: #ffffff;
+    height: 100vh;
+    height: 100dvh;
 }
 
 .text-editor.fullscreen .toolbar {
@@ -31,11 +33,16 @@
 .text-editor.fullscreen .editor-content {
     flex: 1;
     max-height: none;
+    min-height: 0;
+    overflow-y: visible;
     border-radius: 0;
 }
 
 .text-editor.fullscreen .editor-statusbar {
     border-radius: 0;
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
 }
 
 .toolbar {
@@ -579,6 +586,19 @@
     position: relative;
 }
 
+.editor-content.ProseMirror {
+    outline: none;
+}
+
+.editor-content.ProseMirror:focus {
+    outline: none;
+}
+
+.text-editor.fullscreen .editor-content .ProseMirror {
+    min-height: 100%;
+    outline: none;
+}
+
 .editor-content.is-empty::before {
     content: attr(data-placeholder);
     color: var(--text-muted);
@@ -952,6 +972,8 @@
 .editor-wrapper.fullscreen {
     flex: 1;
     min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .editor-statusbar {
