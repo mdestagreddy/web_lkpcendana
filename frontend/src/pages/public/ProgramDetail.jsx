@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { publicApi } from '../../services/api';
-import { ArrowLeft, Layers, UserPlus } from 'lucide-react';
+import { Layers, UserPlus } from 'lucide-react';
 import Image from '../../components/Image';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import BackLink from '../../components/BackLink';
 import './ProgramDetail.css';
 
 export default function ProgramDetail() {
@@ -22,13 +24,13 @@ export default function ProgramDetail() {
         }).catch(() => setLoading(false));
     }, [id]);
 
-    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
+    if (loading) return <div className="container"><LoadingSpinner /></div>;
     if (!program) return <div className="container"><p>Program tidak ditemukan</p></div>;
 
     return (
         <div className="program-detail">
             <div className="container">
-                <Link to="/programs" className="back-link"><ArrowLeft size={18} /> Kembali ke Program</Link>
+                <BackLink to="/programs" label="Kembali ke Program" />
                 <div className="program-header">
                     <div className="program-image-wrapper">
                         {program.image_url ? (

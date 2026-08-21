@@ -3,6 +3,9 @@ import { adminApi } from '../../services/api';
 import ImageUpload from '../../components/ImageUpload';
 import { Plus, Save, X, Pencil, Trash2, ClipboardList } from 'lucide-react';
 import CustomCheckbox from '../../components/CustomCheckbox';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import ConfirmDialog from '../../components/ConfirmDialog';
+import FormField from '../../components/FormField';
 import './AdminCRUD.css';
 
 export default function AdminPrograms() {
@@ -12,6 +15,7 @@ export default function AdminPrograms() {
     const [form, setForm] = useState({ title: '', slug: '', category: '', level: 'Pemula', duration_minutes: 0, description: '', type: 'offline', is_featured: false, is_active: true, sort_order: 0, image_url: '' });
     const [modules, setModules] = useState({});
     const [newModule, setNewModule] = useState({});
+    const [deleteDialog, setDeleteDialog] = useState({ open: false, id: null });
 
     useEffect(() => {
         load();
@@ -45,8 +49,14 @@ export default function AdminPrograms() {
     }
 
     function handleDelete(id) {
-        if (!confirm('Apakah Anda yakin?')) return;
-        adminApi.programs.delete(id).then(load).catch(() => {});
+        setDeleteDialog({ open: true, id });
+    }
+
+    function confirmDelete() {
+        if (deleteDialog.id) {
+            adminApi.programs.delete(deleteDialog.id).then(load).catch(() => {});
+        }
+        setDeleteDialog({ open: false, id: null });
     }
 
     function addModule(programId) {
@@ -67,7 +77,7 @@ export default function AdminPrograms() {
         }).catch(() => {});
     }
 
-    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
+    if (loading) return <div className="container"><LoadingSpinner /></div>;
 
     return (
         <div className="admin-crud">
@@ -75,45 +85,24 @@ export default function AdminPrograms() {
             <form onSubmit={handleSubmit} className="crud-form">
                 <div className="form-section">
                     <h3 className="form-section-title">Informasi Program</h3>
-                    <div className="form-group">
-                        <label htmlFor="title">Judul</label>
-                        <input id="title" placeholder="Judul program" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="slug">Slug</label>
-                        <input id="slug" placeholder="contoh: program-web-development" value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} required />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="category">Kategori</label>
-                        <input id="category" placeholder="contoh: Teknologi" value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="level">Level</label>
-                        <select id="level" value={form.level} onChange={e => setForm({ ...form, level: e.target.value })}>
-                            <option value="Pemula">Pemula</option>
-                            <option value="Intermediate">Intermediate</option>
-                            <option value="Expert">Expert</option>
-                        </select>
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="type">Tipe</label>
-                        <select id="type" value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}>
-                            <option value="offline">Offline</option>
-                            <option value="online">Online</option>
-                        </select>
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="duration_minutes">Durasi (menit)</label>
-                        <input id="duration_minutes" type="number" placeholder="0" value={form.duration_minutes} onChange={e => setForm({ ...form, duration_minutes: parseInt(e.target.value) || 0 })} />
-                    </div>
+                    <FormField id="title" label="Judul" value={form.title} onChange={title => setForm({ ...form, title })} placeholder="Judul program" required />
+                    <FormField id="slug" label="Slug" value={form.slug} onChange={slug => setForm({ ...form, slug })} placeholder="contoh: program-web-development" required />
+                    <FormField id="category" label="Kategori" value={form.category} onChange={category => setForm({ ...form, category })} placeholder="contoh: Teknologi" />
+                    <FormField id="level" label="Level" type="select" value={form.level} onChange={level => setForm({ ...form, level })} options={[
+                        { value: 'Pemula', label: 'Pemula' },
+                        { value: 'Intermediate', label: 'Intermediate' },
+                        { value: 'Expert', label: 'Expert' },
+                    ]} />
+                    <FormField id="type" label="Tipe" type="select" value={form.type} onChange={type => setForm({ ...form, type })} options={[
+                        { value: 'offline', label: 'Offline' },
+                        { value: 'online', label: 'Online' },
+                    ]} />
+                    <FormField id="duration_minutes" label="Durasi (menit)" type="number" value={form.duration_minutes} onChange={duration_minutes => setForm({ ...form, duration_minutes: parseInt(duration_minutes) || 0 })} placeholder="0" />
                 </div>
 
                 <div className="form-section">
                     <h3 className="form-section-title">Deskripsi &amp; Gambar</h3>
-                    <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                        <label htmlFor="description">Deskripsi</label>
-                        <textarea id="description" placeholder="Deskripsi lengkap program" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
-                    </div>
+                    <FormField id="description" label="Deskripsi" type="textarea" value={form.description} onChange={description => setForm({ ...form, description })} placeholder="Deskripsi lengkap program" fullWidth />
                     <div className="form-group">
                         <label>Gambar Program</label>
                         <ImageUpload
@@ -136,10 +125,7 @@ export default function AdminPrograms() {
                             Aktif
                         </CustomCheckbox>
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="sort_order">Urutan</label>
-                        <input id="sort_order" type="number" placeholder="0" value={form.sort_order} onChange={e => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} />
-                    </div>
+                    <FormField id="sort_order" label="Urutan" type="number" value={form.sort_order} onChange={sort_order => setForm({ ...form, sort_order: parseInt(sort_order) || 0 })} placeholder="0" />
                 </div>
 
                 <div className="form-actions">
@@ -201,6 +187,12 @@ export default function AdminPrograms() {
                     </div>
                 ))}
             </div>
+            <ConfirmDialog
+                open={deleteDialog.open}
+                message="Apakah Anda yakin ingin menghapus program ini?"
+                onConfirm={confirmDelete}
+                onCancel={() => setDeleteDialog({ open: false, id: null })}
+            />
         </div>
     );
 }

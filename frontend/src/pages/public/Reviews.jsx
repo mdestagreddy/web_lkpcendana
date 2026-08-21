@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { publicApi, API_BASE_URL } from '../../services/api';
-import { Star, Send, Loader2, Camera, X } from 'lucide-react';
+import { Send, Camera, X } from 'lucide-react';
 import ImageLightbox from '../../components/ImageLightbox';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import StarRating from '../../components/StarRating';
+import Alert from '../../components/Alert';
 import './Reviews.css';
 
 export default function Reviews() {
@@ -141,20 +144,6 @@ export default function Reviews() {
         }
     }
 
-    function renderStars(rating, interactive = false) {
-        return Array.from({ length: 5 }, (_, i) => (
-            <button
-                key={i}
-                type={interactive ? 'button' : 'button'}
-                className={`star-btn ${interactive ? 'interactive' : ''} ${i < rating ? 'filled' : ''}`}
-                onClick={interactive ? () => setForm({ ...form, rating: i + 1 }) : undefined}
-                disabled={!interactive}
-            >
-                <Star size={interactive ? 28 : 18} fill={i < rating ? 'currentColor' : 'none'} />
-            </button>
-        ));
-    }
-
     function formatDate(dateStr) {
         if (!dateStr) return '';
         const d = new Date(dateStr);
@@ -167,14 +156,14 @@ export default function Reviews() {
                 <h1>Ulasan</h1>
                 <p className="page-subtitle">Bagikan pengalaman Anda di LKP Cendana</p>
 
-                {success && <div className="alert alert-success">{success}</div>}
-                {error && <div className="alert alert-error">{error}</div>}
+                {success && <Alert type="success">{success}</Alert>}
+                {error && <Alert type="error">{error}</Alert>}
 
                 <div className="reviews-layout">
                     <div className="reviews-list-section">
                         <h2>Ulasan dari Peserta</h2>
                         {loading ? (
-                            <p className="loading"><Loader2 className="spin" size={24} /> Memuat ulasan...</p>
+                            <LoadingSpinner />
                         ) : reviews.length === 0 ? (
                             <p className="empty-message">Belum ada ulasan. Jadilah yang pertama!</p>
                         ) : (
@@ -187,7 +176,7 @@ export default function Reviews() {
                                             </div>
                                             <div className="review-meta">
                                                 <h4>{review.nama}</h4>
-                                                <div className="review-stars-small">{renderStars(review.rating)}</div>
+                                                <div className="review-stars-small"><StarRating rating={review.rating} /></div>
                                                 <span className="review-date">{formatDate(review.created_at)}</span>
                                             </div>
                                         </div>
@@ -232,7 +221,7 @@ export default function Reviews() {
                             </div>
                             <div className="form-group">
                                 <label>Rating *</label>
-                                <div className="star-rating">{renderStars(form.rating, true)}</div>
+                                <div className="star-rating"><StarRating rating={form.rating} onChange={rating => setForm({ ...form, rating })} /></div>
                                 <span className="rating-label">{form.rating} / 5</span>
                             </div>
                             <div className="form-group">
@@ -298,7 +287,7 @@ export default function Reviews() {
                                 />
                             </div>
                             <button type="submit" className="btn btn-primary submit-btn" disabled={submitting}>
-                                {submitting ? <><Loader2 size={16} className="spin" /> Mengirim...</> : <><Send size={16} /> Kirim Ulasan</>}
+                                {submitting ? <LoadingSpinner text="Mengirim..." size="sm" className="inline" /> : <><Send size={16} /> Kirim Ulasan</>}
                             </button>
                         </form>
                     </div>

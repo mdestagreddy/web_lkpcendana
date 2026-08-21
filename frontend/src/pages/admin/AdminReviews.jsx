@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
 import { adminApi } from '../../services/api';
-import { Plus, Save, X, Pencil, Trash2, Star, Calendar } from 'lucide-react';
+import { Plus, Save, X, Pencil, Trash2, Calendar } from 'lucide-react';
 import CustomCheckbox from '../../components/CustomCheckbox';
 import MultiImageUpload from '../../components/MultiImageUpload';
 import ImageLightbox from '../../components/ImageLightbox';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import StarRating from '../../components/StarRating';
+import ConfirmDialog from '../../components/ConfirmDialog';
+import FormField from '../../components/FormField';
 import './AdminCRUD.css';
 
 export default function AdminReviews() {
@@ -19,6 +23,7 @@ export default function AdminReviews() {
         is_active: true,
         created_at: '',
     });
+    const [deleteDialog, setDeleteDialog] = useState({ open: false, id: null });
 
     useEffect(() => { load(); }, []);
 
@@ -68,25 +73,17 @@ export default function AdminReviews() {
     }
 
     function handleDelete(id) {
-        if (!confirm('Apakah Anda yakin?')) return;
-        adminApi.reviews.delete(id).then(load).catch(() => {});
+        setDeleteDialog({ open: true, id });
     }
 
-    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
-
-    function renderStars(rating, interactive = false) {
-        return Array.from({ length: 5 }, (_, i) => (
-            <button
-                key={i}
-                type={interactive ? 'button' : 'button'}
-                className={`star-btn ${interactive ? 'interactive' : ''} ${i < rating ? 'filled' : ''}`}
-                onClick={interactive ? () => setForm({ ...form, rating: i + 1 }) : undefined}
-                disabled={!interactive}
-            >
-                <Star size={interactive ? 28 : 16} fill={i < rating ? 'currentColor' : 'none'} />
-            </button>
-        ));
+    function confirmDelete() {
+        if (deleteDialog.id) {
+            adminApi.reviews.delete(deleteDialog.id).then(load).catch(() => {});
+        }
+        setDeleteDialog({ open: false, id: null });
     }
+
+    if (loading) return <div className="container"><LoadingSpinner /></div>;
 
     function formatDate(dateStr) {
         if (!dateStr) return '';
@@ -100,32 +97,20 @@ export default function AdminReviews() {
             <form onSubmit={handleSubmit} className="crud-form">
                 <div className="form-section">
                     <h3 className="form-section-title">Informasi Reviewer</h3>
-                    <div className="form-group">
-                        <label htmlFor="nama">Nama *</label>
-                        <input id="nama" placeholder="Nama lengkap" value={form.nama} onChange={e => setForm({ ...form, nama: e.target.value })} required />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="email">Email</label>
-                        <input id="email" type="email" placeholder="email@contoh.com" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="created_at">Tanggal Unggah</label>
-                        <input id="created_at" type="date" value={form.created_at} onChange={e => setForm({ ...form, created_at: e.target.value })} />
-                        <span className="form-help">Kosongkan untuk gunakan tanggal hari ini.</span>
-                    </div>
+                    <FormField id="nama" label="Nama *" value={form.nama} onChange={nama => setForm({ ...form, nama })} placeholder="Nama lengkap" required />
+                    <FormField id="email" label="Email" type="email" value={form.email} onChange={email => setForm({ ...form, email })} placeholder="email@contoh.com" />
+                    <FormField id="created_at" label="Tanggal Unggah" type="date" value={form.created_at} onChange={created_at => setForm({ ...form, created_at })} />
+                    <span className="form-help">Kosongkan untuk gunakan tanggal hari ini.</span>
                 </div>
 
                 <div className="form-section">
-                    <h3 className="form-section-title">Ulasan & Rating</h3>
+                    <h3 className="form-section-title">Ulasan &amp; Rating</h3>
                     <div className="form-group">
                         <label>Rating</label>
-                        <div className="star-rating">{renderStars(form.rating, true)}</div>
+                        <div className="star-rating"><StarRating rating={form.rating} onChange={rating => setForm({ ...form, rating })} /></div>
                         <span className="rating-label">{form.rating} / 5</span>
                     </div>
-                    <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                        <label htmlFor="isi">Ulasan *</label>
-                        <textarea id="isi" placeholder="Ketik ulasan di sini..." value={form.isi} onChange={e => setForm({ ...form, isi: e.target.value })} required rows={4} />
-                    </div>
+                    <FormField id="isi" label="Ulasan *" type="textarea" value={form.isi} onChange={isi => setForm({ ...form, isi })} placeholder="Ketik ulasan di sini..." required fullWidth rows={4} />
                 </div>
 
                 <div className="form-section">
@@ -175,7 +160,7 @@ export default function AdminReviews() {
                             </div>
                             <p className="generic-card-desc">{item.isi}</p>
                             {imgs.length > 0 && (
-                                <ImageLightbox items={imgs.map(url => ({ src: url, author: item.nama, text: item.isi }))} />
+                                <ImageLightbox items={imgs.map(url => ({ src: url, author: item.nama, text: item.isi }))} className="admin-review-images" />
                             )}
                             <div className="generic-card-meta">
                                 {imgs.length > 0 && <span className="badge badge-info">📷 {imgs.length} gambar</span>}
@@ -186,6 +171,12 @@ export default function AdminReviews() {
                     );
                 })}
             </div>
+            <ConfirmDialog
+                open={deleteDialog.open}
+                message="Apakah Anda yakin ingin menghapus ulasan ini?"
+                onConfirm={confirmDelete}
+                onCancel={() => setDeleteDialog({ open: false, id: null })}
+            />
         </div>
     );
 }

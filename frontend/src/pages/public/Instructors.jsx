@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { publicApi } from '../../services/api';
 import { User } from 'lucide-react';
-import { FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa';
-import { SiX } from 'react-icons/si';
 import Image from '../../components/Image';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import SocialLinks from '../../components/SocialLinks';
 import './Instructors.css';
 
 export default function Instructors() {
@@ -17,7 +17,7 @@ export default function Instructors() {
         }).catch(() => setLoading(false));
     }, []);
 
-    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
+    if (loading) return <div className="container"><LoadingSpinner /></div>;
 
     return (
         <div className="instructors-page">
@@ -36,20 +36,14 @@ export default function Instructors() {
                             <h3>{instructor.nama}</h3>
                             <p className="role">{instructor.role}</p>
                             <p className="bio">{instructor.bio}</p>
-                            <div className="social-links">
-                                {instructor.facebook_url && instructor.facebook_url !== '#' && (
-                                    <a href={instructor.facebook_url} target="_blank" rel="noopener noreferrer"><FaFacebook size={18} /></a>
-                                )}
-                                {instructor.twitter_url && instructor.twitter_url !== '#' && (
-                                    <a href={instructor.twitter_url} target="_blank" rel="noopener noreferrer"><SiX size={18} /></a>
-                                )}
-                                {instructor.instagram_url && instructor.instagram_url !== '#' && (
-                                    <a href={instructor.instagram_url} target="_blank" rel="noopener noreferrer"><FaInstagram size={18} /></a>
-                                )}
-                                {instructor.youtube_url && instructor.youtube_url !== '#' && (
-                                    <a href={instructor.youtube_url} target="_blank" rel="noopener noreferrer"><FaYoutube size={18} /></a>
-                                )}
-                            </div>
+                            <SocialLinks
+                                links={[
+                                    { platform: 'facebook', url: instructor.facebook_url },
+                                    { platform: 'twitter', url: instructor.twitter_url },
+                                    { platform: 'instagram', url: instructor.instagram_url },
+                                    { platform: 'youtube', url: instructor.youtube_url },
+                                ]}
+                            />
                         </div>
                     ))}
                 </div>

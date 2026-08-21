@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { publicApi } from '../../services/api';
 import { MapPin, Phone, Mail } from 'lucide-react';
-import { FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa';
-import { SiX } from 'react-icons/si';
+import SocialLinks from '../../components/SocialLinks';
 import './Contact.css';
 
 export default function Contact() {
@@ -32,18 +31,14 @@ export default function Contact() {
                     </div>
                     <div className="social-info">
                         <h2>Media Sosial</h2>
-                        {settings.facebook_url && (
-                            <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer"><FaFacebook size={18} /> Facebook</a>
-                        )}
-                        {settings.instagram_url && (
-                            <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer"><FaInstagram size={18} /> Instagram</a>
-                        )}
-                        {settings.twitter_url && (
-                            <a href={settings.twitter_url} target="_blank" rel="noopener noreferrer"><SiX size={18} /> X</a>
-                        )}
-                        {settings.youtube_url && (
-                            <a href={settings.youtube_url} target="_blank" rel="noopener noreferrer"><FaYoutube size={18} /> YouTube</a>
-                        )}
+                        <SocialLinks
+                            links={[
+                                { platform: 'facebook', url: settings.facebook_url },
+                                { platform: 'instagram', url: settings.instagram_url },
+                                { platform: 'twitter', url: settings.twitter_url },
+                                { platform: 'youtube', url: settings.youtube_url },
+                            ]}
+                        />
                     </div>
                 </div>
             </div>

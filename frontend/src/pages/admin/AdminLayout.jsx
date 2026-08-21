@@ -4,6 +4,7 @@ import { useAuth } from '../../context/useAuth';
 import { useTheme } from '../../context/useTheme';
 import { ThemeProvider } from '../../context/ThemeContext';
 import { LayoutDashboard, GraduationCap, Users, MessageSquare, Star, Image, UserCog, Building2, Target, Settings, FileText, Tag, GitBranch, Shield, LogOut, Sun, Moon, Monitor } from 'lucide-react';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import './AdminLayout.css';
 
 function AdminLayoutInner() {
@@ -37,7 +38,7 @@ function AdminLayoutInner() {
     }, [sidebarOpen]);
 
     if (loading) {
-        return <div className="admin-layout"><main className="admin-content"><p className="loading">Memuat...</p></main></div>;
+        return <div className="admin-layout"><main className="admin-content"><LoadingSpinner /></main></div>;
     }
 
     if (!user) {

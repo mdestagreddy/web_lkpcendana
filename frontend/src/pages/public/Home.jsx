@@ -3,6 +3,7 @@ import { publicApi } from '../../services/api';
 import { useState, useEffect } from 'react';
 import { Star, Wifi, MessageSquare, ArrowRight, Building2, User } from 'lucide-react';
 import Image from '../../components/Image';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import './Home.css';
 
 export default function Home() {
@@ -68,7 +69,7 @@ export default function Home() {
         };
     }, []);
 
-    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
+    if (loading) return <div className="container"><LoadingSpinner /></div>;
 
     const headerImage = settings.header_image || '';
     const headerImageMobile = settings.header_image_mobile || '';

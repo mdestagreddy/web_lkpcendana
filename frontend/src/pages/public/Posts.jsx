@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { publicApi } from '../../services/api';
 import { Calendar, Tag, ArrowRight } from 'lucide-react';
 import Image from '../../components/Image';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import './Posts.css';
 
 export default function Posts() {
@@ -37,7 +38,7 @@ export default function Posts() {
                 </div>
 
                 {loading ? (
-                    <p className="loading">Memuat...</p>
+                    <LoadingSpinner />
                 ) : posts.length === 0 ? (
                     <p className="no-posts">Belum ada artikel yang dipublikasikan.</p>
                 ) : (

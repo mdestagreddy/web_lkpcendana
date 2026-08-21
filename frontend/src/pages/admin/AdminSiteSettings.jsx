@@ -1,7 +1,10 @@
 ﻿import { useState, useEffect } from 'react';
 import { adminApi } from '../../services/api';
 import ImageUpload from '../../components/ImageUpload';
-import { Plus, Save, X, Pencil } from 'lucide-react';
+import { Plus, Save, X } from 'lucide-react';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import Alert from '../../components/Alert';
+import CRUDCard from '../../components/CRUDCard';
 import './AdminCRUD.css';
 
 export default function AdminSiteSettings() {
@@ -88,7 +91,7 @@ export default function AdminSiteSettings() {
         setForm({ key_name: item.key_name, value: item.value });
     }
 
-    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
+    if (loading) return <div className="container"><LoadingSpinner /></div>;
 
     const filteredSettings = items.filter(item => !['logo_image', 'header_image', 'header_image_mobile', 'favicon'].includes(item.key_name));
 
@@ -96,7 +99,7 @@ export default function AdminSiteSettings() {
         <div className="admin-crud">
             <h1>Pengaturan Situs</h1>
 
-            {error && <div className="alert alert-error" style={{ marginBottom: '1.5rem' }}>{error}</div>}
+            {error && <Alert type="error">{error}</Alert>}
 
             <div className="image-settings-section">
                 <h2>Gambar Situs</h2>
@@ -138,17 +141,13 @@ export default function AdminSiteSettings() {
                 ) : (
                     <div className="items-list">
                         {filteredSettings.map(item => (
-                            <div key={item.id} className="generic-card">
-                                <div className="generic-card-header">
-                                    <div className="generic-card-title">
-                                        <h3>{item.key_name}</h3>
-                                        <span className="generic-card-sub">{item.value}</span>
-                                    </div>
-                                    <div className="generic-card-actions">
-                                        <button onClick={() => startEdit(item)} className="btn btn-small btn-primary"><Pencil size={14} /> Edit</button>
-                                    </div>
-                                </div>
-                            </div>
+                            <CRUDCard
+                                key={item.id}
+                                item={item}
+                                onEdit={startEdit}
+                                title={<h3>{item.key_name}</h3>}
+                                subtitle={<span>{item.value}</span>}
+                            />
                         ))}
                     </div>
                 )}

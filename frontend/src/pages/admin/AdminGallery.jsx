@@ -1,9 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { adminApi } from '../../services/api';
 import ImageUpload from '../../components/ImageUpload';
-import Image from '../../components/Image';
-import { Plus, Save, X, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Save, X, Pencil, Trash2, ZoomIn } from 'lucide-react';
 import CustomCheckbox from '../../components/CustomCheckbox';
+import ImageLightbox from '../../components/ImageLightbox';
+import Image from '../../components/Image';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import ConfirmDialog from '../../components/ConfirmDialog';
+import FormField from '../../components/FormField';
 import './AdminCRUD.css';
 
 export default function AdminGallery() {
@@ -11,7 +15,8 @@ export default function AdminGallery() {
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(null);
     const [form, setForm] = useState({ kategori: '', caption: '', image_url: '', thumbnail_url: '', alt_text: '', sort_order: 0, is_active: true });
-    const [brokenImages, setBrokenImages] = useState({});
+    const [deleteDialog, setDeleteDialog] = useState({ open: false, id: null });
+    const lightboxRef = useRef(null);
 
     useEffect(() => { load(); }, []);
 
@@ -40,11 +45,19 @@ export default function AdminGallery() {
     }
 
     function handleDelete(id) {
-        if (!confirm('Apakah Anda yakin?')) return;
-        adminApi.gallery.delete(id).then(load).catch(() => {});
+        setDeleteDialog({ open: true, id });
     }
 
-    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
+    function confirmDelete() {
+        if (deleteDialog.id) {
+            adminApi.gallery.delete(deleteDialog.id).then(load).catch(() => {});
+        }
+        setDeleteDialog({ open: false, id: null });
+    }
+
+    const lightboxItems = useMemo(() => items.map(item => ({ src: item.image_url, author: item.kategori || '', text: item.caption || '' })), [items]);
+
+    if (loading) return <div className="container"><LoadingSpinner /></div>;
 
     return (
         <div className="admin-crud">
@@ -52,14 +65,8 @@ export default function AdminGallery() {
             <form onSubmit={handleSubmit} className="crud-form">
                 <div className="form-section">
                     <h3 className="form-section-title">Informasi Galeri</h3>
-                    <div className="form-group">
-                        <label htmlFor="kategori">Kategori</label>
-                        <input id="kategori" placeholder="contoh: Acara, Fasilitas" value={form.kategori} onChange={e => setForm({ ...form, kategori: e.target.value })} required />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="caption">Keterangan</label>
-                        <input id="caption" placeholder="Deskripsi singkat gambar" value={form.caption} onChange={e => setForm({ ...form, caption: e.target.value })} />
-                    </div>
+                    <FormField id="kategori" label="Kategori" value={form.kategori} onChange={kategori => setForm({ ...form, kategori })} placeholder="contoh: Acara, Fasilitas" required />
+                    <FormField id="caption" label="Keterangan" value={form.caption} onChange={caption => setForm({ ...form, caption })} placeholder="Deskripsi singkat gambar" />
                 </div>
 
                 <div className="form-section">
@@ -80,10 +87,7 @@ export default function AdminGallery() {
                             onChange={url => setForm({ ...form, thumbnail_url: url })}
                         />
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="alt_text">Teks Alt</label>
-                        <input id="alt_text" placeholder="Deskripsi untuk aksesibilitas" value={form.alt_text} onChange={e => setForm({ ...form, alt_text: e.target.value })} />
-                    </div>
+                    <FormField id="alt_text" label="Teks Alt" value={form.alt_text} onChange={alt_text => setForm({ ...form, alt_text })} placeholder="Deskripsi untuk aksesibilitas" />
                 </div>
 
                 <div className="form-section">
@@ -93,10 +97,7 @@ export default function AdminGallery() {
                             Aktif
                         </CustomCheckbox>
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="sort_order">Urutan</label>
-                        <input id="sort_order" type="number" placeholder="0" value={form.sort_order} onChange={e => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} />
-                    </div>
+                    <FormField id="sort_order" label="Urutan" type="number" value={form.sort_order} onChange={sort_order => setForm({ ...form, sort_order: parseInt(sort_order) || 0 })} placeholder="0" />
                 </div>
 
                 <div className="form-actions">
@@ -107,13 +108,16 @@ export default function AdminGallery() {
             {items.length === 0 && <p className="items-empty">Tidak ada data Galeri</p>}
 
             <div className={`items-list gallery-grid${items.length === 0 ? ' is-empty' : ''}`}>
-                {items.map(item => (
+                {items.map((item, idx) => (
                     <div key={item.id} className="gallery-card">
                         <div className="gallery-card-preview">
-                            {brokenImages[item.id] ? (
-                                <div className="gallery-placeholder">Tidak ada gambar</div>
-                            ) : item.image_url ? (
-                                <Image src={item.image_url} alt={item.alt_text || item.caption || 'Galeri'} loading="lazy" onError={() => setBrokenImages(prev => ({ ...prev, [item.id]: true }))} />
+                            {item.image_url ? (
+                                <div className="gallery-card-image" onClick={() => lightboxRef.current?.openLightbox(lightboxItems, idx)}>
+                                    <Image src={item.image_url} alt={item.alt_text || item.caption || 'Galeri'} loading="lazy" />
+                                    <div className="gallery-card-overlay">
+                                        <ZoomIn size={20} />
+                                    </div>
+                                </div>
                             ) : (
                                 <div className="gallery-placeholder">Tidak ada gambar</div>
                             )}
@@ -129,6 +133,13 @@ export default function AdminGallery() {
                     </div>
                 ))}
             </div>
+            <ImageLightbox ref={lightboxRef} multiTrigger items={lightboxItems} />
+            <ConfirmDialog
+                open={deleteDialog.open}
+                message="Apakah Anda yakin ingin menghapus gambar ini?"
+                onConfirm={confirmDelete}
+                onCancel={() => setDeleteDialog({ open: false, id: null })}
+            />
         </div>
     );
 }

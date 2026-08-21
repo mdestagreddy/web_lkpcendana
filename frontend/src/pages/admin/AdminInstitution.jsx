@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { adminApi } from '../../services/api';
 import { Plus, Save, X, Pencil } from 'lucide-react';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import Alert from '../../components/Alert';
 import './AdminCRUD.css';
 
 export default function AdminInstitution() {
@@ -98,12 +100,12 @@ export default function AdminInstitution() {
             });
     }
 
-    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
+    if (loading) return <div className="container"><LoadingSpinner /></div>;
 
     return (
         <div className="admin-crud">
             <h1>Info Institusi</h1>
-            {error && <div className="alert alert-error" style={{ marginBottom: '1.5rem' }}>{error}</div>}
+            {error && <Alert type="error">{error}</Alert>}
             <form onSubmit={handleSubmit} className="crud-form">
                 <div className="form-section">
                     <h3 className="form-section-title">Sambutan Selamat Datang</h3>

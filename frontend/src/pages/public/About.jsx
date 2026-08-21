@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { publicApi } from '../../services/api';
 import { Building2, Eye, Flag, Users, Info, MapPin, Phone, Mail, Calendar, Award } from 'lucide-react';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import './About.css';
 
 export default function About() {
@@ -22,7 +23,7 @@ export default function About() {
         }).catch(() => setLoading(false));
     }, []);
 
-    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
+    if (loading) return <div className="container"><LoadingSpinner /></div>;
 
     const vision = visionMission.filter(vm => vm.type === 'vision');
     const missions = visionMission.filter(vm => vm.type === 'mission');

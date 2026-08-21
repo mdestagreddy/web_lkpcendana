@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react';
 import { adminApi } from '../../services/api';
-import { Plus, Save, X, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Save, X } from 'lucide-react';
 import TextEditor from '../../components/TextEditor';
 import CustomCheckbox from '../../components/CustomCheckbox';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import ConfirmDialog from '../../components/ConfirmDialog';
+import FormField from '../../components/FormField';
+import CRUDCard from '../../components/CRUDCard';
 import './AdminCRUD.css';
 
 function formatDate(value) {
@@ -31,6 +35,7 @@ export default function AdminPrivacyPolicies() {
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(null);
     const [form, setForm] = useState({ content: '', version: '', effective_date: '', is_current: true });
+    const [deleteDialog, setDeleteDialog] = useState({ open: false, id: null });
 
     useEffect(() => { load(); }, []);
 
@@ -74,11 +79,17 @@ export default function AdminPrivacyPolicies() {
     }
 
     function handleDelete(id) {
-        if (!confirm('Apakah Anda yakin?')) return;
-        adminApi.privacyPolicies.delete(id).then(load).catch(() => {});
+        setDeleteDialog({ open: true, id });
     }
 
-    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
+    function confirmDelete() {
+        if (deleteDialog.id) {
+            adminApi.privacyPolicies.delete(deleteDialog.id).then(load).catch(() => {});
+        }
+        setDeleteDialog({ open: false, id: null });
+    }
+
+    if (loading) return <div className="container"><LoadingSpinner /></div>;
 
     return (
         <div className="admin-crud">
@@ -95,14 +106,8 @@ export default function AdminPrivacyPolicies() {
                             placeholder="Tulis isi kebijakan privasi..."
                         />
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="version">Versi</label>
-                        <input id="version" placeholder="contoh: 1.0" value={form.version} onChange={e => setForm({ ...form, version: e.target.value })} />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="effective_date">Tanggal Berlaku</label>
-                        <input id="effective_date" type="date" placeholder="YYYY-MM-DD" value={form.effective_date} onChange={e => setForm({ ...form, effective_date: e.target.value })} />
-                    </div>
+                    <FormField id="version" label="Versi" value={form.version} onChange={version => setForm({ ...form, version })} placeholder="contoh: 1.0" />
+                    <FormField id="effective_date" label="Tanggal Berlaku" type="date" value={form.effective_date} onChange={effective_date => setForm({ ...form, effective_date })} placeholder="YYYY-MM-DD" />
                 </div>
 
                 <div className="form-section">
@@ -123,24 +128,28 @@ export default function AdminPrivacyPolicies() {
 
             <div className={`items-list${items.length === 0 ? ' is-empty' : ''}`}>
                 {items.map(item => (
-                    <div key={item.id} className="generic-card">
-                        <div className="generic-card-header">
-                            <div className="generic-card-title">
-                                <h3>Versi {item.version || '-'}</h3>
-                                <span className="generic-card-sub">Berlaku: {formatDate(item.effective_date)}</span>
-                            </div>
-                            <div className="generic-card-actions">
-                                <button onClick={() => startEdit(item)} className="btn btn-small btn-primary"><Pencil size={14} /> Edit</button>
-                                <button onClick={() => handleDelete(item.id)} className="btn btn-small btn-danger"><Trash2 size={14} /> Hapus</button>
-                            </div>
-                        </div>
-                        <p className="generic-card-desc" dangerouslySetInnerHTML={{ __html: renderContent(item.content) }} />
-                        <div className="generic-card-meta">
-                            {item.is_current ? <span className="badge badge-status active">Versi Saat Ini</span> : <span className="badge badge-status inactive">Arsip</span>}
-                        </div>
-                    </div>
+                    <CRUDCard
+                        key={item.id}
+                        item={item}
+                        onEdit={startEdit}
+                        onDelete={handleDelete}
+                        title={<h3>Versi {item.version || '-'}</h3>}
+                        subtitle={<span>Berlaku: {formatDate(item.effective_date)}</span>}
+                        description={<span dangerouslySetInnerHTML={{ __html: renderContent(item.content) }} />}
+                        meta={
+                            item.is_current
+                                ? <span className="badge badge-status active">Versi Saat Ini</span>
+                                : <span className="badge badge-status inactive">Arsip</span>
+                        }
+                    />
                 ))}
             </div>
+            <ConfirmDialog
+                open={deleteDialog.open}
+                message="Apakah Anda yakin ingin menghapus kebijakan privasi ini?"
+                onConfirm={confirmDelete}
+                onCancel={() => setDeleteDialog({ open: false, id: null })}
+            />
         </div>
     );
 }

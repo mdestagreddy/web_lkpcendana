@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { publicApi } from '../../services/api';
 import { Shield } from 'lucide-react';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import './PrivacyPolicy.css';
 
 function formatDate(value) {
@@ -35,7 +36,7 @@ export default function PrivacyPolicy() {
         }).catch(() => setLoading(false));
     }, []);
 
-    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
+    if (loading) return <div className="container"><LoadingSpinner /></div>;
     if (!policy) return <div className="container"><p>Kebijakan privasi tidak ditemukan</p></div>;
 
     return (

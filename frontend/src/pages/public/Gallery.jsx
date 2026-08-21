@@ -1,14 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { publicApi } from '../../services/api';
-import { LayoutGrid, Filter } from 'lucide-react';
+import { LayoutGrid, Filter, ZoomIn } from 'lucide-react';
+import ImageLightbox from '../../components/ImageLightbox';
 import Image from '../../components/Image';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import './Gallery.css';
 
 export default function Gallery() {
     const [items, setItems] = useState([]);
     const [filter, setFilter] = useState('');
     const [loading, setLoading] = useState(true);
-    const [brokenImages, setBrokenImages] = useState({});
+    const lightboxRef = useRef(null);
 
     useEffect(() => {
         setLoading(true);
@@ -19,6 +21,8 @@ export default function Gallery() {
     }, [filter]);
 
     const categories = [...new Set(items.map(item => item.kategori))];
+
+    const lightboxItems = useMemo(() => items.map(item => ({ src: item.image_url, author: item.kategori || '', text: item.caption || '' })), [items]);
 
     return (
         <div className="gallery-page">
@@ -43,23 +47,20 @@ export default function Gallery() {
                 </div>
 
                 {loading ? (
-                    <p className="loading">Memuat...</p>
+                    <LoadingSpinner />
                 ) : (
                     <div className="gallery-grid">
-                        {items.map(item => (
+                        {items.map((item, idx) => (
                             <div key={item.id} className="gallery-item">
-                                {brokenImages[item.id] ? (
-                                    <div className="gallery-placeholder">Tidak ada gambar</div>
+                                {item.image_url ? (
+                                    <div className="gallery-item-image" onClick={() => lightboxRef.current?.openLightbox(lightboxItems, idx)}>
+                                        <Image src={item.image_url} alt={item.alt_text || item.caption} loading="lazy" />
+                                        <div className="gallery-item-overlay">
+                                            <ZoomIn size={20} />
+                                        </div>
+                                    </div>
                                 ) : (
-                                    <Image
-                                        src={item.thumbnail_url || item.image_url}
-                                        alt={item.alt_text || item.caption}
-                                        onError={() => {
-                                            if (!brokenImages[item.id]) {
-                                                setBrokenImages(prev => ({ ...prev, [item.id]: true }));
-                                            }
-                                        }}
-                                    />
+                                    <div className="gallery-placeholder">Tidak ada gambar</div>
                                 )}
                                 <div className="caption">
                                     <p>{item.caption}</p>
@@ -70,6 +71,7 @@ export default function Gallery() {
                     </div>
                 )}
             </div>
+            <ImageLightbox ref={lightboxRef} multiTrigger items={lightboxItems} />
         </div>
     );
 }

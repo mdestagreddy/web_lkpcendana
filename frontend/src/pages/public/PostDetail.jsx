@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { publicApi } from '../../services/api';
-import { ArrowLeft, Calendar, Tag } from 'lucide-react';
+import { Calendar, Tag } from 'lucide-react';
 import Image from '../../components/Image';
 import ImageLightbox from '../../components/ImageLightbox';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import BackLink from '../../components/BackLink';
 import './PostDetail.css';
 
 export default function PostDetail() {
@@ -71,13 +73,13 @@ export default function PostDetail() {
         return doc.body.innerHTML;
     };
 
-    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
+    if (loading) return <div className="container"><LoadingSpinner /></div>;
     if (!post) return <div className="container"><p>Artikel tidak ditemukan.</p></div>;
 
     return (
         <div className="post-detail-page">
             <div className="container">
-                <Link to="/posts" className="back-link"><ArrowLeft size={18} /> Kembali ke Artikel</Link>
+                <BackLink to="/posts" label="Kembali ke Artikel" />
                 <article className="post-detail">
                     <header className="post-detail-header">
                         <div className="post-detail-meta">
@@ -99,6 +101,7 @@ export default function PostDetail() {
                 </article>
                 {articleImages.length > 0 && (
                     <ImageLightbox
+                        hidden={true}
                         open={lightboxOpen}
                         index={lightboxIndex}
                         onClose={() => setLightboxOpen(false)}

@@ -4,6 +4,9 @@ import ImageUpload from '../../components/ImageUpload';
 import Image from '../../components/Image';
 import { Plus, Save, X, Pencil, Trash2, User } from 'lucide-react';
 import CustomCheckbox from '../../components/CustomCheckbox';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import ConfirmDialog from '../../components/ConfirmDialog';
+import FormField from '../../components/FormField';
 import './AdminCRUD.css';
 
 export default function AdminTestimonials() {
@@ -11,6 +14,7 @@ export default function AdminTestimonials() {
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(null);
     const [form, setForm] = useState({ nama: '', lokasi: '', isi: '', foto: '', is_featured: false, sort_order: 0, is_active: true });
+    const [deleteDialog, setDeleteDialog] = useState({ open: false, id: null });
 
     useEffect(() => { load(); }, []);
 
@@ -39,11 +43,17 @@ export default function AdminTestimonials() {
     }
 
     function handleDelete(id) {
-        if (!confirm('Apakah Anda yakin?')) return;
-        adminApi.testimonials.delete(id).then(load).catch(() => {});
+        setDeleteDialog({ open: true, id });
     }
 
-    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
+    function confirmDelete() {
+        if (deleteDialog.id) {
+            adminApi.testimonials.delete(deleteDialog.id).then(load).catch(() => {});
+        }
+        setDeleteDialog({ open: false, id: null });
+    }
+
+    if (loading) return <div className="container"><LoadingSpinner /></div>;
 
     return (
         <div className="admin-crud">
@@ -51,22 +61,13 @@ export default function AdminTestimonials() {
             <form onSubmit={handleSubmit} className="crud-form">
                 <div className="form-section">
                     <h3 className="form-section-title">Informasi Testimoni</h3>
-                    <div className="form-group">
-                        <label htmlFor="nama">Nama</label>
-                        <input id="nama" placeholder="Nama lengkap" value={form.nama} onChange={e => setForm({ ...form, nama: e.target.value })} required />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="lokasi">Lokasi</label>
-                        <input id="lokasi" placeholder="Kota, Provinsi" value={form.lokasi} onChange={e => setForm({ ...form, lokasi: e.target.value })} />
-                    </div>
+                    <FormField id="nama" label="Nama" value={form.nama} onChange={nama => setForm({ ...form, nama })} placeholder="Nama lengkap" required />
+                    <FormField id="lokasi" label="Lokasi" value={form.lokasi} onChange={lokasi => setForm({ ...form, lokasi })} placeholder="Kota, Provinsi" />
                 </div>
 
                 <div className="form-section">
                     <h3 className="form-section-title">Isi &amp; Foto</h3>
-                    <div className="form-group" style={{ gridColumn: '1 / -1' }}>
-                        <label htmlFor="isi">Testimoni</label>
-                        <textarea id="isi" placeholder="Ketik testimoni di sini..." value={form.isi} onChange={e => setForm({ ...form, isi: e.target.value })} required />
-                    </div>
+                    <FormField id="isi" label="Testimoni" type="textarea" value={form.isi} onChange={isi => setForm({ ...form, isi })} placeholder="Ketik testimoni di sini..." required fullWidth />
                     <div className="form-group">
                         <label>Foto</label>
                         <ImageUpload
@@ -89,10 +90,7 @@ export default function AdminTestimonials() {
                             Aktif
                         </CustomCheckbox>
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="sort_order">Urutan</label>
-                        <input id="sort_order" type="number" placeholder="0" value={form.sort_order} onChange={e => setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })} />
-                    </div>
+                    <FormField id="sort_order" label="Urutan" type="number" value={form.sort_order} onChange={sort_order => setForm({ ...form, sort_order: parseInt(sort_order) || 0 })} placeholder="0" />
                 </div>
 
                 <div className="form-actions">
@@ -131,6 +129,12 @@ export default function AdminTestimonials() {
                     </div>
                 ))}
             </div>
+            <ConfirmDialog
+                open={deleteDialog.open}
+                message="Apakah Anda yakin ingin menghapus testimonial ini?"
+                onConfirm={confirmDelete}
+                onCancel={() => setDeleteDialog({ open: false, id: null })}
+            />
         </div>
     );
 }

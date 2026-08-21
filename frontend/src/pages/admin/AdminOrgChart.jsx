@@ -1,47 +1,33 @@
-import { useState, useEffect } from 'react';
 import { adminApi } from '../../services/api';
 import ImageUpload from '../../components/ImageUpload';
-import { Plus, Save, X, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Save, X } from 'lucide-react';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import ConfirmDialog from '../../components/ConfirmDialog';
+import FormField from '../../components/FormField';
+import CRUDCard from '../../components/CRUDCard';
+import useCRUD from '../../hooks/useCRUD';
 import './AdminCRUD.css';
 
 export default function AdminOrgChart() {
-    const [items, setItems] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [editing, setEditing] = useState(null);
-    const [form, setForm] = useState({ nama: '', role: '', parent_id: '', foto: '', sort_order: 0 });
+    const {
+        items,
+        loading,
+        editing,
+        form,
+        setForm,
+        deleteDialog,
+        setDeleteDialog,
+        handleSubmit,
+        resetForm,
+        startEdit,
+        handleDelete,
+        confirmDelete,
+    } = useCRUD({
+        api: adminApi.orgChart,
+        initialForm: { nama: '', role: '', parent_id: '', foto: '', sort_order: 0 },
+    });
 
-    useEffect(() => { load(); }, []);
-
-    function load() {
-        setLoading(true);
-        adminApi.orgChart.list().then(data => { setItems(data); setLoading(false); }).catch(() => setLoading(false));
-    }
-
-    function handleSubmit(e) {
-        e.preventDefault();
-        if (editing) {
-            adminApi.orgChart.update(editing.id, form).then(load).then(() => setEditing(null)).catch(() => {});
-        } else {
-            adminApi.orgChart.create(form).then(load).then(() => resetForm()).catch(() => {});
-        }
-    }
-
-    function resetForm() {
-        setForm({ nama: '', role: '', parent_id: '', foto: '', sort_order: 0 });
-        setEditing(null);
-    }
-
-    function startEdit(item) {
-        setEditing(item);
-        setForm(item);
-    }
-
-    function handleDelete(id) {
-        if (!confirm('Apakah Anda yakin?')) return;
-        adminApi.orgChart.delete(id).then(load).catch(() => {});
-    }
-
-    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
+    if (loading) return <div className="container"><LoadingSpinner /></div>;
 
     return (
         <div className="admin-crud">
@@ -49,18 +35,9 @@ export default function AdminOrgChart() {
             <form onSubmit={handleSubmit} className="crud-form">
                 <div className="form-section">
                     <h3 className="form-section-title">Informasi Anggota</h3>
-                    <div className="form-group">
-                        <label htmlFor="nama">Nama</label>
-                        <input id="nama" placeholder="Nama lengkap" value={form.nama} onChange={e => setForm({ ...form, nama: e.target.value })} required />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="role">Peran / Jabatan</label>
-                        <input id="role" placeholder="contoh: Ketua, Sekretaris" value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="parent_id">ID Induk</label>
-                        <input id="parent_id" type="number" placeholder="Kosongkan jika tidak ada induk" value={form.parent_id} onChange={e => setForm({ ...form, parent_id: e.target.value })} />
-                    </div>
+                    <FormField id="nama" label="Nama" value={form.nama} onChange={nama => setForm({ ...form, nama })} placeholder="Nama lengkap" required />
+                    <FormField id="role" label="Peran / Jabatan" value={form.role} onChange={role => setForm({ ...form, role })} placeholder="contoh: Ketua, Sekretaris" />
+                    <FormField id="parent_id" label="ID Induk" type="number" value={form.parent_id} onChange={parent_id => setForm({ ...form, parent_id })} placeholder="Kosongkan jika tidak ada induk" />
                 </div>
 
                 <div className="form-section">
@@ -88,24 +65,28 @@ export default function AdminOrgChart() {
 
             <div className={`items-list${items.length === 0 ? ' is-empty' : ''}`}>
                 {items.map(item => (
-                    <div key={item.id} className="generic-card">
-                        <div className="generic-card-header">
-                            <div className="generic-card-title">
-                                <h3>{item.nama}</h3>
-                                <span className="generic-card-sub">{item.role || 'Tanpa jabatan'}</span>
-                            </div>
-                            <div className="generic-card-actions">
-                                <button onClick={() => startEdit(item)} className="btn btn-small btn-primary"><Pencil size={14} /> Edit</button>
-                                <button onClick={() => handleDelete(item.id)} className="btn btn-small btn-danger"><Trash2 size={14} /> Hapus</button>
-                            </div>
-                        </div>
-                        <div className="generic-card-meta">
-                            <span className="meta-text">ID Induk: {item.parent_id || 'Tidak Ada'}</span>
-                            <span className="meta-text">Urutan: {item.sort_order}</span>
-                        </div>
-                    </div>
+                    <CRUDCard
+                        key={item.id}
+                        item={item}
+                        onEdit={startEdit}
+                        onDelete={handleDelete}
+                        title={<h3>{item.nama}</h3>}
+                        subtitle={<span>{item.role || 'Tanpa jabatan'}</span>}
+                        meta={
+                            <>
+                                <span className="meta-text">ID Induk: {item.parent_id || 'Tidak Ada'}</span>
+                                <span className="meta-text">Urutan: {item.sort_order}</span>
+                            </>
+                        }
+                    />
                 ))}
             </div>
+            <ConfirmDialog
+                open={deleteDialog.open}
+                message="Apakah Anda yakin ingin menghapus data organisasi ini?"
+                onConfirm={confirmDelete}
+                onCancel={() => setDeleteDialog({ open: false, id: null })}
+            />
         </div>
     );
 }

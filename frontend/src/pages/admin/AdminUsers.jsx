@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import { adminApi } from '../../services/api';
-import { Plus, Save, X, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Save, X } from 'lucide-react';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import ConfirmDialog from '../../components/ConfirmDialog';
+import FormField from '../../components/FormField';
+import CRUDCard from '../../components/CRUDCard';
 import './AdminCRUD.css';
 
 export default function AdminUsers() {
@@ -8,6 +12,7 @@ export default function AdminUsers() {
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(null);
     const [form, setForm] = useState({ nama: '', email: '', password: '', role: 'admin', avatar: '' });
+    const [deleteDialog, setDeleteDialog] = useState({ open: false, id: null });
 
     useEffect(() => { load(); }, []);
 
@@ -36,11 +41,17 @@ export default function AdminUsers() {
     }
 
     function handleDelete(id) {
-        if (!confirm('Apakah Anda yakin?')) return;
-        adminApi.users.delete(id).then(load).catch(() => {});
+        setDeleteDialog({ open: true, id });
     }
 
-    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
+    function confirmDelete() {
+        if (deleteDialog.id) {
+            adminApi.users.delete(deleteDialog.id).then(load).catch(() => {});
+        }
+        setDeleteDialog({ open: false, id: null });
+    }
+
+    if (loading) return <div className="container"><LoadingSpinner /></div>;
 
     return (
         <div className="admin-crud">
@@ -48,33 +59,18 @@ export default function AdminUsers() {
             <form onSubmit={handleSubmit} className="crud-form">
                 <div className="form-section">
                     <h3 className="form-section-title">Informasi Akun</h3>
-                    <div className="form-group">
-                        <label htmlFor="nama">Nama</label>
-                        <input id="nama" placeholder="Nama lengkap" value={form.nama} onChange={e => setForm({ ...form, nama: e.target.value })} required />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="email">Email</label>
-                        <input id="email" type="email" placeholder="nama@email.com" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="password">Kata Sandi</label>
-                        <input id="password" type="password" placeholder={editing ? 'Kosongkan jika tidak diubah' : 'Kata sandi'} value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} required={!editing} />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="role">Peran</label>
-                        <select id="role" value={form.role} onChange={e => setForm({ ...form, role: e.target.value })}>
-                            <option value="admin">Admin</option>
-                            <option value="superadmin">Superadmin</option>
-                        </select>
-                    </div>
+                    <FormField id="nama" label="Nama" value={form.nama} onChange={nama => setForm({ ...form, nama })} placeholder="Nama lengkap" required />
+                    <FormField id="email" label="Email" type="email" value={form.email} onChange={email => setForm({ ...form, email })} placeholder="nama@email.com" required />
+                    <FormField id="password" label="Kata Sandi" type="password" value={form.password} onChange={password => setForm({ ...form, password })} placeholder={editing ? 'Kosongkan jika tidak diubah' : 'Kata sandi'} required={!editing} />
+                    <FormField id="role" label="Peran" type="select" value={form.role} onChange={role => setForm({ ...form, role })} options={[
+                        { value: 'admin', label: 'Admin' },
+                        { value: 'superadmin', label: 'Superadmin' },
+                    ]} />
                 </div>
 
                 <div className="form-section">
                     <h3 className="form-section-title">Profil</h3>
-                    <div className="form-group">
-                        <label htmlFor="avatar">URL Avatar</label>
-                        <input id="avatar" placeholder="https://..." value={form.avatar} onChange={e => setForm({ ...form, avatar: e.target.value })} />
-                    </div>
+                    <FormField id="avatar" label="URL Avatar" value={form.avatar} onChange={avatar => setForm({ ...form, avatar })} placeholder="https://..." />
                 </div>
 
                 <div className="form-actions">
@@ -86,23 +82,25 @@ export default function AdminUsers() {
 
             <div className={`items-list${items.length === 0 ? ' is-empty' : ''}`}>
                 {items.map(item => (
-                    <div key={item.id} className="generic-card">
-                        <div className="generic-card-header">
-                            <div className="generic-card-title">
-                                <h3>{item.nama}</h3>
-                                <span className="generic-card-sub">{item.email}</span>
-                            </div>
-                            <div className="generic-card-actions">
-                                <button onClick={() => startEdit(item)} className="btn btn-small btn-primary"><Pencil size={14} /> Edit</button>
-                                <button onClick={() => handleDelete(item.id)} className="btn btn-small btn-danger"><Trash2 size={14} /> Hapus</button>
-                            </div>
-                        </div>
-                        <div className="generic-card-meta">
+                    <CRUDCard
+                        key={item.id}
+                        item={item}
+                        onEdit={startEdit}
+                        onDelete={handleDelete}
+                        title={<h3>{item.nama}</h3>}
+                        subtitle={<span>{item.email}</span>}
+                        meta={
                             <span className={`badge badge-status ${item.role === 'superadmin' ? 'active' : 'inactive'}`}>{item.role}</span>
-                        </div>
-                    </div>
+                        }
+                    />
                 ))}
             </div>
+            <ConfirmDialog
+                open={deleteDialog.open}
+                message="Apakah Anda yakin ingin menghapus pengguna ini?"
+                onConfirm={confirmDelete}
+                onCancel={() => setDeleteDialog({ open: false, id: null })}
+            />
         </div>
     );
 }

@@ -154,35 +154,6 @@
     opacity: 1;
 }
 
-.star-rating {
-    display: flex;
-    gap: 0.25rem;
-}
-
-.star-btn {
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    color: #d1d5db;
-    transition: color 0.15s, transform 0.15s;
-}
-
-.star-btn.interactive:hover {
-    color: #f59e0b;
-    transform: scale(1.15);
-}
-
-.star-btn.filled {
-    color: #f59e0b;
-}
-
-.rating-label {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    margin-left: 0.5rem;
-}
-
 .captcha-container {
     display: flex;
     align-items: center;
@@ -330,22 +301,7 @@
     text-align: center;
 }
 
-.loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    color: var(--text-muted);
-}
 
-.spin {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
 
 @media (max-width: 768px) {
     .reviews-page h1 {
@@ -379,14 +335,6 @@
 [data-theme="dark"] .captcha-display {
     background: #0f172a;
     border-color: #334155;
-}
-
-[data-theme="dark"] .star-btn {
-    color: #475569;
-}
-
-[data-theme="dark"] .star-btn.filled {
-    color: #f59e0b;
 }
 
 [data-theme="dark"] .review-images img {

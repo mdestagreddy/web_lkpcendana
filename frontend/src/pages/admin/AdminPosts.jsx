@@ -3,6 +3,9 @@ import { adminApi } from '../../services/api';
 import { Plus, Save, X, Pencil, Trash2 } from 'lucide-react';
 import TextEditor from '../../components/TextEditor';
 import Image from '../../components/Image';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import ConfirmDialog from '../../components/ConfirmDialog';
+import FormField from '../../components/FormField';
 import './AdminCRUD.css';
 
 export default function AdminPosts() {
@@ -13,6 +16,7 @@ export default function AdminPosts() {
     const [submitting, setSubmitting] = useState(false);
     const [error, setError] = useState('');
     const [form, setForm] = useState({ title: '', slug: '', content: '', excerpt: '', featured_image: '', category_id: '', author_id: '', status: 'draft', published_at: '' });
+    const [deleteDialog, setDeleteDialog] = useState({ open: false, id: null });
 
     useEffect(() => {
         Promise.all([
@@ -76,11 +80,17 @@ export default function AdminPosts() {
     }
 
     function handleDelete(id) {
-        if (!confirm('Apakah Anda yakin?')) return;
-        adminApi.posts.delete(id).then(load).catch(err => setError(err?.data?.error || err?.message || 'Gagal menghapus postingan'));
+        setDeleteDialog({ open: true, id });
     }
 
-    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
+    function confirmDelete() {
+        if (deleteDialog.id) {
+            adminApi.posts.delete(deleteDialog.id).then(load).catch(err => setError(err?.data?.error || err?.message || 'Gagal menghapus postingan'));
+        }
+        setDeleteDialog({ open: false, id: null });
+    }
+
+    if (loading) return <div className="container"><LoadingSpinner /></div>;
 
     return (
         <div className="admin-crud">
@@ -89,26 +99,14 @@ export default function AdminPosts() {
             <form onSubmit={handleSubmit} className="crud-form">
                 <div className="form-section">
                     <h3 className="form-section-title">Informasi Artikel</h3>
-                    <div className="form-group">
-                        <label htmlFor="title">Judul</label>
-                        <input id="title" placeholder="Judul artikel" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="slug">Slug</label>
-                        <input id="slug" placeholder="contoh: cara-belajar-coding" value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} required />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="status">Status</label>
-                        <select id="status" value={form.status} onChange={e => setForm({ ...form, status: e.target.value })}>
-                            <option value="draft">Draf</option>
-                            <option value="published">Dipublikasikan</option>
-                            <option value="archived">Diarsipkan</option>
-                        </select>
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="published_at">Tanggal Publikasi</label>
-                        <input id="published_at" placeholder="YYYY-MM-DD" value={form.published_at} onChange={e => setForm({ ...form, published_at: e.target.value })} />
-                    </div>
+                    <FormField id="title" label="Judul" value={form.title} onChange={title => setForm({ ...form, title })} placeholder="Judul artikel" required />
+                    <FormField id="slug" label="Slug" value={form.slug} onChange={slug => setForm({ ...form, slug })} placeholder="contoh: cara-belajar-coding" required />
+                    <FormField id="status" label="Status" type="select" value={form.status} onChange={status => setForm({ ...form, status })} options={[
+                        { value: 'draft', label: 'Draf' },
+                        { value: 'published', label: 'Dipublikasikan' },
+                        { value: 'archived', label: 'Diarsipkan' },
+                    ]} />
+                    <FormField id="published_at" label="Tanggal Publikasi" value={form.published_at} onChange={published_at => setForm({ ...form, published_at })} placeholder="YYYY-MM-DD" />
                 </div>
 
                 <div className="form-section">
@@ -122,31 +120,17 @@ export default function AdminPosts() {
                             placeholder="Tulis konten artikel..."
                         />
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="excerpt">Ringkasan</label>
-                        <input id="excerpt" placeholder="Ringkasan singkat" value={form.excerpt} onChange={e => setForm({ ...form, excerpt: e.target.value })} />
-                    </div>
+                    <FormField id="excerpt" label="Ringkasan" value={form.excerpt} onChange={excerpt => setForm({ ...form, excerpt })} placeholder="Ringkasan singkat" />
                 </div>
 
                 <div className="form-section">
                     <h3 className="form-section-title">Klasifikasi &amp; Media</h3>
-                    <div className="form-group">
-                        <label htmlFor="category_id">Kategori</label>
-                        <select id="category_id" value={form.category_id} onChange={e => setForm({ ...form, category_id: e.target.value })}>
-                            <option value="">Tanpa Kategori</option>
-                            {categories.map(cat => (
-                                <option key={cat.id} value={cat.id}>{cat.name}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="author_id">ID Penulis</label>
-                        <input id="author_id" type="number" placeholder="1" value={form.author_id} onChange={e => setForm({ ...form, author_id: e.target.value })} />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="featured_image">URL Gambar Unggulan</label>
-                        <input id="featured_image" placeholder="https://..." value={form.featured_image} onChange={e => setForm({ ...form, featured_image: e.target.value })} />
-                    </div>
+                    <FormField id="category_id" label="Kategori" type="select" value={form.category_id} onChange={category_id => setForm({ ...form, category_id })} options={[
+                        { value: '', label: 'Tanpa Kategori' },
+                        ...categories.map(cat => ({ value: cat.id, label: cat.name })),
+                    ]} />
+                    <FormField id="author_id" label="ID Penulis" type="number" value={form.author_id} onChange={author_id => setForm({ ...form, author_id })} placeholder="1" />
+                    <FormField id="featured_image" label="URL Gambar Unggulan" value={form.featured_image} onChange={featured_image => setForm({ ...form, featured_image })} placeholder="https://..." />
                 </div>
 
                 <div className="form-actions">
@@ -185,6 +169,12 @@ export default function AdminPosts() {
                     </div>
                 ))}
             </div>
+            <ConfirmDialog
+                open={deleteDialog.open}
+                message="Apakah Anda yakin ingin menghapus postingan ini?"
+                onConfirm={confirmDelete}
+                onCancel={() => setDeleteDialog({ open: false, id: null })}
+            />
         </div>
     );
 }

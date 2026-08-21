@@ -2,6 +2,7 @@
 import { Link } from 'react-router-dom';
 import { adminApi } from '../../services/api';
 import { GraduationCap, Users, MessageSquare, Star, UserCog, FileText, Image } from 'lucide-react';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import './AdminDashboard.css';
 
 export default function AdminDashboard() {
@@ -33,7 +34,7 @@ export default function AdminDashboard() {
         }).catch(() => setLoading(false));
     }, []);
 
-    if (loading) return <div className="container"><p className="loading">Memuat...</p></div>;
+    if (loading) return <div className="container"><LoadingSpinner /></div>;
 
     const statCards = [
         { label: 'Program', value: stats.programs, link: '/admin/programs', accent: 'var(--accent-1)', icon: GraduationCap },

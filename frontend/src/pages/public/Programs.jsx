@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { publicApi } from '../../services/api';
 import { Search, Tag, Signal, ArrowRight } from 'lucide-react';
 import Image from '../../components/Image';
+import LoadingSpinner from '../../components/LoadingSpinner';
 import './Programs.css';
 
 export default function Programs() {
@@ -46,7 +47,7 @@ export default function Programs() {
                 </div>
 
                 {loading ? (
-                    <p className="loading">Memuat...</p>
+                    <LoadingSpinner />
                 ) : (
                     <div className="programs-grid">
                         {programs.map(program => (
