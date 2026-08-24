@@ -139,7 +139,7 @@
     border: 1px solid var(--border-light);
     border-radius: var(--radius-sm);
     font-size: 0.875rem;
-    background: #ffffff;
+    background-color: #ffffff;
     color: var(--text-primary);
     transition: var(--transition);
     font-family: inherit;
@@ -155,6 +155,17 @@
 .setting-group select option {
     background: #ffffff;
     color: var(--text-primary);
+}
+
+.setting-group select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.75rem center !important;
+    background-size: 16px !important;
+    padding-right: 2.5rem;
 }
 
 .upload-actions {
@@ -286,7 +297,7 @@
 
 [data-theme="dark"] .setting-group input,
 [data-theme="dark"] .setting-group select {
-    background: #1e293b;
+    background-color: #1e293b;
     border-color: #334155;
     color: #f1f5f9;
 }
@@ -298,6 +309,14 @@
 [data-theme="dark"] .setting-group select option {
     background: #1e293b;
     color: #f1f5f9;
+}
+
+[data-theme="dark"] .setting-group select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23f1f5f9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.75rem center !important;
+    background-size: 16px !important;
+    padding-right: 2.5rem;
 }
 
 [data-theme="dark"] .btn-upload:disabled {

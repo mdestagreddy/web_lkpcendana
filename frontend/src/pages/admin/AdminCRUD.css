@@ -92,8 +92,7 @@
     transition: var(--transition);
     font-family: inherit;
 }
-.crud-form select {
-    padding-right: 2.5rem;
+.crud-form select { 
     appearance: none !important;
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
@@ -103,6 +102,7 @@
     background-position: right 0.75rem center !important;
     background-size: 16px !important;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    padding-right: 2.5rem;
 }
 .crud-form input::placeholder,
 .crud-form textarea::placeholder {
@@ -162,6 +162,7 @@
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
+    margin: 0;
 }
 .crud-form .form-group label {
     font-size: 0.85rem;

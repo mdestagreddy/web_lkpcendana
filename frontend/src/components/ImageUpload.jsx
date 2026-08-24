@@ -3,6 +3,7 @@ import { Camera, MoveHorizontal, MoveVertical, Gauge, Image, Upload, Trash2, Fil
 import FlexIcon from './FlexIcon';
 import ImageComponent from './Image';
 import './ImageUpload.css';
+import './FormField.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -243,6 +244,7 @@ export default function ImageUpload({
                         <select
                             value={settings.format}
                             onChange={e => setSettings({ ...settings, format: e.target.value })}
+                            className="form-field-input"
                         >
                             <option value="jpeg">JPEG</option>
                             <option value="png">PNG</option>
