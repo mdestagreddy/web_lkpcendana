@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { adminApi } from '../../services/api';
 import ImageUpload from '../../components/ImageUpload';
 import { Plus, Save, X, Pencil, Trash2, ClipboardList } from 'lucide-react';
+import FlexIcon from '../../components/FlexIcon';
 import CustomCheckbox from '../../components/CustomCheckbox';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import ConfirmDialog from '../../components/ConfirmDialog';
@@ -129,8 +130,8 @@ export default function AdminPrograms() {
                 </div>
 
                 <div className="form-actions">
-                    <button type="submit" className="btn btn-primary">{editing ? <><Save size={16} /> Perbarui</> : <><Plus size={16} /> Tambah</>}</button>
-                    {editing && <button type="button" onClick={resetForm} className="btn btn-secondary"><X size={16} /> Batal</button>}
+                    <button type="submit" className="btn btn-primary">{editing ? <><FlexIcon Icon={Save} size={16}>Perbarui</FlexIcon></> : <><FlexIcon Icon={Plus} size={16}>Tambah</FlexIcon></>}</button>
+                    {editing && <button type="button" onClick={resetForm} className="btn btn-secondary"><FlexIcon Icon={X} size={16} /> Batal</button>}
                 </div>
             </form>
 
@@ -145,9 +146,9 @@ export default function AdminPrograms() {
                                 <span className="program-slug">/{item.slug}</span>
                             </div>
                             <div className="program-card-actions">
-                                <button onClick={() => startEdit(item)} className="btn btn-small btn-primary"><Pencil size={14} /> Edit</button>
-                                <button onClick={() => handleDelete(item.id)} className="btn btn-small btn-danger"><Trash2 size={14} /> Hapus</button>
-                                <button onClick={() => loadModules(item.id)} className="btn btn-small btn-secondary"><ClipboardList size={14} /> Modul</button>
+                                <button onClick={() => startEdit(item)} className="btn btn-small btn-primary"><FlexIcon Icon={Pencil} size={14}>Edit</FlexIcon></button>
+                                <button onClick={() => handleDelete(item.id)} className="btn btn-small btn-danger"><FlexIcon Icon={Trash2} size={14}>Hapus</FlexIcon></button>
+                                <button onClick={() => loadModules(item.id)} className="btn btn-small btn-secondary"><FlexIcon Icon={ClipboardList} size={14}>Modul</FlexIcon></button>
                             </div>
                         </div>
                         <div className="program-card-meta">
@@ -169,7 +170,7 @@ export default function AdminPrograms() {
                                         {modules[item.id].map(mod => (
                                             <div key={mod.id} className="module-item">
                                                 <span>{mod.name}</span>
-                                                <button onClick={() => deleteModule(item.id, mod.id)} className="btn btn-small btn-danger"><Trash2 size={14} /> Hapus</button>
+                                                <button onClick={() => deleteModule(item.id, mod.id)} className="btn btn-small btn-danger"><FlexIcon Icon={Trash2} size={14} /> Hapus</button>
                                             </div>
                                         ))}
                                     </div>
@@ -180,7 +181,7 @@ export default function AdminPrograms() {
                                         value={newModule[item.id]?.name || ''}
                                         onChange={e => setNewModule({ ...newModule, [item.id]: { name: e.target.value } })}
                                     />
-                                    <button onClick={() => addModule(item.id)} className="btn btn-small btn-primary"><Plus size={14} /> Tambah</button>
+                                    <button onClick={() => addModule(item.id)} className="btn btn-small btn-primary"><FlexIcon Icon={Plus} size={14} /> Tambah</button>
                                 </div>
                             </div>
                         )}

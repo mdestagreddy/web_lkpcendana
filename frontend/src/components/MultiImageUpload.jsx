@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
-import ImageComponent from './Image';
 import { Upload, Trash2, Plus } from 'lucide-react';
+import FlexIcon from './FlexIcon';
+import ImageComponent from './Image';
 import './MultiImageUpload.css';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -149,7 +150,7 @@ export default function MultiImageUpload({ value = [], onChange, label = 'Gambar
                             className="thumb-remove"
                             title="Hapus"
                         >
-                            <Trash2 size={14} />
+                            <FlexIcon Icon={Trash2} size={14} />
                         </button>
                     </div>
                 ))}
@@ -159,7 +160,7 @@ export default function MultiImageUpload({ value = [], onChange, label = 'Gambar
                     disabled={disabled || uploading}
                     className="upload-add-btn"
                 >
-                    <Plus size={24} />
+                    <FlexIcon Icon={Plus} size={24} />
                     <span>{uploading ? 'Mengupload...' : 'Tambah Gambar'}</span>
                 </button>
             </div>
@@ -171,7 +172,7 @@ export default function MultiImageUpload({ value = [], onChange, label = 'Gambar
                     disabled={disabled || uploading}
                     className="btn-upload-secondary"
                 >
-                    <Upload size={16} /> Upload dari Komputer
+                    <FlexIcon Icon={Upload} size={16}>Upload dari Komputer</FlexIcon>
                 </button>
                 <button
                     type="button"
@@ -179,7 +180,7 @@ export default function MultiImageUpload({ value = [], onChange, label = 'Gambar
                     disabled={disabled || uploading}
                     className="btn-upload-secondary"
                 >
-                    <Plus size={16} /> Tambah via URL
+                    <FlexIcon Icon={Plus} size={16}>Tambah via URL</FlexIcon>
                 </button>
             </div>
 

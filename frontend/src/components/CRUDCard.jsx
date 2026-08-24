@@ -1,4 +1,5 @@
 import { Pencil, Trash2 } from 'lucide-react';
+import FlexIcon from './FlexIcon';
 import './CRUDCard.css';
 
 function CRUDCard({ item, onEdit, onDelete, title, subtitle, description, meta, actions, className = '' }) {
@@ -14,8 +15,8 @@ function CRUDCard({ item, onEdit, onDelete, title, subtitle, description, meta, 
                 <div className="generic-card-actions">
                     {actions || (
                         <>
-                            {onEdit && <button type="button" onClick={() => onEdit(item)} className="btn btn-small btn-primary"><Pencil size={14} /> Edit</button>}
-                            {onDelete && <button type="button" onClick={() => onDelete(item.id)} className="btn btn-small btn-danger"><Trash2 size={14} /> Hapus</button>}
+                            {onEdit && <button type="button" onClick={() => onEdit(item)} className="btn btn-small btn-primary"><FlexIcon Icon={Pencil} size={14}>Edit</FlexIcon></button>}
+                            {onDelete && <button type="button" onClick={() => onDelete(item.id)} className="btn btn-small btn-danger"><FlexIcon Icon={Trash2} size={14}>Hapus</FlexIcon></button>}
                         </>
                     )}
                 </div>

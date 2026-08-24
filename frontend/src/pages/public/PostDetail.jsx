@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { publicApi } from '../../services/api';
 import { Calendar, Tag } from 'lucide-react';
+import FlexIcon from '../../components/FlexIcon';
 import Image from '../../components/Image';
 import ImageLightbox from '../../components/ImageLightbox';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -84,10 +85,10 @@ export default function PostDetail() {
                     <header className="post-detail-header">
                         <div className="post-detail-meta">
                             {post.category_name && (
-                                <span className="post-category"><Tag size={16} /> {post.category_name}</span>
+                                <span className="post-category"><FlexIcon Icon={Tag} size={16}>{post.category_name}</FlexIcon></span>
                             )}
                             {post.published_at && (
-                                <span className="post-date"><Calendar size={16} /> {new Date(post.published_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                <span className="post-date"><FlexIcon Icon={Calendar} size={16}>{new Date(post.published_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</FlexIcon></span>
                             )}
                         </div>
                         <h1>{post.title}</h1>

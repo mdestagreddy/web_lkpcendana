@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { adminApi } from '../../services/api';
 import ImageUpload from '../../components/ImageUpload';
 import { Plus, Save, X, Pencil, Trash2, User } from 'lucide-react';
+import FlexIcon from '../../components/FlexIcon';
 import { FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa';
 import { SiX } from 'react-icons/si';
 import Image from '../../components/Image';
@@ -83,10 +84,10 @@ export default function AdminInstructors() {
 
                 <div className="form-section">
                     <h3 className="form-section-title">Media Sosial</h3>
-                    <FormField id="facebook_url" label={<><FaFacebook size={16} /> Facebook</>} value={form.facebook_url} onChange={facebook_url => setForm({ ...form, facebook_url })} placeholder="https://facebook.com/username" className="url-input" />
-                    <FormField id="twitter_url" label={<><SiX size={16} /> X</>} value={form.twitter_url} onChange={twitter_url => setForm({ ...form, twitter_url })} placeholder="https://x.com/username" className="url-input" />
-                    <FormField id="instagram_url" label={<><FaInstagram size={16} /> Instagram</>} value={form.instagram_url} onChange={instagram_url => setForm({ ...form, instagram_url })} placeholder="https://instagram.com/username" className="url-input" />
-                    <FormField id="youtube_url" label={<><FaYoutube size={16} /> YouTube</>} value={form.youtube_url} onChange={youtube_url => setForm({ ...form, youtube_url })} placeholder="https://youtube.com/@username" className="url-input" />
+                    <FormField id="facebook_url" label={<><FlexIcon Icon={FaFacebook} size={16}>Facebook</FlexIcon></>} value={form.facebook_url} onChange={facebook_url => setForm({ ...form, facebook_url })} placeholder="https://facebook.com/username" className="url-input" />
+                    <FormField id="twitter_url" label={<><FlexIcon Icon={SiX} size={16}>X</FlexIcon></>} value={form.twitter_url} onChange={twitter_url => setForm({ ...form, twitter_url })} placeholder="https://x.com/username" className="url-input" />
+                    <FormField id="instagram_url" label={<><FlexIcon Icon={FaInstagram} size={16}>Instagram</FlexIcon></>} value={form.instagram_url} onChange={instagram_url => setForm({ ...form, instagram_url })} placeholder="https://instagram.com/username" className="url-input" />
+                    <FormField id="youtube_url" label={<><FlexIcon Icon={FaYoutube} size={16}>YouTube</FlexIcon></>} value={form.youtube_url} onChange={youtube_url => setForm({ ...form, youtube_url })} placeholder="https://youtube.com/@username" className="url-input" />
                 </div>
 
                 <div className="form-section">
@@ -100,8 +101,8 @@ export default function AdminInstructors() {
                 </div>
 
                 <div className="form-actions">
-                    <button type="submit" className="btn btn-primary">{editing ? <><Save size={16} /> Perbarui</> : <><Plus size={16} /> Tambah</>}</button>
-                    {(editing || form.nama || form.slug) && <button type="button" onClick={resetForm} className="btn btn-secondary"><X size={16} /> Batal</button>}
+                    <button type="submit" className="btn btn-primary">{editing ? <><FlexIcon Icon={Save} size={16}>Perbarui</FlexIcon></> : <><FlexIcon Icon={Plus} size={16}>Tambah</FlexIcon></>}</button>
+                    {(editing || form.nama || form.slug) && <button type="button" onClick={resetForm} className="btn btn-secondary"><FlexIcon Icon={X} size={16}>Batal</FlexIcon></button>}
                 </div>
             </form>
             {items.length === 0 && <p className="items-empty">Tidak ada data Instruktur</p>}
@@ -113,7 +114,7 @@ export default function AdminInstructors() {
                             {item.foto ? (
                                 <Image src={item.foto} alt={item.nama} />
                             ) : (
-                                <div className="admin-instructor-avatar"><User size={28} strokeWidth={1.5} /></div>
+                                <div className="admin-instructor-avatar"><FlexIcon Icon={User} size={28} strokeWidth={1.5} /></div>
                             )}
                         </div>
                         <div className="generic-card-header">
@@ -122,8 +123,8 @@ export default function AdminInstructors() {
                                 <span className="generic-card-sub">{item.role || 'Tanpa peran'}</span>
                             </div>
                             <div className="generic-card-actions">
-                                <button onClick={() => startEdit(item)} className="btn btn-small btn-primary"><Pencil size={14} /> Edit</button>
-                                <button onClick={() => handleDelete(item.id)} className="btn btn-small btn-danger"><Trash2 size={14} /> Hapus</button>
+                                <button onClick={() => startEdit(item)} className="btn btn-small btn-primary"><FlexIcon Icon={Pencil} size={14}>Edit</FlexIcon></button>
+                                <button onClick={() => handleDelete(item.id)} className="btn btn-small btn-danger"><FlexIcon Icon={Trash2} size={14}>Hapus</FlexIcon></button>
                             </div>
                         </div>
                         <div className="generic-card-meta">

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { publicApi, API_BASE_URL } from '../../services/api';
 import { Send, Camera, X } from 'lucide-react';
+import FlexIcon from '../../components/FlexIcon';
 import ImageLightbox from '../../components/ImageLightbox';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import StarRating from '../../components/StarRating';
@@ -251,7 +252,7 @@ export default function Reviews() {
                                     onClick={() => fileInputRef.current?.click()}
                                     disabled={uploadingImages || previewImages.length >= 5}
                                 >
-                                    <Camera size={16} /> {uploadingImages ? 'Mengunggah...' : `Tambah Gambar (${previewImages.length}/5)`}
+                                    <FlexIcon Icon={Camera} size={16}>{uploadingImages ? 'Mengunggah...' : `Tambah Gambar (${previewImages.length}/5)`}</FlexIcon>
                                 </button>
                                 {previewImages.length > 0 && (
                                     <div className="image-previews">
@@ -259,7 +260,7 @@ export default function Reviews() {
                                             <div key={idx} className="image-preview">
                                                 <img src={URL.createObjectURL(file)} alt={`Preview ${idx + 1}`} />
                                                 <button type="button" className="remove-img" onClick={() => removeImage(idx)}>
-                                                    <X size={12} />
+                                                    <FlexIcon Icon={X} size={12} />
                                                 </button>
                                             </div>
                                         ))}
@@ -275,7 +276,7 @@ export default function Reviews() {
                                         <div className="captcha-loading">Memuat captcha...</div>
                                     )}
                                     <button type="button" className="btn btn-small btn-secondary" onClick={loadCaptcha} title="Muat ulang captcha">
-                                        <Send size={14} /> Refresh
+                                        <FlexIcon Icon={Send} size={14}>Refresh</FlexIcon>
                                     </button>
                                 </div>
                                 <input
@@ -287,7 +288,7 @@ export default function Reviews() {
                                 />
                             </div>
                             <button type="submit" className="btn btn-primary submit-btn" disabled={submitting}>
-                                {submitting ? <LoadingSpinner text="Mengirim..." size="sm" className="inline" /> : <><Send size={16} /> Kirim Ulasan</>}
+                                    {submitting ? <LoadingSpinner text="Mengirim..." size="sm" className="inline" /> : <FlexIcon Icon={Send} size={16}>Kirim Ulasan</FlexIcon>}
                             </button>
                         </form>
                     </div>

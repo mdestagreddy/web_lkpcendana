@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react';
+import FlexIcon from './FlexIcon';
 import './CustomCheckbox.css';
 
 export default function CustomCheckbox({ id, checked, onChange, children, ...props }) {
@@ -13,7 +14,7 @@ export default function CustomCheckbox({ id, checked, onChange, children, ...pro
                     {...props}
                 />
                 <span className="custom-checkbox-box" aria-hidden="true">
-                    <Check size={14} strokeWidth={3} />
+                    <FlexIcon Icon={Check} size={14} strokeWidth={3} />
                 </span>
             </span>
             {children && <span className="custom-checkbox-label">{children}</span>}

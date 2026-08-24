@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { publicApi } from '../../services/api';
 import { Calendar, Tag, ArrowRight } from 'lucide-react';
+import FlexIcon from '../../components/FlexIcon';
 import Image from '../../components/Image';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import './Posts.css';
@@ -53,15 +54,15 @@ export default function Posts() {
                                 <div className="post-body">
                                     <div className="post-meta">
                                         {post.category_name && (
-                                            <span className="post-category"><Tag size={14} /> {post.category_name}</span>
+                                            <span className="post-category"><FlexIcon Icon={Tag} size={14}>{post.category_name}</FlexIcon></span>
                                         )}
                                         {post.published_at && (
-                                            <span className="post-date"><Calendar size={14} /> {new Date(post.published_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                                            <span className="post-date"><FlexIcon Icon={Calendar} size={14}>{new Date(post.published_at).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</FlexIcon></span>
                                         )}
                                     </div>
                                     <h2>{post.title}</h2>
                                     {post.excerpt && <p className="post-excerpt">{post.excerpt}</p>}
-                                    <Link to={`/posts/${post.id}`} className="btn btn-primary"><ArrowRight size={16} /> Baca Selengkapnya</Link>
+                                    <Link to={`/posts/${post.id}`} className="btn btn-primary"><FlexIcon Icon={ArrowRight} size={16}>Baca Selengkapnya</FlexIcon></Link>
                                 </div>
                             </article>
                         ))}

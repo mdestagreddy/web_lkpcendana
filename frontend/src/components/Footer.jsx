@@ -2,6 +2,7 @@
 import { publicApi } from '../services/api';
 import { useState, useEffect } from 'react';
 import { Monitor, Wifi, ClipboardList, MapPin, Phone, Mail } from 'lucide-react';
+import FlexIcon from './FlexIcon';
 import SocialLinks from './SocialLinks';
 import './Footer.css';
 
@@ -28,21 +29,21 @@ export default function Footer() {
                 <div className="footer-section">
                     <h3>{institution.name || 'LKP Cendana'}</h3>
                     {institution.address && (
-                        <p><MapPin size={16} style={{ marginRight: 8, verticalAlign: 'text-bottom', flexShrink: 0 }} />{institution.address}</p>
+                        <p><FlexIcon Icon={MapPin} align="start" size={16} style={{ marginRight: 8, flexShrink: 0, marginBottom: '0.5rem', }}>{institution.address}</FlexIcon></p>
                     )}
                     {(institution.phone || institution.email) && (
                         <p>
-                            {institution.phone && <><Phone size={16} style={{ marginRight: 8, verticalAlign: 'text-bottom', flexShrink: 0 }} />{institution.phone}</>}<br />
-                            {institution.email && <><Mail size={16} style={{ marginRight: 8, verticalAlign: 'text-bottom', flexShrink: 0 }} />{institution.email}</>}
+                            {institution.phone && <><FlexIcon Icon={Phone} size={16} style={{ marginRight: 8, flexShrink: 0 }}>{institution.phone}</FlexIcon></>}<br />
+                            {institution.email && <><FlexIcon Icon={Mail} size={16} style={{ marginRight: 8, flexShrink: 0 }}>{institution.email}</FlexIcon></>}
                         </p>
                     )}
                 </div>
                 <div className="footer-section">
                     <h4>Program Unggulan</h4>
                     <ul>
-                        <li><Link to="/programs?type=offline"><Monitor size={16} /> Offline Classes</Link></li>
-                        <li><Link to="/programs?type=online"><Wifi size={16} /> Online Courses</Link></li>
-                        <li><Link to="/registration"><ClipboardList size={16} /> Pendaftaran</Link></li>
+                        <li><Link to="/programs?type=offline"><FlexIcon Icon={Monitor} size={16}>Offline Classes</FlexIcon></Link></li>
+                        <li><Link to="/programs?type=online"><FlexIcon Icon={Wifi} size={16}>Online Courses</FlexIcon></Link></li>
+                        <li><Link to="/registration"><FlexIcon Icon={ClipboardList} size={16}>Pendaftaran</FlexIcon></Link></li>
                     </ul>
                 </div>
                 <div className="footer-section">

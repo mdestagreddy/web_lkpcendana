@@ -62,24 +62,11 @@ button {
     outline: none;
     font-family: inherit;
 }
+
 img {
     max-width: 100%;
     height: auto;
     display: block;
-}
-button svg,
-a svg,
-label svg,
-span svg,
-p svg,
-li svg,
-h1 svg,
-h2 svg,
-h3 svg,
-h4 svg {
-    display: inline-block;
-    vertical-align: middle;
-    position: relative;
 }
 ::-webkit-scrollbar {
     width: 8px;

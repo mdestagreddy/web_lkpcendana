@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { publicApi } from '../../services/api';
 import { LayoutGrid, Filter, ZoomIn } from 'lucide-react';
+import FlexIcon from '../../components/FlexIcon';
 import ImageLightbox from '../../components/ImageLightbox';
 import Image from '../../components/Image';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -33,7 +34,7 @@ export default function Gallery() {
                         className={!filter ? 'active' : ''}
                         onClick={() => setFilter('')}
                     >
-                        <LayoutGrid size={16} /> Semua
+                        <FlexIcon Icon={LayoutGrid} size={16}>Semua</FlexIcon>
                     </button>
                     {categories.map(cat => (
                         <button
@@ -41,7 +42,7 @@ export default function Gallery() {
                             className={filter === cat ? 'active' : ''}
                             onClick={() => setFilter(cat)}
                         >
-                            <Filter size={16} /> {cat.replace(/_/g, ' ')}
+                                <FlexIcon Icon={Filter} size={16}>{cat.replace(/_/g, ' ')}</FlexIcon>
                         </button>
                     ))}
                 </div>
@@ -56,7 +57,7 @@ export default function Gallery() {
                                     <div className="gallery-item-image" onClick={() => lightboxRef.current?.openLightbox(lightboxItems, idx)}>
                                         <Image src={item.image_url} alt={item.alt_text || item.caption} loading="lazy" />
                                         <div className="gallery-item-overlay">
-                                            <ZoomIn size={20} />
+                                            <FlexIcon Icon={ZoomIn} size={20} />
                                         </div>
                                     </div>
                                 ) : (

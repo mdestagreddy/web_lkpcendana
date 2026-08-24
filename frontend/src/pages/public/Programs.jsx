@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { publicApi } from '../../services/api';
 import { Search, Tag, Signal, ArrowRight } from 'lucide-react';
+import FlexIcon from '../../components/FlexIcon';
 import Image from '../../components/Image';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import './Programs.css';
@@ -36,7 +37,7 @@ export default function Programs() {
                         <option value="Expert">Expert</option>
                     </select>
                     <div className="search-input-wrapper">
-                        <Search size={18} />
+                        <FlexIcon Icon={Search} size={18} />
                         <input
                             type="text"
                             placeholder="Cari program..."
@@ -59,8 +60,10 @@ export default function Programs() {
                                         <div className="program-image-placeholder">Tidak ada gambar</div>
                                     )}
                                 </div>
-                                <span className="badge"><Tag size={14} /> {program.category.toUpperCase()}</span>
-                                <span className="level-badge"><Signal size={14} /> {program.level}</span>
+                                <span className="badges">
+                                    <span className="badge"><FlexIcon Icon={Tag} size={14}>{program.category.toUpperCase()}</FlexIcon></span>
+                                    <span className="level-badge"><FlexIcon Icon={Signal} size={14}>{program.level}</FlexIcon></span>
+                                </span>
                                 <h3>{program.title}</h3>
                                 <p>{program.description}</p>
                                 <div className="program-meta">
@@ -69,7 +72,7 @@ export default function Programs() {
                                         <span>{Math.floor(program.duration_minutes / 60)}j {program.duration_minutes % 60}m</span>
                                     )}
                                 </div>
-                                <Link to={`/programs/${program.id}`} className="btn btn-primary"><ArrowRight size={18} /> Lihat Detail</Link>
+                                <Link to={`/programs/${program.id}`} className="btn btn-primary"><FlexIcon Icon={ArrowRight} size={18}>Lihat Detail</FlexIcon></Link>
                             </div>
                         ))}
                     </div>

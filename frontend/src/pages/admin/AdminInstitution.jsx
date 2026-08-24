@@ -3,6 +3,7 @@ import { adminApi } from '../../services/api';
 import { Plus, Save, X, Pencil } from 'lucide-react';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import Alert from '../../components/Alert';
+import FlexIcon from '../../components/FlexIcon';
 import './AdminCRUD.css';
 
 export default function AdminInstitution() {
@@ -119,7 +120,7 @@ export default function AdminInstitution() {
                             rows={2}
                         />
                         <button type="button" onClick={handleSaveWelcome} className="btn btn-primary" disabled={savingWelcome || saving}>
-                            {(savingWelcome || saving) ? 'Menyimpan...' : <><Save size={16} /> Simpan Sambutan</>}
+                            {(savingWelcome || saving) ? 'Menyimpan...' : <><FlexIcon Icon={Save}  size={16}>Simpan Sambutan</FlexIcon></>}
                         </button>
                     </div>
                     <div className="form-group" style={{ gridColumn: '1 / -1' }}>
@@ -132,7 +133,7 @@ export default function AdminInstitution() {
                             rows={2}
                         />
                         <button type="button" onClick={handleSaveHero} className="btn btn-primary" disabled={savingHero || saving}>
-                            {(savingHero || saving) ? 'Menyimpan...' : <><Save size={16} /> Simpan Tagline</>}
+                            {(savingHero || saving) ? 'Menyimpan...' : <><FlexIcon Icon={Save} size={16}>Simpan Tagline</FlexIcon></>}
                         </button>
                     </div>
                 </div>
@@ -150,8 +151,8 @@ export default function AdminInstitution() {
                 </div>
 
                 <div className="form-actions">
-                    <button type="submit" className="btn btn-primary" disabled={saving}>{editing ? <><Save size={16} /> Perbarui</> : <><Plus size={16} /> Buat/Perbarui</>}</button>
-                    {editing && <button type="button" onClick={resetForm} className="btn btn-secondary" disabled={saving}><X size={16} /> Batal</button>}
+                    <button type="submit" className="btn btn-primary" disabled={saving}>{editing ? <><Save size={16} /> Perbarui</> : <><FlexIcon Icon={Plus} size={16}>Buat/Perbarui</FlexIcon></>}</button>
+                    {editing && <button type="button" onClick={resetForm} className="btn btn-secondary" disabled={saving}><FlexIcon Icon={X} size={16}>Batal</FlexIcon></button>}
                 </div>
             </form>
             {items.length === 0 && <p className="items-empty">Tidak ada data Institusi</p>}
@@ -164,7 +165,7 @@ export default function AdminInstitution() {
                             <p>{item.value}</p>
                         </div>
                         <div className="item-actions">
-                            <button onClick={() => startEdit(item)} className="btn btn-small btn-primary"><Pencil size={14} /> Edit</button>
+                            <button onClick={() => startEdit(item)} className="btn btn-small btn-primary"><FlexIcon Icon={Pencil} size={14}>Edit</FlexIcon></button>
                         </div>
                     </div>
                 ))}

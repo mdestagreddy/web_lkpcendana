@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { adminApi } from '../../services/api';
-import { Plus, Save, X, Pencil, Trash2, Calendar } from 'lucide-react';
+import { Plus, Save, X, Pencil, Trash2, Calendar, Image, Star } from 'lucide-react';
+import FlexIcon from '../../components/FlexIcon';
 import CustomCheckbox from '../../components/CustomCheckbox';
 import MultiImageUpload from '../../components/MultiImageUpload';
 import ImageLightbox from '../../components/ImageLightbox';
@@ -131,8 +132,8 @@ export default function AdminReviews() {
                 </div>
 
                 <div className="form-actions">
-                    <button type="submit" className="btn btn-primary">{editing ? <><Save size={16} /> Perbarui</> : <><Plus size={16} /> Tambah</>}</button>
-                    {editing && <button type="button" onClick={resetForm} className="btn btn-secondary"><X size={16} /> Batal</button>}
+                    <button type="submit" className="btn btn-primary">{editing ? <><FlexIcon Icon={Save} size={16}>Perbarui</FlexIcon></> : <><FlexIcon Icon={Plus} size={16}>Tambah</FlexIcon></>}</button>
+                    {editing && <button type="button" onClick={resetForm} className="btn btn-secondary"><FlexIcon Icon={X} size={16}>Batal</FlexIcon></button>}
                 </div>
             </form>
             {items.length === 0 && <p className="items-empty">Tidak ada data Ulasan</p>}
@@ -151,11 +152,11 @@ export default function AdminReviews() {
                         <div key={item.id} className="generic-card">
                             <div className="generic-card-header">
                                 <div className="generic-card-title">
-                                    <h3>{item.nama} <span className="generic-card-sub">⭐ {item.rating}/5</span></h3>
+                                    <h3>{item.nama}<span className="generic-card-sub" style={{ marginLeft: '0.5rem' }}><FlexIcon Icon={Star} color={'#f59e0b'} fill={'#f59e0b'}>{item.rating}/5</FlexIcon></span></h3>
                                 </div>
                                 <div className="generic-card-actions">
-                                    <button onClick={() => startEdit(item)} className="btn btn-small btn-primary"><Pencil size={14} /> Edit</button>
-                                    <button onClick={() => handleDelete(item.id)} className="btn btn-small btn-danger"><Trash2 size={14} /> Hapus</button>
+                                    <button onClick={() => startEdit(item)} className="btn btn-small btn-primary"><FlexIcon Icon={Pencil} size={14}>Edit</FlexIcon></button>
+                                    <button onClick={() => handleDelete(item.id)} className="btn btn-small btn-danger"><FlexIcon Icon={Trash2} size={14}>Hapus</FlexIcon></button>
                                 </div>
                             </div>
                             <p className="generic-card-desc">{item.isi}</p>
@@ -163,9 +164,9 @@ export default function AdminReviews() {
                                 <ImageLightbox items={imgs.map(url => ({ src: url, author: item.nama, text: item.isi }))} className="admin-review-images" />
                             )}
                             <div className="generic-card-meta">
-                                {imgs.length > 0 && <span className="badge badge-info">📷 {imgs.length} gambar</span>}
+                                {imgs.length > 0 && <span className="badge badge-info"><FlexIcon Icon={Image} size={14}>{imgs.length} gambar</FlexIcon></span>}
                                 <span className={`badge badge-status ${item.is_active ? 'active' : 'inactive'}`}>{item.is_active ? 'Aktif' : 'Nonaktif'}</span>
-                                {item.created_at && <span className="badge badge-date"><Calendar size={14} /> {formatDate(item.created_at)}</span>}
+                                {item.created_at && <span className="badge badge-date"><FlexIcon Icon={Calendar} size={14}>{formatDate(item.created_at)}</FlexIcon></span>}
                             </div>
                         </div>
                     );

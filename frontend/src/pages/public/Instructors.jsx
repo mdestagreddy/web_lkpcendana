@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { publicApi } from '../../services/api';
 import { User } from 'lucide-react';
+import FlexIcon from '../../components/FlexIcon';
 import Image from '../../components/Image';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SocialLinks from '../../components/SocialLinks';
@@ -30,7 +31,7 @@ export default function Instructors() {
                                 {instructor.foto ? (
                                     <Image src={instructor.foto} alt={instructor.nama} />
                                 ) : (
-                                    <div className="placeholder"><User size={48} strokeWidth={1} /></div>
+                                    <div className="placeholder">                                    <FlexIcon Icon={User} size={48} strokeWidth={1} /></div>
                                 )}
                             </div>
                             <h3>{instructor.nama}</h3>

@@ -1,0 +1,13 @@
+.flex-icon {
+    display: inline-flex;
+    justify-content: center;
+    flex-shrink: 0;
+    vertical-align: -0.15em;
+    gap: 0.5rem;
+    line-height: 1;
+    color: inherit;
+
+    & svg {
+        flex-shrink: 0;
+    }
+}

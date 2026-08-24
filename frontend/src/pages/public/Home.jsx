@@ -2,6 +2,7 @@
 import { publicApi } from '../../services/api';
 import { useState, useEffect } from 'react';
 import { Star, Wifi, MessageSquare, ArrowRight, Building2, User } from 'lucide-react';
+import FlexIcon from '../../components/FlexIcon';
 import Image from '../../components/Image';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import './Home.css';
@@ -91,7 +92,7 @@ export default function Home() {
                     />
                 ) : (
                     <div className="header-placeholder">
-                        <Building2 size={64} strokeWidth={1} />
+                        <FlexIcon Icon={Building2} size={64} strokeWidth={1} />
                         <p className="header-placeholder-text">{siteName}</p>
                     </div>
                 )}
@@ -112,7 +113,7 @@ export default function Home() {
             {featuredPrograms.length > 0 && (
                 <section className="featured-section">
                     <div className="container">
-                        <h2><Star size={24} /> Program Unggulan</h2>
+                        <h2><FlexIcon Icon={Star} size={24}>Program Unggulan</FlexIcon></h2>
                         <div className="programs-grid">
                             {featuredPrograms.map(program => (
                                 <div key={program.id} className="program-card featured">
@@ -125,7 +126,7 @@ export default function Home() {
                                     </div>
                                     <h3>{program.title}</h3>
                                     <p>{program.description}</p>
-                                    <Link to="/registration" className="btn btn-primary"><ArrowRight size={18} /> Daftar Sekarang</Link>
+                                    <Link to="/registration" className="btn btn-primary"><FlexIcon Icon={ArrowRight} size={18}>Daftar Sekarang</FlexIcon></Link>
                                 </div>
                             ))}
                         </div>
@@ -136,7 +137,7 @@ export default function Home() {
             {onlinePrograms.length > 0 && (
                 <section className="online-section">
                     <div className="container">
-                        <h2><Wifi size={24} /> Pelatihan Online</h2>
+                        <h2><FlexIcon Icon={Wifi} size={24}>Pelatihan Online</FlexIcon></h2>
                         <div className="programs-grid">
                             {onlinePrograms.map(program => (
                                 <div key={program.id} className="program-card">
@@ -161,7 +162,7 @@ export default function Home() {
             {testimonials.length > 0 && (
                 <section className="testimonials-section">
                     <div className="container">
-                        <h2><MessageSquare size={24} /> Testimoni Alumni</h2>
+                        <h2><FlexIcon Icon={MessageSquare} size={24}>Testimoni Alumni</FlexIcon></h2>
                         <div className="testimonials-grid">
                             {testimonials.map(item => (
                                 <div key={item.id} className="testimonial-card">
@@ -169,7 +170,7 @@ export default function Home() {
                                         <Image src={item.foto} alt={item.nama} className="testimonial-photo" />
                                     ) : (
                                         <div className="testimonial-avatar">
-                                            <User size={40} strokeWidth={1.5} />
+                                            <FlexIcon Icon={User} size={40} strokeWidth={1.5} />
                                         </div>
                                     )}
                                     <p>"{item.isi}"</p>

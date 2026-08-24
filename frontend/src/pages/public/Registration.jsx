@@ -1,4 +1,5 @@
 import { Monitor, Car } from 'lucide-react';
+import FlexIcon from '../../components/FlexIcon';
 import './Registration.css';
 
 const FORMS = [
@@ -28,9 +29,9 @@ export default function Registration() {
                         return (
                             <div key={form.title} className="iframe-card">
                                 <div className="iframe-card-header">
-                                    <div className="iframe-icon">
-                                        <Icon size={24} />
-                                    </div>
+                                <div className="iframe-icon">
+                                    <FlexIcon Icon={Icon} size={24} />
+                                </div>
                                     <div>
                                         <h3>{form.title}</h3>
                                         <p>{form.description}</p>

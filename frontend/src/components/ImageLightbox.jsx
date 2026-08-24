@@ -5,6 +5,7 @@ import Captions from 'yet-another-react-lightbox/plugins/captions';
 import 'yet-another-react-lightbox/plugins/captions.css';
 import Zoom from 'yet-another-react-lightbox/plugins/zoom';
 import { ZoomIn } from 'lucide-react';
+import FlexIcon from './FlexIcon';
 import './ImageLightbox.css';
 
 const API_BASE_URL = import.meta.env.VITE_BACKEND || 'http://localhost:5000';
@@ -98,7 +99,7 @@ const ImageLightboxComponent = ({ items, multiTrigger, open: controlledOpen, onC
                         >
                             <img src={slide.src} alt={slide.title ? `Ulasan oleh ${slide.title}` : `Ulasan gambar ${idx + 1}`} loading="lazy" />
                             <span className="lightbox-overlay">
-                                <ZoomIn size={20} />
+                                <FlexIcon Icon={ZoomIn} size={20} />
                             </span>
                         </button>
                     ))}

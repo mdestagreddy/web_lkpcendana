@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { adminApi } from '../../services/api';
 import ImageUpload from '../../components/ImageUpload';
 import { Plus, Save, X, Pencil, Trash2, ZoomIn } from 'lucide-react';
+import FlexIcon from '../../components/FlexIcon';
 import CustomCheckbox from '../../components/CustomCheckbox';
 import ImageLightbox from '../../components/ImageLightbox';
 import Image from '../../components/Image';
@@ -101,8 +102,8 @@ export default function AdminGallery() {
                 </div>
 
                 <div className="form-actions">
-                    <button type="submit" className="btn btn-primary">{editing ? <><Save size={16} /> Perbarui</> : <><Plus size={16} /> Tambah</>}</button>
-                    {editing && <button type="button" onClick={resetForm} className="btn btn-secondary"><X size={16} /> Batal</button>}
+                    <button type="submit" className="btn btn-primary">{editing ? <><FlexIcon Icon={Save} size={16}>Perbarui</FlexIcon></> : <><FlexIcon Icon={Plus} size={16}>Tambah</FlexIcon></>}</button>
+                    {editing && <button type="button" onClick={resetForm} className="btn btn-secondary"><FlexIcon Icon={X} size={16}>Batal</FlexIcon></button>}
                 </div>
             </form>
             {items.length === 0 && <p className="items-empty">Tidak ada data Galeri</p>}
@@ -115,7 +116,7 @@ export default function AdminGallery() {
                                 <div className="gallery-card-image" onClick={() => lightboxRef.current?.openLightbox(lightboxItems, idx)}>
                                     <Image src={item.image_url} alt={item.alt_text || item.caption || 'Galeri'} loading="lazy" />
                                     <div className="gallery-card-overlay">
-                                        <ZoomIn size={20} />
+                                        <FlexIcon Icon={ZoomIn} size={20} />
                                     </div>
                                 </div>
                             ) : (
@@ -126,8 +127,8 @@ export default function AdminGallery() {
                             <h3>{item.caption || 'Tanpa keterangan'}</h3>
                             <p>{item.kategori}</p>
                             <div className="generic-card-actions">
-                                <button onClick={() => startEdit(item)} className="btn btn-small btn-primary"><Pencil size={14} /> Edit</button>
-                                <button onClick={() => handleDelete(item.id)} className="btn btn-small btn-danger"><Trash2 size={14} /> Hapus</button>
+                                <button onClick={() => startEdit(item)} className="btn btn-small btn-primary"><FlexIcon Icon={Pencil} size={14}>Edit</FlexIcon></button>
+                                <button onClick={() => handleDelete(item.id)} className="btn btn-small btn-danger"><FlexIcon Icon={Trash2} size={14}>Hapus</FlexIcon></button>
                             </div>
                         </div>
                     </div>

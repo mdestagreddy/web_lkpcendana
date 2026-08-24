@@ -1,5 +1,6 @@
 import { FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa';
 import { SiX } from 'react-icons/si';
+import FlexIcon from './FlexIcon';
 import './SocialLinks.css';
 
 const iconMap = {
@@ -26,8 +27,9 @@ function SocialLinks({ links = [], size = 18, showLabel = false }) {
             if (!Icon) return null;
             return (
                 <a key={link.platform} href={link.url} target="_blank" rel="noopener noreferrer" aria-label={labelMap[link.platform?.toLowerCase()] || link.platform}>
-                    <Icon size={size} />
-                    {showLabel && <span className="social-label">{labelMap[link.platform?.toLowerCase()] || link.platform}</span>}
+                    <FlexIcon Icon={Icon} size={size}>
+                        {showLabel && <span className="social-label">{labelMap[link.platform?.toLowerCase()] || link.platform}</span>}
+                    </FlexIcon>
                 </a>
             );
         })

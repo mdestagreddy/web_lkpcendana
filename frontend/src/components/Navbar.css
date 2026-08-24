@@ -41,6 +41,7 @@
     align-items: center;
     gap: 0.6rem;
     letter-spacing: -0.02em;
+    flex-shrink: 0;
 }
 
 .theme-toggle-nav {
@@ -170,8 +171,9 @@
     padding: 0;
     transition: background 0.2s ease;
     display: none;
-    line-height: 0;
     margin: auto 0;
+    width: 40px;
+    height: 40px;
 }
 
 .navbar .sidebar-toggle:hover {
@@ -186,7 +188,7 @@
     stroke: #f1f5f9;
 }
 
-.navbar .sidebar-toggle span {
+.navbar .sidebar-toggle > span:not(.flex-icon) {
     display: block;
     width: 24px;
     height: 2px;
@@ -196,20 +198,16 @@
     transform-origin: center;
 }
 
-[data-theme="dark"] .navbar .sidebar-toggle span {
-    background: #f1f5f9;
-}
-
-.navbar .sidebar-toggle.open span:nth-child(1) {
+.navbar .sidebar-toggle.open > span:not(.flex-icon):nth-child(1) {
     transform: translateY(8px) rotate(45deg);
 }
 
-.navbar .sidebar-toggle.open span:nth-child(2) {
+.navbar .sidebar-toggle.open > span:not(.flex-icon):nth-child(2) {
     opacity: 0;
     transform: scaleX(0);
 }
 
-.navbar .sidebar-toggle.open span:nth-child(3) {
+.navbar .sidebar-toggle.open > span:not(.flex-icon):nth-child(3) {
     transform: translateY(-8px) rotate(-45deg);
 }
 

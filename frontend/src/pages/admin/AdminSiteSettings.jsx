@@ -2,6 +2,7 @@
 import { adminApi } from '../../services/api';
 import ImageUpload from '../../components/ImageUpload';
 import { Plus, Save, X } from 'lucide-react';
+import FlexIcon from '../../components/FlexIcon';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import Alert from '../../components/Alert';
 import CRUDCard from '../../components/CRUDCard';
@@ -133,8 +134,8 @@ export default function AdminSiteSettings() {
                 <form onSubmit={handleSubmit} className="crud-form">
                     <input placeholder="Kunci" value={form.key_name} onChange={e => setForm({ ...form, key_name: e.target.value })} required disabled={!!editing} />
                     <input placeholder="Nilai" value={form.value} onChange={e => setForm({ ...form, value: e.target.value })} required />
-                    <button type="submit" className="btn btn-primary">{editing ? <><Save size={16} /> Perbarui</> : <><Plus size={16} /> Buat/Perbarui</>}</button>
-                    {editing && <button type="button" onClick={resetForm} className="btn btn-secondary"><X size={16} /> Batal</button>}
+                    <button type="submit" className="btn btn-primary">{editing ? <><FlexIcon Icon={Save} size={16} /> Perbarui</> : <><FlexIcon Icon={Plus} size={16}>Buat/Perbarui</FlexIcon></>}</button>
+                    {editing && <button type="button" onClick={resetForm} className="btn btn-secondary"><FlexIcon Icon={X} size={16}>Batal</FlexIcon></button>}
                 </form>
                 {filteredSettings.length === 0 ? (
                     <p className="items-empty">Tidak ada data Pengaturan</p>

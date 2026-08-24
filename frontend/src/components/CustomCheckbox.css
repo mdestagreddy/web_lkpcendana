@@ -1,7 +1,6 @@
 .custom-checkbox-wrapper {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 0.6rem;
     cursor: pointer;
     user-select: none;
     font-size: 0.9rem;
@@ -36,10 +35,6 @@
     background: #ffffff;
     color: transparent;
     transition: all 0.2s ease;
-
-    &> * {
-        transform: translateY(0.1rem);
-    }
 }
 
 .custom-checkbox input:checked + .custom-checkbox-box {
@@ -57,10 +52,13 @@
     border-color: var(--blue-700);
 }
 
+.custom-checkbox-wrapper .custom-checkbox-label {
+    margin-left: 0.5rem;
+}
+
 @media (max-width: 640px) {
     .custom-checkbox-wrapper {
         font-size: 0.85rem;
-        gap: 0.5rem;
     }
 
     .custom-checkbox-box {

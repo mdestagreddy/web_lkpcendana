@@ -1,5 +1,72 @@
 .reviews-page {
-    padding: 2rem 0 4rem;
+    padding: 3rem 2rem;
+}
+
+.reviews-page .btn {
+    display: inline-block;
+    padding: 0.75rem 1.75rem;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.01em;
+    transition: var(--transition);
+    background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.reviews-page .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.35);
+    filter: brightness(1.1);
+}
+
+.reviews-page .btn-primary:hover {
+    filter: brightness(1.15);
+}
+
+.reviews-page .btn-secondary {
+    background: #f1f5f9;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-light);
+}
+
+.reviews-page .btn-secondary:hover {
+    background: #e2e8f0;
+}
+
+.reviews-page .btn-small {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.reviews-page .upload-btn,
+.reviews-page .submit-btn {
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
+}
+
+[data-theme="dark"] .reviews-page .btn {
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+}
+
+[data-theme="dark"] .reviews-page .btn:hover {
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.45);
+}
+
+[data-theme="dark"] .reviews-page .btn-secondary {
+    background: #1e293b;
+    color: #cbd5e1;
+    border-color: #334155;
+}
+
+[data-theme="dark"] .reviews-page .btn-secondary:hover {
+    background: #334155;
 }
 
 .reviews-page h1 {
@@ -23,6 +90,7 @@
 @media (max-width: 900px) {
     .reviews-layout {
         grid-template-columns: 1fr;
+        gap: 1rem;
     }
 }
 
@@ -245,11 +313,6 @@
     max-height: 400px;
 }
 
-.upload-btn {
-    width: 100%;
-    justify-content: center;
-}
-
 .image-previews {
     display: flex;
     gap: 0.5rem;
@@ -288,12 +351,6 @@
     cursor: pointer;
 }
 
-.submit-btn {
-    width: 100%;
-    justify-content: center;
-    margin-top: 0.5rem;
-}
-
 .empty-message {
     color: var(--text-muted);
     font-style: italic;
@@ -304,6 +361,10 @@
 
 
 @media (max-width: 768px) {
+    .reviews-page {
+        padding: 2rem 0 1rem 0;
+    }
+    
     .reviews-page h1 {
         font-size: 1.5rem;
     }

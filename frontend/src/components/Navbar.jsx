@@ -1,7 +1,8 @@
 ﻿import { Link, useLocation } from 'react-router-dom';
 import { publicApi } from '../services/api';
 import { useState, useEffect } from 'react';
-import { Home, GraduationCap, Users, Image, ClipboardList, Info, Phone, Shield, Menu, X, Sun, Moon, Monitor, FileText, Star } from 'lucide-react';
+import { Home, GraduationCap, Users, Image, ClipboardList, Info, Phone, Shield, X, Sun, Moon, Monitor, FileText, Star } from 'lucide-react';
+import FlexIcon from './FlexIcon';
 import { useTheme } from '../context/useTheme';
 import AppImage from './Image';
 import './Navbar.css';
@@ -33,7 +34,9 @@ export default function Navbar({ menuOpen, onToggleSidebar }) {
                     onClick={onToggleSidebar}
                     aria-label="Toggle menu"
                 >
-                    {menuOpen ? <X size={24} /> : <Menu size={24} />}
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </button>
                 <Link to="/" className="navbar-brand">
                     {settings.logo_image ? (
@@ -51,20 +54,20 @@ export default function Navbar({ menuOpen, onToggleSidebar }) {
                                 <X size={24} />
                             </button>
                         </li>
-                        <li><Link to="/" className={isActive('/')} onClick={() => menuOpen && onToggleSidebar()}><Home size={18} /> <span className="nav-label">Beranda</span></Link></li>
-                        <li><Link to="/programs" className={isActive('/programs')} onClick={() => menuOpen && onToggleSidebar()}><GraduationCap size={18} /> <span className="nav-label">Program</span></Link></li>
-                        <li><Link to="/instructors" className={isActive('/instructors')} onClick={() => menuOpen && onToggleSidebar()}><Users size={18} /> <span className="nav-label">Instruktur</span></Link></li>
-                        <li><Link to="/gallery" className={isActive('/gallery')} onClick={() => menuOpen && onToggleSidebar()}><Image size={18} /> <span className="nav-label">Galeri</span></Link></li>
-                        <li><Link to="/posts" className={isActive('/posts')} onClick={() => menuOpen && onToggleSidebar()}><FileText size={18} /> <span className="nav-label">Artikel</span></Link></li>
-                        <li><Link to="/reviews" className={isActive('/reviews')} onClick={() => menuOpen && onToggleSidebar()}><Star size={18} /> <span className="nav-label">Ulasan</span></Link></li>
-                        <li><Link to="/registration" className={isActive('/registration')} onClick={() => menuOpen && onToggleSidebar()}><ClipboardList size={18} /> <span className="nav-label">Pendaftaran</span></Link></li>
-                        <li><Link to="/about" className={isActive('/about')} onClick={() => menuOpen && onToggleSidebar()}><Info size={18} /> <span className="nav-label">Tentang Kami</span></Link></li>
-                        <li><Link to="/contact" className={isActive('/contact')} onClick={() => menuOpen && onToggleSidebar()}><Phone size={18} /> <span className="nav-label">Kontak</span></Link></li>
-                        <li><Link to="/privacy-policy" className={isActive('/privacy-policy')} onClick={() => menuOpen && onToggleSidebar()}><Shield size={18} /> <span className="nav-label">Kebijakan Privasi</span></Link></li>
+                        <li><Link to="/" className={isActive('/')} onClick={() => menuOpen && onToggleSidebar()}><FlexIcon Icon={Home} size={18}>Beranda</FlexIcon></Link></li>
+                        <li><Link to="/programs" className={isActive('/programs')} onClick={() => menuOpen && onToggleSidebar()}><FlexIcon Icon={GraduationCap} size={18}>Program</FlexIcon></Link></li>
+                        <li><Link to="/instructors" className={isActive('/instructors')} onClick={() => menuOpen && onToggleSidebar()}><FlexIcon Icon={Users} size={18}>Instruktur</FlexIcon></Link></li>
+                        <li><Link to="/gallery" className={isActive('/gallery')} onClick={() => menuOpen && onToggleSidebar()}><FlexIcon Icon={Image} size={18}>Galeri</FlexIcon></Link></li>
+                        <li><Link to="/posts" className={isActive('/posts')} onClick={() => menuOpen && onToggleSidebar()}><FlexIcon Icon={FileText} size={18}>Artikel</FlexIcon></Link></li>
+                        <li><Link to="/reviews" className={isActive('/reviews')} onClick={() => menuOpen && onToggleSidebar()}><FlexIcon Icon={Star} size={18}>Ulasan</FlexIcon></Link></li>
+                        <li><Link to="/registration" className={isActive('/registration')} onClick={() => menuOpen && onToggleSidebar()}><FlexIcon Icon={ClipboardList} size={18}>Pendaftaran</FlexIcon></Link></li>
+                        <li><Link to="/about" className={isActive('/about')} onClick={() => menuOpen && onToggleSidebar()}><FlexIcon Icon={Info} size={18}>Tentang Kami</FlexIcon></Link></li>
+                        <li><Link to="/contact" className={isActive('/contact')} onClick={() => menuOpen && onToggleSidebar()}><FlexIcon Icon={Phone} size={18}>Kontak</FlexIcon></Link></li>
+                        <li><Link to="/privacy-policy" className={isActive('/privacy-policy')} onClick={() => menuOpen && onToggleSidebar()}><FlexIcon Icon={Shield} size={18}>Kebijakan Privasi</FlexIcon></Link></li>
                     </ul>
 
                     <button onClick={toggleTheme} className="theme-toggle-nav" aria-label="Toggle dark mode">
-                        {themeMode === 'system' ? <Monitor size={18} /> : themeMode === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                        {themeMode === 'system' ? <FlexIcon Icon={Monitor} size={18} /> : themeMode === 'dark' ? <FlexIcon Icon={Sun} size={18} /> : <FlexIcon Icon={Moon} size={18} />}
                     </button>
                 </div>
             </div>

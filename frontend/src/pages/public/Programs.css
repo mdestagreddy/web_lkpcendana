@@ -151,6 +151,12 @@
     border-color: #cbd5e1;
 }
 
+.badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
 .badge {
     display: inline-block;
     background: linear-gradient(135deg, var(--orange-500), var(--orange-400));
@@ -172,6 +178,8 @@
     font-size: 0.8rem;
     border: 1px solid #bfdbfe;
     font-weight: 600;
+    line-height: 1;
+    height: 100%;
 }
 
 .program-card h3 {
@@ -190,26 +198,29 @@
 .program-meta {
     display: flex;
     gap: 1rem;
-    margin: 1rem 0;
+    margin: 1rem 0 0.4rem 0;
     color: var(--text-muted);
     font-size: 0.875rem;
 }
 
-.btn {
+.programs-page .btn {
     display: inline-block;
-    padding: 0.75rem 1.75rem;
+    padding: 0.75rem 1rem;
     border-radius: 999px;
     text-decoration: none;
-    margin-top: 0.75rem;
     font-weight: 700;
     font-size: 0.95rem;
     transition: var(--transition);
     background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
     color: #fff;
     box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    line-height: 1;
 }
 
-.btn:hover {
+.programs-page .btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 22px rgba(37, 99, 235, 0.35);
     filter: brightness(1.1);

@@ -3,6 +3,7 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import { publicApi } from '../../services/api';
 import { useAuth } from '../../context/useAuth';
 import { Mail, Lock, LogIn } from 'lucide-react';
+import FlexIcon from '../../components/FlexIcon';
 import Alert from '../../components/Alert';
 import './AdminLogin.css';
 
@@ -43,7 +44,7 @@ export default function AdminLogin() {
                 {error && <Alert type="error">{error}</Alert>}
 
                 <div className="form-group">
-                    <label htmlFor="email"><Mail size={16} /> Email</label>
+                    <label htmlFor="email"><FlexIcon Icon={Mail} size={16} /> Email</label>
                     <input
                         type="email"
                         id="email"
@@ -55,7 +56,7 @@ export default function AdminLogin() {
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="password"><Lock size={16} /> Kata Sandi</label>
+                    <label htmlFor="password"><FlexIcon Icon={Lock} size={16} /> Kata Sandi</label>
                     <input
                         type="password"
                         id="password"
@@ -66,7 +67,7 @@ export default function AdminLogin() {
                 </div>
 
                 <button type="submit" className="btn-login" disabled={loading}>
-                    <LogIn size={18} /> {loading ? 'Sedang masuk...' : 'Masuk'}
+                    <FlexIcon Icon={LogIn} size={18} /> {loading ? 'Sedang masuk...' : 'Masuk'}
                 </button>
             </form>
         </div>

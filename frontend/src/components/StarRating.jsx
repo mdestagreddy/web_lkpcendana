@@ -1,4 +1,5 @@
 import { Star } from 'lucide-react';
+import FlexIcon from './FlexIcon';
 import './StarRating.css';
 
 function StarRating({ rating = 0, onChange, readonly = false, size = 18 }) {
@@ -13,7 +14,7 @@ function StarRating({ rating = 0, onChange, readonly = false, size = 18 }) {
                     disabled={readonly}
                     aria-label={`Bintang ${i + 1}`}
                 >
-                    <Star size={size} fill={i < rating ? 'currentColor' : 'none'} />
+                    <FlexIcon Icon={Star} size={size} fill={i < rating ? 'currentColor' : 'none'} />
                 </button>
             ))}
         </div>

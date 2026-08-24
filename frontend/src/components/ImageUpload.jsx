@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Camera, MoveHorizontal, MoveVertical, Gauge, Image, Upload, Trash2, FileText } from 'lucide-react';
+import FlexIcon from './FlexIcon';
 import ImageComponent from './Image';
 import './ImageUpload.css';
 
@@ -180,7 +181,7 @@ export default function ImageUpload({
                     <ImageComponent src={preview} alt="Preview" />
                 ) : (
                     <div className="upload-placeholder">
-                        <Camera size={48} strokeWidth={1} />
+                        <FlexIcon Icon={Camera} size={48} strokeWidth={1} />
                         <p>Belum ada gambar</p>
                         <p className="upload-drag-hint">Drag & drop gambar di sini</p>
                     </div>
@@ -199,7 +200,7 @@ export default function ImageUpload({
 
                 <div className="upload-settings">
                     <div className="setting-group">
-                        <label><FileText size={16} /> Nama File</label>
+                        <label><FlexIcon Icon={FileText} size={16}>Nama File</FlexIcon></label>
                         <input
                             type="text"
                             value={settings.custom_filename}
@@ -208,7 +209,7 @@ export default function ImageUpload({
                         />
                     </div>
                     <div className="setting-group">
-                        <label><MoveHorizontal size={16} /> Lebar (px)</label>
+                        <label><FlexIcon Icon={MoveHorizontal} size={16}>Lebar (px)</FlexIcon></label>
                         <input
                             type="number"
                             value={settings.resize_width}
@@ -218,7 +219,7 @@ export default function ImageUpload({
                         />
                     </div>
                     <div className="setting-group">
-                        <label><MoveVertical size={16} /> Tinggi (px)</label>
+                        <label><FlexIcon Icon={MoveVertical} size={16}>Tinggi (px)</FlexIcon></label>
                         <input
                             type="number"
                             value={settings.resize_height}
@@ -228,7 +229,7 @@ export default function ImageUpload({
                         />
                     </div>
                     <div className="setting-group">
-                        <label><Gauge size={16} /> Kualitas (%)</label>
+                        <label><FlexIcon Icon={Gauge} size={16}>Kualitas (%)</FlexIcon></label>
                         <input
                             type="number"
                             value={settings.quality}
@@ -238,7 +239,7 @@ export default function ImageUpload({
                         />
                     </div>
                     <div className="setting-group">
-                        <label><Image size={16} /> Format</label>
+                        <label><FlexIcon Icon={Image} size={16}>Format</FlexIcon></label>
                         <select
                             value={settings.format}
                             onChange={e => setSettings({ ...settings, format: e.target.value })}
@@ -257,7 +258,7 @@ export default function ImageUpload({
                         disabled={!fileInputRef.current?.files?.[0] || uploading || disabled}
                         className="btn-upload"
                     >
-                        {uploading ? 'Mengupload...' : <><Upload size={16} /> Upload</>}
+                            {uploading ? 'Mengupload...' : <><FlexIcon Icon={Upload} size={16}>Upload</FlexIcon></>}
                     </button>
                     {preview && (
                         <button
@@ -266,7 +267,7 @@ export default function ImageUpload({
                             disabled={disabled}
                             className="btn-remove"
                         >
-                            <Trash2 size={16} /> Hapus
+                            <FlexIcon Icon={Trash2} size={16}>Hapus</FlexIcon>
                         </button>
                     )}
                 </div>

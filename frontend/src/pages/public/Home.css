@@ -279,10 +279,12 @@
     line-height: 1.7;
     position: relative;
     z-index: 1;
+    margin-bottom: 1.5rem;
 }
 
 .testimonial-card h4 {
-    margin-top: 1.25rem;
+    position: absolute;
+    bottom: 1.5rem;
     color: var(--orange-500);
     font-weight: 700;
     font-size: 0.95rem;
@@ -310,9 +312,9 @@
     border: 2px solid var(--border-light);
 }
 
-.btn {
+.home .btn {
     display: inline-block;
-    padding: 0.75rem 1.75rem;
+    padding: 0.75rem 1rem;
     border-radius: 999px;
     text-decoration: none;
     margin-top: 1.25rem;
@@ -323,15 +325,16 @@
     background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
     color: #fff;
     box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+    line-height: 1;
 }
 
-.btn:hover {
+.home .btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 22px rgba(37, 99, 235, 0.35);
     filter: brightness(1.1);
 }
 
-.btn-primary:hover {
+.home .btn-primary:hover {
     filter: brightness(1.15);
 }
 

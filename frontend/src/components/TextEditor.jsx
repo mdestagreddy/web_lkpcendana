@@ -16,6 +16,7 @@ import {
     Minus, FileCode2, Image, Upload, Trash2, ChevronDown, Table, Play
 } from 'lucide-react';
 import { Maximize2, Minimize2 } from 'lucide-react';
+import FlexIcon from './FlexIcon';
 import CustomColorPicker from './CustomColorPicker';
 import HTMLEditor from './HTMLEditor';
 import { ThemeContext } from '../context/ThemeContext';
@@ -982,7 +983,7 @@ export default function TextEditor({ value = '', onChange, placeholder = 'Tulis 
                     title={title}
                     style={activeColor ? { color: activeColor } : undefined}
                 >
-                    <Palette size={16} style={{ position: 'relative', zIndex: 2 }} />
+                    <FlexIcon Icon={Palette} size={16} style={{ position: 'relative', zIndex: 2 }} />
                     <span className="toolbar-color-indicator" style={{ backgroundColor: activeColor || 'currentColor' }} />
                 </button>
                 {isOpen && (
@@ -1052,9 +1053,9 @@ export default function TextEditor({ value = '', onChange, placeholder = 'Tulis 
                     onClick={() => setOpen(!open)}
                     title="Heading"
                 >
-                    <ActiveIcon size={16} />
+                    <FlexIcon Icon={ActiveIcon} size={16} />
                     <span className="heading-select-label">{currentHeading}</span>
-                    <ChevronDown size={14} />
+                    <FlexIcon Icon={ChevronDown} size={14} />
                 </button>
                 {open && (
                     <div className="heading-select-menu">
@@ -1065,7 +1066,7 @@ export default function TextEditor({ value = '', onChange, placeholder = 'Tulis 
                                 className={`heading-select-option ${(activeFormats.h1 && value === 'h1') || (activeFormats.h2 && value === 'h2') || (activeFormats.h3 && value === 'h3') || (activeFormats.paragraph && value === 'p') ? 'active' : ''}`}
                                 onMouseDown={(e) => { e.preventDefault(); exec('formatBlock', value); setOpen(false); }}
                             >
-                                <Icon size={16} />
+                                <FlexIcon Icon={Icon} size={16} />
                                 <span>{label}</span>
                             </button>
                         ))}
@@ -1118,7 +1119,7 @@ export default function TextEditor({ value = '', onChange, placeholder = 'Tulis 
                     title="Font Size"
                 >
                     <span className="heading-select-label">{currentLabel}</span>
-                    <ChevronDown size={14} />
+                    <FlexIcon Icon={ChevronDown} size={14} />
                 </button>
                 {open && (
                     <div className="heading-select-menu font-size-menu" ref={menuRef}>
@@ -1291,7 +1292,7 @@ export default function TextEditor({ value = '', onChange, placeholder = 'Tulis 
                                     className={`image-tab ${imageUploadMode ? 'active' : ''}`}
                                     onClick={() => handleImageModeToggle('upload')}
                                 >
-                                    <Upload size={14} /> Upload
+                                    <FlexIcon Icon={Upload} size={14} /> Upload
                                 </button>
                             </div>
 
@@ -1441,7 +1442,7 @@ export default function TextEditor({ value = '', onChange, placeholder = 'Tulis 
                             left: imageDeletePos.left,
                         }}
                     >
-                        <Trash2 size={14} />
+                        <FlexIcon Icon={Trash2} size={14} />
                         {imageDeleteLoading ? 'Menghapus...' : 'Hapus Gambar'}
                     </button>
                 )}
@@ -1478,13 +1479,13 @@ export default function TextEditor({ value = '', onChange, placeholder = 'Tulis 
                                 + Baris
                             </button>
                             <button type="button" className="table-toolbar-btn" onMouseDown={(e) => e.preventDefault()} onClick={deleteTableRow} title="Hapus Baris">
-                                <Trash2 size={14} /> Baris
+                                <FlexIcon Icon={Trash2} size={14} /> Baris
                             </button>
                             <button type="button" className="table-toolbar-btn" onMouseDown={(e) => e.preventDefault()} onClick={insertTableCol} title="Tambah Kolom">
                                 + Kolom
                             </button>
                             <button type="button" className="table-toolbar-btn" onMouseDown={(e) => e.preventDefault()} onClick={deleteTableCol} title="Hapus Kolom">
-                                <Trash2 size={14} /> Kolom
+                                <FlexIcon Icon={Trash2} size={14} /> Kolom
                             </button>
                         </div>
                 )}

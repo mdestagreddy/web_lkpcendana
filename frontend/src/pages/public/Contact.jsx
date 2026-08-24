@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { publicApi } from '../../services/api';
 import { MapPin, Phone, Mail } from 'lucide-react';
+import FlexIcon from '../../components/FlexIcon';
 import SocialLinks from '../../components/SocialLinks';
 import './Contact.css';
 
@@ -25,9 +26,9 @@ export default function Contact() {
                 <div className="contact-grid">
                     <div className="contact-info">
                         <h2>Informasi Kontak</h2>
-                        <p><MapPin size={18} /> {institution.address}</p>
-                        <p><Phone size={18} /> {institution.phone}</p>
-                        <p><Mail size={18} /> {institution.email}</p>
+                        <p><FlexIcon Icon={MapPin} size={18}>{institution.address}</FlexIcon></p>
+                        <p><FlexIcon Icon={Phone} size={18}>{institution.phone}</FlexIcon></p>
+                        <p><FlexIcon Icon={Mail} size={18}>{institution.email}</FlexIcon></p>
                     </div>
                     <div className="social-info">
                         <h2>Media Sosial</h2>

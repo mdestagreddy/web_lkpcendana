@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { publicApi } from '../../services/api';
 import { Layers, UserPlus } from 'lucide-react';
+import FlexIcon from '../../components/FlexIcon';
 import Image from '../../components/Image';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import BackLink from '../../components/BackLink';
@@ -39,8 +40,10 @@ export default function ProgramDetail() {
                             <div className="program-image-placeholder">Tidak ada gambar</div>
                         )}
                     </div>
-                    <span className="badge">{program.category.toUpperCase()}</span>
-                    <span className="level-badge">{program.level}</span>
+                    <span className="badges">
+                        <span className="badge">{program.category.toUpperCase()}</span>
+                        <span className="level-badge">{program.level}</span>
+                    </span>
                     <h1>{program.title}</h1>
                     <p className="description">{program.description}</p>
                     <div className="meta">
@@ -53,7 +56,7 @@ export default function ProgramDetail() {
 
                 {modules.length > 0 && (
                     <div className="modules-section">
-                        <h2><Layers size={24} /> Modul Program</h2>
+                        <h2><FlexIcon Icon={Layers} size={24} /> Modul Program</h2>
                         <ul className="modules-list">
                             {modules.map((mod, index) => (
                                 <li key={mod.id}>{index + 1}. {mod.name}</li>
@@ -62,7 +65,7 @@ export default function ProgramDetail() {
                     </div>
                 )}
 
-                {program.type === 'offline' ? <Link to="/registration" className="btn btn-primary btn-large"><UserPlus size={20} /> Daftar Sekarang</Link> : ""}
+                {program.type === 'offline' ? <Link to="/registration" className="btn btn-primary btn-large"><FlexIcon Icon={UserPlus} size={20}>Daftar Sekarang</FlexIcon></Link> : ""}
             </div>
         </div>
     );

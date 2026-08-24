@@ -2,6 +2,7 @@
 import { Link } from 'react-router-dom';
 import { adminApi } from '../../services/api';
 import { GraduationCap, Users, MessageSquare, Star, UserCog, FileText, Image } from 'lucide-react';
+import FlexIcon from '../../components/FlexIcon';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import './AdminDashboard.css';
 
@@ -54,7 +55,7 @@ export default function AdminDashboard() {
                     const Icon = card.icon;
                     return (
                         <Link key={card.label} to={card.link} className="stat-card" style={{ '--card-accent': card.accent } }>
-                            <Icon size={32} strokeWidth={1.5} />
+                            <FlexIcon Icon={Icon} size={32} strokeWidth={1.5} />
                             <h3>{card.value}</h3>
                             <p>{card.label}</p>
                         </Link>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { adminApi } from '../../services/api';
 import { Plus, Save, X, Pencil, Trash2 } from 'lucide-react';
+import FlexIcon from '../../components/FlexIcon';
 import TextEditor from '../../components/TextEditor';
 import Image from '../../components/Image';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -134,8 +135,8 @@ export default function AdminPosts() {
                 </div>
 
                 <div className="form-actions">
-                    <button type="submit" className="btn btn-primary" disabled={submitting}>{editing ? <><Save size={16} /> Perbarui</> : <><Plus size={16} /> Tambah</>}</button>
-                    {editing && <button type="button" onClick={resetForm} className="btn btn-secondary"><X size={16} /> Batal</button>}
+                    <button type="submit" className="btn btn-primary" disabled={submitting}>{editing ? <><FlexIcon Icon={Save} size={16}>Perbarui</FlexIcon></> : <><FlexIcon Icon={Plus} size={16}>Tambah</FlexIcon></>}</button>
+                    {editing && <button type="button" onClick={resetForm} className="btn btn-secondary"><FlexIcon Icon={X} size={16}>Batal</FlexIcon></button>}
                 </div>
             </form>
             {items.length === 0 && <p className="items-empty">Tidak ada data Artikel</p>}
@@ -156,8 +157,8 @@ export default function AdminPosts() {
                                 <span className="generic-card-sub">{item.category_name || 'Tanpa kategori'} · {item.status}</span>
                             </div>
                             <div className="generic-card-actions">
-                                <button onClick={() => startEdit(item)} className="btn btn-small btn-primary"><Pencil size={14} /> Edit</button>
-                                <button onClick={() => handleDelete(item.id)} className="btn btn-small btn-danger"><Trash2 size={14} /> Hapus</button>
+                                <button onClick={() => startEdit(item)} className="btn btn-small btn-primary"><FlexIcon Icon={Pencil} size={14}>Edit</FlexIcon></button>
+                                <button onClick={() => handleDelete(item.id)} className="btn btn-small btn-danger"><FlexIcon Icon={Trash2} size={14}>Hapus</FlexIcon></button>
                             </div>
                         </div>
                         {(item.excerpt || item.content) && (

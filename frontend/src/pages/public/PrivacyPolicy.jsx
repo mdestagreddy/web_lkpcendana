@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { publicApi } from '../../services/api';
 import { Shield } from 'lucide-react';
+import FlexIcon from '../../components/FlexIcon';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import './PrivacyPolicy.css';
 
@@ -42,7 +43,7 @@ export default function PrivacyPolicy() {
     return (
         <div className="privacy-page">
             <div className="container">
-                <h1><Shield size={28} /> Kebijakan Privasi</h1>
+                <h1><FlexIcon Icon={Shield} size={28}>Kebijakan Privasi</FlexIcon></h1>
                 <div className="privacy-content">
                     <div dangerouslySetInnerHTML={{ __html: renderContent(policy.content) }} />
                     <p><strong>Versi:</strong> {policy.version}</p>

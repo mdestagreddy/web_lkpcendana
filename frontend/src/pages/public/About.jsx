@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { publicApi } from '../../services/api';
 import { Building2, Eye, Flag, Users, Info, MapPin, Phone, Mail, Calendar, Award } from 'lucide-react';
+import FlexIcon from '../../components/FlexIcon';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import './About.css';
 
@@ -31,10 +32,10 @@ export default function About() {
     return (
         <div className="about-page">
             <div className="container">
-                <h1><Info size={28} /> Tentang Kami</h1>
+                <h1><FlexIcon Icon={Info} size={28}>Tentang Kami</FlexIcon></h1>
 
                 <section className="about-section">
-                    <h2><Building2 size={22} /> Profil Lembaga</h2>
+                        <h2><FlexIcon Icon={Building2} size={22}>Profil Lembaga</FlexIcon></h2>
                     {institution.welcome_message && (
                         <p className="institution-desc welcome-message">
                             {institution.welcome_message}
@@ -47,7 +48,7 @@ export default function About() {
                     <div className="info-grid">
                         {institution.address && (
                             <div className="info-item">
-                                <MapPin size={18} />
+                                <FlexIcon Icon={MapPin} size={18} />
                                 <div>
                                     <strong>Alamat</strong>
                                     <p>{institution.address}</p>
@@ -56,7 +57,7 @@ export default function About() {
                         )}
                         {institution.phone && (
                             <div className="info-item">
-                                <Phone size={18} />
+                                <FlexIcon Icon={Phone} size={18} />
                                 <div>
                                     <strong>Telepon</strong>
                                     <p>{institution.phone}</p>
@@ -65,7 +66,7 @@ export default function About() {
                         )}
                         {institution.email && (
                             <div className="info-item">
-                                <Mail size={18} />
+                                <FlexIcon Icon={Mail} size={18} />
                                 <div>
                                     <strong>Email</strong>
                                     <p>{institution.email}</p>
@@ -74,7 +75,7 @@ export default function About() {
                         )}
                         {institution.established_year && (
                             <div className="info-item">
-                                <Calendar size={18} />
+                                <FlexIcon Icon={Calendar} size={18} />
                                 <div>
                                     <strong>Tahun Berdiri</strong>
                                     <p>{institution.established_year}</p>
@@ -83,7 +84,7 @@ export default function About() {
                         )}
                         {institution.accreditation && (
                             <div className="info-item">
-                                <Award size={18} />
+                                <FlexIcon Icon={Award} size={18} />
                                 <div>
                                     <strong>Akreditasi</strong>
                                     <p>{institution.accreditation}</p>
@@ -95,14 +96,14 @@ export default function About() {
 
                 {vision.length > 0 && (
                     <section className="about-section">
-                        <h2><Eye size={22} /> Visi</h2>
+                        <h2><FlexIcon Icon={Eye} size={22}>Visi</FlexIcon></h2>
                         <p>{vision[0].content}</p>
                     </section>
                 )}
 
                 {missions.length > 0 && (
                     <section className="about-section">
-                        <h2><Flag size={22} /> Misi</h2>
+                        <h2><FlexIcon Icon={Flag} size={22}>Misi</FlexIcon></h2>
                         <ol>
                             {missions.map((mission, _index) => (
                                 <li key={mission.id}>{mission.content}</li>
@@ -113,7 +114,7 @@ export default function About() {
 
                 {instructors.length > 0 && (
                     <section className="about-section">
-                        <h2><Users size={22} /> Instruktur Kami</h2>
+                        <h2><FlexIcon Icon={Users} size={22}>Instruktur Kami</FlexIcon></h2>
                         <div className="instructors-grid">
                             {instructors.map(instructor => (
                                 <div key={instructor.id} className="instructor-card">

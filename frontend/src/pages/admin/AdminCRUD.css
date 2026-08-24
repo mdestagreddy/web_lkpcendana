@@ -145,6 +145,7 @@
     grid-column: 1 / -1;
     display: flex;
     flex-direction: column;
+    gap: 1rem;
 }
 .crud-form .form-section-title {
     grid-column: 1 / -1;
@@ -261,8 +262,8 @@
     margin-top: 1rem;
     flex-wrap: wrap;
 }
-.btn {
-    padding: 0.5rem 1rem;
+.admin-crud .btn {
+    padding: 0.5rem 0.6rem;
     border: none;
     border-radius: 999px;
     cursor: pointer;
@@ -271,24 +272,23 @@
     display: inline-block;
     font-weight: 700;
     transition: var(--transition);
+    line-height: 1;
 }
-.btn-primary {
+.admin-crud .btn-primary {
     background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
     color: #fff;
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
-.btn-secondary {
+.admin-crud .btn-secondary {
     background: #f1f5f9;
     color: var(--text-secondary);
-    border: 1px solid var(--border-light);
-}
-.btn-danger {
+}   
+.admin-crud .btn-danger {
     background: #fef2f2;
     color: #dc2626;
-    border: 1px solid #fecaca;
 }
-.btn-small {
-    padding: 0.25rem 0.75rem;
+.admin-crud .btn-small {
+    padding: 0.5rem 0.75rem;
     font-size: 0.875rem;
 }
 .modules-panel {
@@ -439,6 +439,7 @@
     font-weight: 700;
     line-height: 1.4;
     white-space: nowrap;
+    margin: 0;
 }
 .badge-category {
     background: #eff6ff;
@@ -836,7 +837,7 @@
     .item-info p {
         font-size: 0.85rem;
     }
-    .btn-small {
+    .admin-crud .btn-small {
         padding: 0.2rem 0.6rem;
         font-size: 0.8rem;
     }
@@ -910,20 +911,20 @@
 [data-theme="dark"] .crud-form .checkbox-label {
     color: #f1f5f9;
 }
-[data-theme="dark"] .btn-secondary {
+[data-theme="dark"] .admin-crud .btn-secondary {
     background: #1e293b;
     color: #cbd5e1;
     border-color: #334155;
 }
-[data-theme="dark"] .btn-secondary:hover {
+[data-theme="dark"] .admin-crud .btn-secondary:hover {
     background: #334155;
 }
-[data-theme="dark"] .btn-danger {
+[data-theme="dark"] .admin-crud .btn-danger {
     background: #451a1a;
     color: #fca5a5;
     border-color: #7f1d1d;
 }
-[data-theme="dark"] .btn-danger:hover {
+[data-theme="dark"] .admin-crud .btn-danger:hover {
     background: #7f1d1d;
     border-color: #f87171;
 }
