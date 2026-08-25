@@ -6,7 +6,7 @@
 
 .posts-page .btn {
     display: inline-block;
-    padding: 0.75rem 1.75rem;
+    padding: 0.75rem 1rem;
     border-radius: 999px;
     text-decoration: none;
     font-weight: 700;
@@ -16,6 +16,10 @@
     background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
     color: #fff;
     box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+    line-height: 1;
+    position: absolute;
+    bottom: -2rem;
+    right: 1rem;
 }
 
 .posts-page .btn:hover {
@@ -117,7 +121,7 @@
     grid-template-columns: 280px 1fr;
 }
 
-.post-card:not(.post-image-wrapper) {
+.post-card:not(:has(.post-image-wrapper)) {
     display: flex;
 
     & .post-body {
@@ -141,9 +145,11 @@
 
 .post-body {
     padding: 1.75rem;
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    margin-bottom: 3rem;
 }
 
 .post-meta {
