@@ -147,6 +147,8 @@ export const publicApi = {
 
     getLoginCaptcha: () => request('/auth/captcha'),
 
+    logout: () => request('/auth/logout', { method: 'POST' }),
+
     getReviews: (params = {}) => {
         const query = new URLSearchParams();
         Object.entries(params).forEach(([key, value]) => {

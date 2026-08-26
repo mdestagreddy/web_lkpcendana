@@ -6,8 +6,9 @@ const db = require('../database/db');
 const { createLimiter } = require('../middleware/rateLimit');
 const { honeypotMiddleware } = require('../middleware/honeypot');
 const captchaStore = require('../utils/captcha');
+const { authMiddleware, JWT_SECRET, getFingerprint } = require('../middleware/auth');
+const tokenBlacklist = require('../middleware/tokenBlacklist');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'cendana-jwt-secret-key';
 const captchaRateLimiter = createLimiter(10, 60 * 1000);
 const loginRateLimiter = createLimiter(5, 60 * 1000);
 
@@ -79,9 +80,9 @@ router.post('/login', loginRateLimiter, honeypotMiddleware, (req, res) => {
             }
 
             const token = jwt.sign(
-                { id: user.id, email: user.email, role: user.role },
+                { id: user.id, email: user.email, role: user.role, token_version: user.token_version || 0, fingerprint: getFingerprint(req) },
                 JWT_SECRET,
-                { expiresIn: '8h' }
+                { expiresIn: '24h' }
             );
 
             res.json({
@@ -95,6 +96,14 @@ router.post('/login', loginRateLimiter, honeypotMiddleware, (req, res) => {
             });
         }
     );
+});
+
+router.post('/logout', authMiddleware, (req, res) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (token) {
+        tokenBlacklist.add(token, req);
+    }
+    res.json({ message: 'Logged out successfully' });
 });
 
 module.exports = router;
