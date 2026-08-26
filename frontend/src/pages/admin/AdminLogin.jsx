@@ -15,6 +15,7 @@ export default function AdminLogin() {
     const [captchaId, setCaptchaId] = useState(null); // eslint-disable-line no-unused-vars
     const [captchaSvg, setCaptchaSvg] = useState(''); // eslint-disable-line no-unused-vars
     const [captchaInput, setCaptchaInput] = useState('');
+    const [hpConfirm, setHpConfirm] = useState('');
     const { login, user, loading: authLoading } = useAuth();
     const navigate = useNavigate();
 
@@ -45,7 +46,7 @@ export default function AdminLogin() {
             return;
         }
 
-        publicApi.login({ email, password, captchaId, captchaText: captchaInput })
+        publicApi.login({ email, password, captchaId, captchaText: captchaInput, hp_confirm: hpConfirm })
             .then(data => {
                 login(data.user, data.token);
                 navigate('/admin');
@@ -109,6 +110,7 @@ export default function AdminLogin() {
                     />
                 </div>
 
+                <input type="text" name="hp_confirm" value={hpConfirm} onChange={e => setHpConfirm(e.target.value)} style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }} tabIndex={-1} autoComplete="off" />
                 <button type="submit" className="btn-login" disabled={loading}>
                     <FlexIcon Icon={LogIn} size={18} /> {loading ? 'Sedang masuk...' : 'Masuk'}
                 </button>

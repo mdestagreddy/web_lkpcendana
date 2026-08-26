@@ -2,17 +2,27 @@ const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
 const bcrypt = require('bcrypt');
+const { createLimiter } = require('../middleware/rateLimit');
+const { honeypotMiddleware } = require('../middleware/honeypot');
 
 const captchaStore = new Map();
 
-router.get('/captcha', (req, res) => {
+const captchaRateLimiter = createLimiter(10, 60 * 1000);
+const reviewRateLimiter = createLimiter(3, 60 * 1000);
+
+router.get('/captcha', captchaRateLimiter, (req, res) => {
     const svgCaptcha = require('svg-captcha');
     const captchaId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
     const captcha = svgCaptcha.create({
-        size: 5,
-        noise: 3,
+        size: 6,
+        noise: 5,
         color: true,
         background: '#f8f9fa',
+        width: 220,
+        height: 80,
+        fontSize: 48,
+        ignoreChars: '0oO1lI',
+        lineWidth: 2,
     });
     captchaStore.set(captchaId, captcha.text.toLowerCase());
     res.json({
@@ -29,7 +39,7 @@ router.get('/', (req, res) => {
     });
 });
 
-router.post('/', (req, res) => {
+router.post('/', reviewRateLimiter, honeypotMiddleware, (req, res) => {
     const { nama, email, rating, isi, images, captchaId, captchaText } = req.body;
     console.log('[Review] Create request:', { nama, email, rating, images, captchaId });
 

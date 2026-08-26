@@ -23,6 +23,7 @@ export default function Reviews() {
     const isiRef = useRef(null);
 
     const [form, setForm] = useState({ nama: '', email: '', rating: 5, isi: '', images: [] });
+    const [hpConfirm, setHpConfirm] = useState('');
 
     useEffect(() => { loadReviews(); }, []);
 
@@ -130,6 +131,7 @@ export default function Reviews() {
                 images: uploadedImageUrls,
                 captchaId,
                 captchaText: captchaInput,
+                hp_confirm: hpConfirm,
             });
             console.log('[Review] Created with images:', uploadedImageUrls);
 
@@ -287,6 +289,7 @@ export default function Reviews() {
                                     required
                                 />
                             </div>
+                            <input type="text" name="hp_confirm" value={hpConfirm} onChange={e => setHpConfirm(e.target.value)} style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }} tabIndex={-1} autoComplete="off" />
                             <button type="submit" className="btn btn-primary submit-btn" disabled={submitting}>
                                     {submitting ? <LoadingSpinner text="Mengirim..." size="sm" className="inline" /> : <FlexIcon Icon={Send} size={16}>Kirim Ulasan</FlexIcon>}
                             </button>

@@ -3,18 +3,28 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const db = require('../database/db');
+const { createLimiter } = require('../middleware/rateLimit');
+const { honeypotMiddleware } = require('../middleware/honeypot');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'cendana-jwt-secret-key';
 const captchaStore = new Map();
 
-router.get('/captcha', (req, res) => {
+const captchaRateLimiter = createLimiter(10, 60 * 1000);
+const loginRateLimiter = createLimiter(5, 60 * 1000);
+
+router.get('/captcha', captchaRateLimiter, (req, res) => {
     const svgCaptcha = require('svg-captcha');
     const captchaId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
     const captcha = svgCaptcha.create({
-        size: 5,
-        noise: 3,
+        size: 6,
+        noise: 5,
         color: true,
         background: '#f8f9fa',
+        width: 220,
+        height: 80,
+        fontSize: 48,
+        ignoreChars: '0oO1lI',
+        lineWidth: 2,
     });
     captchaStore.set(captchaId, captcha.text.toLowerCase());
     res.json({
@@ -23,7 +33,7 @@ router.get('/captcha', (req, res) => {
     });
 });
 
-router.post('/login', (req, res) => {
+router.post('/login', loginRateLimiter, honeypotMiddleware, (req, res) => {
     const { email, password, captchaId, captchaText } = req.body;
 
     if (!email || !password) {
