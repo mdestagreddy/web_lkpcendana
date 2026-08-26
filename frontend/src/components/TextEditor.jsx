@@ -449,17 +449,24 @@ export default function TextEditor({ value = '', onChange, placeholder = 'Tulis 
         const ed = editor
         const handleKeyUp = () => {
             updateActiveFormats(ed)
+            if (!sourceMode) refreshUndoRedoState()
         }
         const handleMouseUp = () => {
             updateActiveFormats(ed)
+            if (!sourceMode) refreshUndoRedoState()
+        }
+        const handleUpdate = () => {
+            if (!sourceMode) refreshUndoRedoState()
         }
         ed.on('keyup', handleKeyUp)
         ed.on('mouseup', handleMouseUp)
+        ed.on('update', handleUpdate)
         return () => {
             ed.off('keyup', handleKeyUp)
             ed.off('mouseup', handleMouseUp)
+            ed.off('update', handleUpdate)
         }
-    }, [editor, updateActiveFormats])
+    }, [editor, updateActiveFormats, refreshUndoRedoState, sourceMode])
 
     const parseYouTubeUrl = useCallback((url) => {
         if (!url) return null
@@ -580,8 +587,8 @@ export default function TextEditor({ value = '', onChange, placeholder = 'Tulis 
             setSourceMode(true)
             setSourceValue(html)
             sourceHistoryRef.current = { stack: [html], index: 0 }
-            setCanUndoSource(false)
-            setCanRedoSource(false)
+            setCanUndo(false)
+            setCanRedo(false)
         }
     }, [sourceMode, sourceValue, value, editor, updateStats])
 
@@ -593,8 +600,9 @@ export default function TextEditor({ value = '', onChange, placeholder = 'Tulis 
             ignoreValueChangeRef.current = true
             onChange?.(html)
             pendingSourceHtmlRef.current = ''
+            refreshUndoRedoState()
         }
-    }, [sourceMode, editor, updateStats, onChange])
+    }, [sourceMode, editor, updateStats, onChange, refreshUndoRedoState])
 
     const toggleFullscreen = useCallback(() => {
         setFullscreen(prev => !prev)
@@ -622,8 +630,8 @@ export default function TextEditor({ value = '', onChange, placeholder = 'Tulis 
         history.stack.push(html)
         if (history.stack.length > 100) history.stack.shift()
         history.index = history.stack.length - 1
-        setCanUndoSource(history.index > 0)
-        setCanRedoSource(false)
+        setCanUndo(history.index > 0)
+        setCanRedo(false)
     }, [onChange, countWords]);
 
     const handleLinkClick = useCallback(() => {
@@ -774,7 +782,12 @@ export default function TextEditor({ value = '', onChange, placeholder = 'Tulis 
 
     const handleTableCellClick = useCallback((e) => {
         if (!editor) return
-        const cell = e.target.closest('td, th')
+        const target = e.target
+        if (!target || typeof target.closest !== 'function') {
+            hideTableToolbar()
+            return
+        }
+        const cell = target.closest('td, th')
         if (!cell) {
             hideTableToolbar()
             return
@@ -807,7 +820,8 @@ export default function TextEditor({ value = '', onChange, placeholder = 'Tulis 
     }, [hideTableToolbar, editor])
 
     const handleEditorClick = useCallback((e) => {
-        const target = e.target || {}
+        const target = e.target
+        if (!target || typeof target.closest !== 'function') return
         if (target.tagName === 'IMG' && target.src) {
             setSelectedImageUrl(target.src)
             setSelectedEmbedUrl('')
@@ -1154,8 +1168,8 @@ export default function TextEditor({ value = '', onChange, placeholder = 'Tulis 
         <div className={`text-editor ${isFocused ? 'focused' : ''} ${fullscreen ? 'fullscreen' : ''}`}>
             <div className="toolbar">
                 <div className="toolbar-group">
-                    <ToolbarButton icon={Undo2} onClick={() => exec('undo')} title="Undo" active={false} disabled={!canUndo} />
-                    <ToolbarButton icon={Redo2} onClick={() => exec('redo')} title="Redo" active={false} disabled={!canRedo} />
+                    <ToolbarButton icon={Undo2} onClick={() => exec('undo')} title="Undo" active={canUndo} disabled={!canUndo} />
+                    <ToolbarButton icon={Redo2} onClick={() => exec('redo')} title="Redo" active={canRedo} disabled={!canRedo} />
                 </div>
 
                 {!sourceMode && <Separator />}
@@ -1415,18 +1429,21 @@ export default function TextEditor({ value = '', onChange, placeholder = 'Tulis 
             )}
 
             <div className={`editor-wrapper ${fullscreen ? 'fullscreen' : ''}`}>
-                {!sourceMode ? (
-                    <EditorContent editor={editor} />
-                ) : (
-                    <HTMLEditor
-                        ref={htmlEditorRef}
-                        value={sourceValue}
-                        onChange={handleSourceChange}
-                        placeholder={placeholder}
-                        fullscreen={fullscreen}
-                        theme={theme}
-                    />
-                )}
+                <div className="editor-container">
+                    {!sourceMode ? (
+                        <EditorContent editor={editor} />
+                    ) : (
+                        <HTMLEditor
+                            ref={htmlEditorRef}
+                            value={sourceValue}
+                            onChange={handleSourceChange}
+                            placeholder={placeholder}
+                            fullscreen={fullscreen}
+                            theme={theme}
+                        />
+                    )}
+                </div>
+                
 
                 {selectedImageUrl && !sourceMode && (
                     <button

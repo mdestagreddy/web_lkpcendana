@@ -145,6 +145,8 @@ export const publicApi = {
 
     getCaptcha: () => request('/public/reviews/captcha'),
 
+    getLoginCaptcha: () => request('/auth/captcha'),
+
     getReviews: (params = {}) => {
         const query = new URLSearchParams();
         Object.entries(params).forEach(([key, value]) => {

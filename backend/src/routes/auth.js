@@ -5,13 +5,46 @@ const bcrypt = require('bcrypt');
 const db = require('../database/db');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'cendana-jwt-secret-key';
+const captchaStore = new Map();
+
+router.get('/captcha', (req, res) => {
+    const svgCaptcha = require('svg-captcha');
+    const captchaId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    const captcha = svgCaptcha.create({
+        size: 5,
+        noise: 3,
+        color: true,
+        background: '#f8f9fa',
+    });
+    captchaStore.set(captchaId, captcha.text.toLowerCase());
+    res.json({
+        captchaId,
+        svg: captcha.data,
+    });
+});
 
 router.post('/login', (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, captchaId, captchaText } = req.body;
 
     if (!email || !password) {
         return res.status(400).json({ error: 'Email and password are required' });
     }
+
+    if (!captchaId || !captchaText) {
+        return res.status(400).json({ error: 'Captcha wajib diisi' });
+    }
+
+    const expected = captchaStore.get(captchaId);
+    if (!expected) {
+        return res.status(400).json({ error: 'Captcha expired, silakan muat ulang' });
+    }
+
+    if (String(captchaText).toLowerCase().trim() !== expected) {
+        captchaStore.delete(captchaId);
+        return res.status(400).json({ error: 'Kode captcha salah, silakan coba lagi' });
+    }
+
+    captchaStore.delete(captchaId);
 
     db.query(
         'SELECT * FROM users WHERE email = ?',

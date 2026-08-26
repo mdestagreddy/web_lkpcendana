@@ -178,7 +178,6 @@ export default function Reviews() {
                                             <div className="review-meta">
                                                 <h4>{review.nama}</h4>
                                                 <div className="review-stars-small"><StarRating rating={review.rating} /></div>
-                                                <span className="review-date">{formatDate(review.created_at)}</span>
                                             </div>
                                         </div>
                                         <p className="review-text">{review.isi}</p>
@@ -188,9 +187,10 @@ export default function Reviews() {
                                         try { imgs = JSON.parse(imgs); } catch { imgs = []; }
                                     }
                                     return (imgs && imgs.length > 0) ? (
-                                        <ImageLightbox items={imgs.map(src => ({ src, author: review.nama, text: review.isi }))} />
+                                        <ImageLightbox style={{ marginBottom: '0.5rem' }} items={imgs.map(src => ({ src, author: review.nama, text: review.isi }))} />
                                     ) : null;
                                 })()}
+                                        <span className="review-date">{formatDate(review.created_at)}</span>
                                     </div>
                                 ))}
                             </div>

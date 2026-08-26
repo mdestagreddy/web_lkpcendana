@@ -16,7 +16,7 @@ function resolveImageUrl(src) {
     return `${API_BASE_URL}/uploads/${src}`;
 }
 
-const ImageLightboxComponent = ({ items, multiTrigger, open: controlledOpen, onClose, index: controlledIndex, hidden, rounded, className, thumbWidth, thumbHeight, onOpen }, ref) => {
+const ImageLightboxComponent = ({ items, style, multiTrigger, open: controlledOpen, onClose, index: controlledIndex, hidden, rounded, className, thumbWidth, thumbHeight, onOpen }, ref) => {
     const [internalOpen, setInternalOpen] = useState(false);
     const [internalIndex, setInternalIndex] = useState(0);
     const [internalItems, setInternalItems] = useState([]);
@@ -84,7 +84,7 @@ const ImageLightboxComponent = ({ items, multiTrigger, open: controlledOpen, onC
     return (
         <>
             {!multiTrigger ? (
-                <div className={wrapperClassName}>
+                <div className={wrapperClassName} style={style}>
                     {slides.map((slide, idx) => (
                         <button
                             key={idx}
