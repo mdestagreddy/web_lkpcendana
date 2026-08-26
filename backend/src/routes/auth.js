@@ -7,6 +7,7 @@ const { createLimiter } = require('../middleware/rateLimit');
 const { honeypotMiddleware } = require('../middleware/honeypot');
 const captchaStore = require('../utils/captcha');
 
+const JWT_SECRET = process.env.JWT_SECRET || 'cendana-jwt-secret-key';
 const captchaRateLimiter = createLimiter(10, 60 * 1000);
 const loginRateLimiter = createLimiter(5, 60 * 1000);
 
