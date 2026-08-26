@@ -221,34 +221,6 @@
     opacity: 1;
 }
 
-.captcha-container {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.5rem;
-}
-
-.captcha-display {
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-sm);
-    padding: 0.25rem;
-    background: var(--bg-light);
-    min-width: 140px;
-    min-height: 50px;
-    display: flex;
-    align-items: center;
-}
-
-.captcha-display svg {
-    max-height: 48px;
-    width: auto;
-}
-
-.captcha-loading {
-    font-size: 0.875rem;
-    color: var(--text-muted);
-}
-
 .review-form-section {
     background: var(--bg-white);
     border: 1px solid var(--border-light);
@@ -390,11 +362,6 @@
 
 [data-theme="dark"] .review-meta h4 {
     color: #f1f5f9;
-}
-
-[data-theme="dark"] .captcha-display {
-    background: #0f172a;
-    border-color: #334155;
 }
 
 [data-theme="dark"] .review-images img {

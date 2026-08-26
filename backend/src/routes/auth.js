@@ -5,16 +5,14 @@ const bcrypt = require('bcrypt');
 const db = require('../database/db');
 const { createLimiter } = require('../middleware/rateLimit');
 const { honeypotMiddleware } = require('../middleware/honeypot');
-
-const JWT_SECRET = process.env.JWT_SECRET || 'cendana-jwt-secret-key';
-const captchaStore = new Map();
+const captchaStore = require('../utils/captcha');
 
 const captchaRateLimiter = createLimiter(10, 60 * 1000);
 const loginRateLimiter = createLimiter(5, 60 * 1000);
 
 router.get('/captcha', captchaRateLimiter, (req, res) => {
     const svgCaptcha = require('svg-captcha');
-    const captchaId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    const captchaId = captchaStore.createSignedId();
     const captcha = svgCaptcha.create({
         size: 6,
         noise: 5,
@@ -26,7 +24,7 @@ router.get('/captcha', captchaRateLimiter, (req, res) => {
         ignoreChars: '0oO1lI',
         lineWidth: 2,
     });
-    captchaStore.set(captchaId, captcha.text.toLowerCase());
+    captchaStore.set(captchaId, captcha.text.toLowerCase(), req);
     res.json({
         captchaId,
         svg: captcha.data,
@@ -44,7 +42,7 @@ router.post('/login', loginRateLimiter, honeypotMiddleware, (req, res) => {
         return res.status(400).json({ error: 'Captcha wajib diisi' });
     }
 
-    const expected = captchaStore.get(captchaId);
+    const expected = captchaStore.get(captchaId, req);
     if (!expected) {
         return res.status(400).json({ error: 'Captcha expired, silakan muat ulang' });
     }

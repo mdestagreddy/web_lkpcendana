@@ -5,6 +5,7 @@ import { useAuth } from '../../context/useAuth';
 import { Mail, Lock, LogIn, RefreshCw } from 'lucide-react';
 import FlexIcon from '../../components/FlexIcon';
 import Alert from '../../components/Alert';
+import SecurityCaptcha from '../../components/SecurityCaptcha';
 import './AdminLogin.css';
 
 export default function AdminLogin() {
@@ -91,22 +92,15 @@ export default function AdminLogin() {
 
                 <div className="form-group">
                     <label htmlFor="captcha">Kode Captcha *</label>
-                    <div className="captcha-container">
-                        {captchaSvg ? (
-                            <div className="captcha-display" dangerouslySetInnerHTML={{ __html: captchaSvg }} />
-                        ) : (
-                            <div className="captcha-loading">Memuat captcha...</div>
-                        )}
-                        <button type="button" className="btn btn-small btn-secondary" onClick={loadCaptcha} title="Muat ulang captcha">
-                            <FlexIcon Icon={RefreshCw} size={14}>Refresh</FlexIcon>
-                        </button>
-                    </div>
-                    <input
-                        id="captcha"
-                        placeholder="Masukkan kode captcha"
-                        value={captchaInput}
-                        onChange={e => setCaptchaInput(e.target.value)}
-                        required
+                    <SecurityCaptcha
+                        loadCaptcha={loadCaptcha}
+                        captchaSvg={captchaSvg}
+                        captchaInput={captchaInput}
+                        onCaptchaChange={e => setCaptchaInput(e.target.value)}
+                        inputId="captcha"
+                        refreshLabel="Refresh"
+                        refreshIcon={RefreshCw}
+                        loading={loading}
                     />
                 </div>
 

@@ -6,6 +6,7 @@ import ImageLightbox from '../../components/ImageLightbox';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import StarRating from '../../components/StarRating';
 import Alert from '../../components/Alert';
+import SecurityCaptcha from '../../components/SecurityCaptcha';
 import './Reviews.css';
 
 export default function Reviews() {
@@ -269,26 +270,16 @@ export default function Reviews() {
                                     </div>
                                 )}
                             </div>
-                            <div className="form-group">
-                                <label htmlFor="captcha">Kode Captcha *</label>
-                                <div className="captcha-container">
-                                    {captchaSvg ? (
-                                        <div className="captcha-display" dangerouslySetInnerHTML={{ __html: captchaSvg }} />
-                                    ) : (
-                                        <div className="captcha-loading">Memuat captcha...</div>
-                                    )}
-                                    <button type="button" className="btn btn-small btn-secondary" onClick={loadCaptcha} title="Muat ulang captcha">
-                                        <FlexIcon Icon={Send} size={14}>Refresh</FlexIcon>
-                                    </button>
-                                </div>
-                                <input
-                                    id="captcha"
-                                    placeholder="Masukkan kode captcha"
-                                    value={captchaInput}
-                                    onChange={e => setCaptchaInput(e.target.value)}
-                                    required
-                                />
-                            </div>
+                            <SecurityCaptcha
+                                loadCaptcha={loadCaptcha}
+                                captchaSvg={captchaSvg}
+                                captchaInput={captchaInput}
+                                onCaptchaChange={e => setCaptchaInput(e.target.value)}
+                                inputId="captcha"
+                                refreshLabel="Refresh"
+                                refreshIcon={Send}
+                                loading={submitting}
+                            />
                             <input type="text" name="hp_confirm" value={hpConfirm} onChange={e => setHpConfirm(e.target.value)} style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }} tabIndex={-1} autoComplete="off" />
                             <button type="submit" className="btn btn-primary submit-btn" disabled={submitting}>
                                     {submitting ? <LoadingSpinner text="Mengirim..." size="sm" className="inline" /> : <FlexIcon Icon={Send} size={16}>Kirim Ulasan</FlexIcon>}
