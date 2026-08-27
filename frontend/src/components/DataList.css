@@ -4,7 +4,11 @@
 .data-list-info {
     font-size: 0.85rem;
     color: var(--text-muted);
+}
+.data-list-info:first-child {
     margin-bottom: 0.75rem;
+}
+.data-list-info:last-child {
     margin-top: 0.75rem;
 }
 .data-list {
