@@ -12,7 +12,7 @@ export default function Layout() {
 
     useEffect(() => {
         function handleResize() {
-            if (window.innerWidth > 1080) {
+            if (window.innerWidth > 1200) {
                 setMenuOpen(false);
             }
         }

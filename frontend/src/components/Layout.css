@@ -16,7 +16,7 @@
     z-index: 998;
 }
 
-@media (max-width: 1080px) {
+@media (max-width: 1200px) {
     .main-content {
         padding-top: 64px;
     }

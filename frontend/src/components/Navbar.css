@@ -227,7 +227,7 @@
     pointer-events: auto;
 }
 
-@media (max-width: 1080px) {
+@media (max-width: 1200px) {
     .navbar-container {
         padding: 0 1rem;
         height: 64px;
