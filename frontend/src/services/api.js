@@ -92,7 +92,16 @@ export const publicApi = {
 
     getFeaturedPrograms: () => request('/public/programs/featured'),
 
-    getInstructors: () => request('/public/instructors'),
+    getInstructors: (params = {}) => {
+        const query = new URLSearchParams();
+        Object.entries(params).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                query.append(key, value);
+            }
+        });
+        const qs = query.toString();
+        return request(`/public/instructors${qs ? `?${qs}` : ''}`);
+    },
 
     getInstructor: (id) => request(`/public/instructors/${id}`),
 
@@ -181,7 +190,16 @@ export const publicApi = {
 
 export const adminApi = {
     programs: {
-        list: () => request('/admin/programs', { isAdmin: true }),
+        list: (params = {}) => {
+            const query = new URLSearchParams();
+            Object.entries(params).forEach(([key, value]) => {
+                if (value !== undefined && value !== null && value !== '') {
+                    query.append(key, value);
+                }
+            });
+            const qs = query.toString();
+            return request(`/admin/programs${qs ? `?${qs}` : ''}`, { isAdmin: true });
+        },
         create: (data) => request('/admin/programs', {
             method: 'POST',
             isAdmin: true,
@@ -217,7 +235,16 @@ export const adminApi = {
     },
 
     instructors: {
-        list: () => request('/admin/instructors', { isAdmin: true }),
+        list: (params = {}) => {
+            const query = new URLSearchParams();
+            Object.entries(params).forEach(([key, value]) => {
+                if (value !== undefined && value !== null && value !== '') {
+                    query.append(key, value);
+                }
+            });
+            const qs = query.toString();
+            return request(`/admin/instructors${qs ? `?${qs}` : ''}`, { isAdmin: true });
+        },
         create: (data) => request('/admin/instructors', {
             method: 'POST',
             isAdmin: true,
@@ -235,7 +262,16 @@ export const adminApi = {
     },
 
     testimonials: {
-        list: () => request('/admin/testimonials', { isAdmin: true }),
+        list: (params = {}) => {
+            const query = new URLSearchParams();
+            Object.entries(params).forEach(([key, value]) => {
+                if (value !== undefined && value !== null && value !== '') {
+                    query.append(key, value);
+                }
+            });
+            const qs = query.toString();
+            return request(`/admin/testimonials${qs ? `?${qs}` : ''}`, { isAdmin: true });
+        },
         create: (data) => request('/admin/testimonials', {
             method: 'POST',
             isAdmin: true,
@@ -253,7 +289,16 @@ export const adminApi = {
     },
 
     gallery: {
-        list: () => request('/admin/gallery', { isAdmin: true }),
+        list: (params = {}) => {
+            const query = new URLSearchParams();
+            Object.entries(params).forEach(([key, value]) => {
+                if (value !== undefined && value !== null && value !== '') {
+                    query.append(key, value);
+                }
+            });
+            const qs = query.toString();
+            return request(`/admin/gallery${qs ? `?${qs}` : ''}`, { isAdmin: true });
+        },
         create: (data) => request('/admin/gallery', {
             method: 'POST',
             isAdmin: true,
@@ -271,7 +316,16 @@ export const adminApi = {
     },
 
     users: {
-        list: () => request('/admin/users', { isAdmin: true }),
+        list: (params = {}) => {
+            const query = new URLSearchParams();
+            Object.entries(params).forEach(([key, value]) => {
+                if (value !== undefined && value !== null && value !== '') {
+                    query.append(key, value);
+                }
+            });
+            const qs = query.toString();
+            return request(`/admin/users${qs ? `?${qs}` : ''}`, { isAdmin: true });
+        },
         create: (data) => request('/admin/users', {
             method: 'POST',
             isAdmin: true,
@@ -325,7 +379,16 @@ export const adminApi = {
     },
 
     posts: {
-        list: () => request('/admin/posts', { isAdmin: true }),
+        list: (params = {}) => {
+            const query = new URLSearchParams();
+            Object.entries(params).forEach(([key, value]) => {
+                if (value !== undefined && value !== null && value !== '') {
+                    query.append(key, value);
+                }
+            });
+            const qs = query.toString();
+            return request(`/admin/posts${qs ? `?${qs}` : ''}`, { isAdmin: true });
+        },
         create: (data) => request('/admin/posts', {
             method: 'POST',
             isAdmin: true,
@@ -343,7 +406,16 @@ export const adminApi = {
     },
 
     categories: {
-        list: () => request('/admin/categories', { isAdmin: true }),
+        list: (params = {}) => {
+            const query = new URLSearchParams();
+            Object.entries(params).forEach(([key, value]) => {
+                if (value !== undefined && value !== null && value !== '') {
+                    query.append(key, value);
+                }
+            });
+            const qs = query.toString();
+            return request(`/admin/categories${qs ? `?${qs}` : ''}`, { isAdmin: true });
+        },
         create: (data) => request('/admin/categories', {
             method: 'POST',
             isAdmin: true,
@@ -361,7 +433,16 @@ export const adminApi = {
     },
 
     orgChart: {
-        list: () => request('/admin/org-chart', { isAdmin: true }),
+        list: (params = {}) => {
+            const query = new URLSearchParams();
+            Object.entries(params).forEach(([key, value]) => {
+                if (value !== undefined && value !== null && value !== '') {
+                    query.append(key, value);
+                }
+            });
+            const qs = query.toString();
+            return request(`/admin/org-chart${qs ? `?${qs}` : ''}`, { isAdmin: true });
+        },
         create: (data) => request('/admin/org-chart', {
             method: 'POST',
             isAdmin: true,
@@ -379,7 +460,16 @@ export const adminApi = {
     },
 
     privacyPolicies: {
-        list: () => request('/admin/privacy-policies', { isAdmin: true }),
+        list: (params = {}) => {
+            const query = new URLSearchParams();
+            Object.entries(params).forEach(([key, value]) => {
+                if (value !== undefined && value !== null && value !== '') {
+                    query.append(key, value);
+                }
+            });
+            const qs = query.toString();
+            return request(`/admin/privacy-policies${qs ? `?${qs}` : ''}`, { isAdmin: true });
+        },
         create: (data) => request('/admin/privacy-policies', {
             method: 'POST',
             isAdmin: true,

@@ -116,7 +116,15 @@
     padding: 1.25rem;
     box-shadow: var(--shadow-sm);
     transition: var(--transition);
+    animation: fadeInUp 0.5s ease-out backwards;
 }
+
+.review-card:nth-child(1) { animation-delay: 0.05s; }
+.review-card:nth-child(2) { animation-delay: 0.1s; }
+.review-card:nth-child(3) { animation-delay: 0.15s; }
+.review-card:nth-child(4) { animation-delay: 0.2s; }
+.review-card:nth-child(5) { animation-delay: 0.25s; }
+.review-card:nth-child(6) { animation-delay: 0.3s; }
 
 .review-card-header {
     display: flex;
@@ -229,6 +237,8 @@
     position: sticky;
     top: 1rem;
     box-shadow: var(--shadow-sm);
+    animation: fadeInUp 0.5s ease-out backwards;
+    animation-delay: 0.3s;
 }
 
 .review-form {

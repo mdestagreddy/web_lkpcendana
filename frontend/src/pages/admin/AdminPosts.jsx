@@ -7,11 +7,16 @@ import Image from '../../components/Image';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import FormField from '../../components/FormField';
+import DataList from '../../components/DataList';
 import './AdminCRUD.css';
+
+const PAGE_SIZE = 10;
 
 export default function AdminPosts() {
     const [items, setItems] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [total, setTotal] = useState(0);
+    const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(null);
     const [submitting, setSubmitting] = useState(false);
@@ -21,14 +26,20 @@ export default function AdminPosts() {
 
     useEffect(() => {
         Promise.all([
-            adminApi.posts.list(),
+            adminApi.posts.list({ limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }),
             adminApi.categories.list(),
         ]).then(([posts, cats]) => {
-            setItems(posts);
+            if (posts && typeof posts === 'object' && 'data' in posts) {
+                setItems(posts.data);
+                setTotal(posts.total);
+            } else {
+                setItems(posts);
+                setTotal(posts?.length || 0);
+            }
             setCategories(cats);
             setLoading(false);
         }).catch(() => setLoading(false));
-    }, []);
+    }, [page]);
 
     function handleSubmit(e) {
         e.preventDefault();
@@ -46,10 +57,7 @@ export default function AdminPosts() {
         }
         setSubmitting(true);
         const promise = editing ? adminApi.posts.update(editing.id, form) : adminApi.posts.create(form);
-        promise.then(load).then(() => {
-            resetForm();
-            setSubmitting(false);
-        }).catch(err => {
+        promise.then(() => { load(); resetForm(); setSubmitting(false); }).catch(err => {
             setError(err?.data?.error || err?.message || 'Gagal menyimpan postingan');
             setSubmitting(false);
         });
@@ -57,7 +65,16 @@ export default function AdminPosts() {
 
     function load() {
         setLoading(true);
-        adminApi.posts.list().then(data => { setItems(data); setLoading(false); }).catch(() => setLoading(false));
+        adminApi.posts.list({ limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }).then(result => {
+            if (result && typeof result === 'object' && 'data' in result) {
+                setItems(result.data);
+                setTotal(result.total);
+            } else {
+                setItems(result);
+                setTotal(result?.length || 0);
+            }
+            setLoading(false);
+        }).catch(() => setLoading(false));
     }
 
     function resetForm() {
@@ -139,9 +156,14 @@ export default function AdminPosts() {
                     {editing && <button type="button" onClick={resetForm} className="btn btn-secondary"><FlexIcon Icon={X} size={16}>Batal</FlexIcon></button>}
                 </div>
             </form>
-            {items.length === 0 && <p className="items-empty">Tidak ada data Artikel</p>}
-
-            <div className={`items-list${items.length === 0 ? ' is-empty' : ''}`}>
+            <DataList
+                items={items}
+                total={total}
+                page={page}
+                pageSize={PAGE_SIZE}
+                onPageChange={setPage}
+                emptyMessage="Tidak ada data Artikel"
+            >
                 {items.map(item => (
                     <div key={item.id} className="generic-card">
                         <div className="admin-post-thumb">
@@ -169,7 +191,7 @@ export default function AdminPosts() {
                         </div>
                     </div>
                 ))}
-            </div>
+            </DataList>
             <ConfirmDialog
                 open={deleteDialog.open}
                 message="Apakah Anda yakin ingin menghapus postingan ini?"

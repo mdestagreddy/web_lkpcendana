@@ -36,6 +36,7 @@
     color: var(--text-secondary);
     position: relative;
     overflow: hidden;
+    animation: fadeInUp 0.5s ease-out backwards;
 }
 
 .privacy-content::before {

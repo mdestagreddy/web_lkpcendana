@@ -27,6 +27,29 @@ function normalizePublishedAt(value) {
     return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
 }
 
+function sendPaginated(req, res, baseQuery, params = []) {
+    const limit = parseInt(req.query.limit) || 0;
+    const offset = parseInt(req.query.offset) || 0;
+
+    if (limit <= 0) {
+        db.query(baseQuery, params, (err, results) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json(results);
+        });
+        return;
+    }
+
+    const countQuery = `SELECT COUNT(*) as total FROM (${baseQuery}) as t`;
+    db.query(countQuery, params, (err, countResults) => {
+        if (err) return res.status(500).json({ error: err.message });
+        const total = countResults[0]?.total || 0;
+        db.query(`${baseQuery} LIMIT ? OFFSET ?`, [...params, limit, offset], (err, results) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ data: results, total, offset, limit });
+        });
+    });
+}
+
 router.use(authMiddleware);
 
 async function generateThumbnail(imageUrl, req) {
@@ -59,10 +82,7 @@ async function generateThumbnail(imageUrl, req) {
 }
 
 router.get('/programs', (req, res) => {
-    db.query('SELECT * FROM programs ORDER BY sort_order ASC, created_at DESC', (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
-    });
+    sendPaginated(req, res, 'SELECT * FROM programs ORDER BY sort_order ASC, created_at DESC');
 });
 
 router.post('/programs', (req, res) => {
@@ -129,10 +149,7 @@ router.delete('/programs/:programId/modules/:moduleId', (req, res) => {
 });
 
 router.get('/instructors', (req, res) => {
-    db.query('SELECT * FROM instructors ORDER BY sort_order ASC, created_at DESC', (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
-    });
+    sendPaginated(req, res, 'SELECT * FROM instructors ORDER BY sort_order ASC, created_at DESC');
 });
 
 router.post('/instructors', (req, res) => {
@@ -168,10 +185,7 @@ router.delete('/instructors/:id', (req, res) => {
 });
 
 router.get('/testimonials', (req, res) => {
-    db.query('SELECT * FROM testimonials ORDER BY sort_order ASC, created_at DESC', (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
-    });
+    sendPaginated(req, res, 'SELECT * FROM testimonials ORDER BY sort_order ASC, created_at DESC');
 });
 
 router.post('/testimonials', (req, res) => {
@@ -207,10 +221,7 @@ router.delete('/testimonials/:id', (req, res) => {
 });
 
 router.get('/gallery', (req, res) => {
-    db.query('SELECT * FROM gallery_items ORDER BY kategori ASC, sort_order ASC', (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
-    });
+    sendPaginated(req, res, 'SELECT * FROM gallery_items ORDER BY kategori ASC, sort_order ASC');
 });
 
 router.post('/gallery', async (req, res) => {
@@ -276,10 +287,7 @@ router.delete('/gallery/:id', (req, res) => {
 });
 
 router.get('/users', (req, res) => {
-    db.query('SELECT id, nama, email, role, avatar, created_at, updated_at FROM users', (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
-    });
+    sendPaginated(req, res, 'SELECT id, nama, email, role, avatar, created_at, updated_at FROM users');
 });
 
 router.post('/users', async (req, res) => {
@@ -345,10 +353,7 @@ router.put('/institution-info/:key', (req, res) => {
 });
 
 router.get('/vision-mission', (req, res) => {
-    db.query('SELECT * FROM vision_mission ORDER BY type ASC, sort_order ASC', (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
-    });
+    sendPaginated(req, res, 'SELECT * FROM vision_mission ORDER BY type ASC, sort_order ASC');
 });
 
 router.post('/vision-mission', (req, res) => {
@@ -376,10 +381,7 @@ router.delete('/vision-mission/:id', (req, res) => {
 });
 
 router.get('/site-settings', (req, res) => {
-    db.query('SELECT * FROM site_settings', (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
-    });
+    sendPaginated(req, res, 'SELECT * FROM site_settings');
 });
 
 router.put('/site-settings/:key', (req, res) => {
@@ -391,10 +393,7 @@ router.put('/site-settings/:key', (req, res) => {
 });
 
 router.get('/posts', (req, res) => {
-    db.query('SELECT p.*, c.name as category_name, c.slug as category_slug FROM posts p LEFT JOIN categories c ON p.category_id = c.id ORDER BY p.created_at DESC', (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
-    });
+    sendPaginated(req, res, 'SELECT p.*, c.name as category_name, c.slug as category_slug FROM posts p LEFT JOIN categories c ON p.category_id = c.id ORDER BY p.created_at DESC');
 });
 
 router.post('/posts', (req, res) => {
@@ -457,10 +456,7 @@ router.delete('/posts/:id', (req, res) => {
 });
 
 router.get('/categories', (req, res) => {
-    db.query('SELECT * FROM categories ORDER BY name ASC', (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
-    });
+    sendPaginated(req, res, 'SELECT * FROM categories ORDER BY name ASC');
 });
 
 router.post('/categories', (req, res) => {
@@ -488,10 +484,7 @@ router.delete('/categories/:id', (req, res) => {
 });
 
 router.get('/org-chart', (req, res) => {
-    db.query('SELECT * FROM org_chart_nodes ORDER BY sort_order ASC, created_at DESC', (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
-    });
+    sendPaginated(req, res, 'SELECT * FROM org_chart_nodes ORDER BY sort_order ASC, created_at DESC');
 });
 
 router.post('/org-chart', (req, res) => {
@@ -519,10 +512,7 @@ router.delete('/org-chart/:id', (req, res) => {
 });
 
 router.get('/privacy-policies', (req, res) => {
-    db.query('SELECT * FROM privacy_policies ORDER BY effective_date DESC', (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
-    });
+    sendPaginated(req, res, 'SELECT * FROM privacy_policies ORDER BY effective_date DESC');
 });
 
 router.post('/privacy-policies', (req, res) => {

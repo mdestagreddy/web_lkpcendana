@@ -8,7 +8,10 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import FormField from '../../components/FormField';
 import CRUDCard from '../../components/CRUDCard';
+import DataList from '../../components/DataList';
 import './AdminCRUD.css';
+
+const PAGE_SIZE = 10;
 
 function formatDate(value) {
     if (!value) return '-';
@@ -33,17 +36,28 @@ function renderContent(content) {
 
 export default function AdminPrivacyPolicies() {
     const [items, setItems] = useState([]);
+    const [total, setTotal] = useState(0);
+    const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(null);
     const [form, setForm] = useState({ content: '', version: '', effective_date: '', is_current: true });
     const [deleteDialog, setDeleteDialog] = useState({ open: false, id: null });
 
-    useEffect(() => { load(); }, []);
-
     function load() {
         setLoading(true);
-        adminApi.privacyPolicies.list().then(data => { setItems(data); setLoading(false); }).catch(() => setLoading(false));
+        adminApi.privacyPolicies.list({ limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }).then(result => {
+            if (result && typeof result === 'object' && 'data' in result) {
+                setItems(result.data);
+                setTotal(result.total);
+            } else {
+                setItems(result);
+                setTotal(result?.length || 0);
+            }
+            setLoading(false);
+        }).catch(() => setLoading(false));
     }
+
+    useEffect(() => { load(); }, [page]);
 
     function handleSubmit(e) {
         e.preventDefault();
@@ -53,13 +67,11 @@ export default function AdminPrivacyPolicies() {
         };
         if (editing) {
             adminApi.privacyPolicies.update(editing.id, payload)
-                .then(load)
-                .then(() => setEditing(null))
+                .then(() => { load(); setEditing(null); })
                 .catch(err => alert('Gagal memperbarui: ' + (err.data?.error || err.message)));
         } else {
             adminApi.privacyPolicies.create(payload)
-                .then(load)
-                .then(() => resetForm())
+                .then(() => { load(); resetForm(); })
                 .catch(err => alert('Gagal menambah: ' + (err.data?.error || err.message)));
         }
     }
@@ -85,7 +97,7 @@ export default function AdminPrivacyPolicies() {
 
     function confirmDelete() {
         if (deleteDialog.id) {
-            adminApi.privacyPolicies.delete(deleteDialog.id).then(load).catch(() => {});
+            adminApi.privacyPolicies.delete(deleteDialog.id).then(() => { load(); }).catch(() => {});
         }
         setDeleteDialog({ open: false, id: null });
     }
@@ -125,9 +137,14 @@ export default function AdminPrivacyPolicies() {
                     {editing && <button type="button" onClick={resetForm} className="btn btn-secondary"><FlexIcon Icon={X} size={16}>Batal</FlexIcon></button>}
                 </div>
             </form>
-            {items.length === 0 && <p className="items-empty">Tidak ada data Kebijakan Privasi</p>}
-
-            <div className={`items-list${items.length === 0 ? ' is-empty' : ''}`}>
+            <DataList
+                items={items}
+                total={total}
+                page={page}
+                pageSize={PAGE_SIZE}
+                onPageChange={setPage}
+                emptyMessage="Tidak ada data Kebijakan Privasi"
+            >
                 {items.map(item => (
                     <CRUDCard
                         key={item.id}
@@ -144,7 +161,7 @@ export default function AdminPrivacyPolicies() {
                         }
                     />
                 ))}
-            </div>
+            </DataList>
             <ConfirmDialog
                 open={deleteDialog.open}
                 message="Apakah Anda yakin ingin menghapus kebijakan privasi ini?"

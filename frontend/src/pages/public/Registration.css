@@ -35,7 +35,11 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    animation: fadeInUp 0.5s ease-out backwards;
 }
+
+.iframe-card:nth-child(1) { animation-delay: 0.05s; }
+.iframe-card:nth-child(2) { animation-delay: 0.15s; }
 
 .iframe-card-header {
     display: flex;

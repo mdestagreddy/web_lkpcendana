@@ -7,10 +7,15 @@ import CustomCheckbox from '../../components/CustomCheckbox';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import FormField from '../../components/FormField';
+import DataList from '../../components/DataList';
 import './AdminCRUD.css';
+
+const PAGE_SIZE = 10;
 
 export default function AdminPrograms() {
     const [items, setItems] = useState([]);
+    const [total, setTotal] = useState(0);
+    const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(null);
     const [form, setForm] = useState({ title: '', slug: '', category: '', level: 'Pemula', duration_minutes: 0, description: '', type: 'offline', is_featured: false, is_active: true, sort_order: 0, image_url: '' });
@@ -18,24 +23,28 @@ export default function AdminPrograms() {
     const [newModule, setNewModule] = useState({});
     const [deleteDialog, setDeleteDialog] = useState({ open: false, id: null });
 
-    useEffect(() => {
-        load();
-    }, []);
-
     function load() {
         setLoading(true);
-        adminApi.programs.list().then(data => {
-            setItems(data);
+        adminApi.programs.list({ limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }).then(result => {
+            if (result && typeof result === 'object' && 'data' in result) {
+                setItems(result.data);
+                setTotal(result.total);
+            } else {
+                setItems(result);
+                setTotal(result?.length || 0);
+            }
             setLoading(false);
         }).catch(() => setLoading(false));
     }
 
+    useEffect(() => { load(); }, [page]);
+
     function handleSubmit(e) {
         e.preventDefault();
         if (editing) {
-            adminApi.programs.update(editing.id, form).then(load).then(() => setEditing(null)).catch(() => {});
+            adminApi.programs.update(editing.id, form).then(() => { load(); setEditing(null); }).catch(() => {});
         } else {
-            adminApi.programs.create(form).then(load).then(() => resetForm()).catch(() => {});
+            adminApi.programs.create(form).then(() => { load(); resetForm(); }).catch(() => {});
         }
     }
 
@@ -55,7 +64,7 @@ export default function AdminPrograms() {
 
     function confirmDelete() {
         if (deleteDialog.id) {
-            adminApi.programs.delete(deleteDialog.id).then(load).catch(() => {});
+            adminApi.programs.delete(deleteDialog.id).then(() => { load(); }).catch(() => {});
         }
         setDeleteDialog({ open: false, id: null });
     }
@@ -135,9 +144,14 @@ export default function AdminPrograms() {
                 </div>
             </form>
 
-            {items.length === 0 && <p className="items-empty">Tidak ada data Program</p>}
-
-            <div className={`items-list${items.length === 0 ? ' is-empty' : ''}`}>
+            <DataList
+                items={items}
+                total={total}
+                page={page}
+                pageSize={PAGE_SIZE}
+                onPageChange={setPage}
+                emptyMessage="Tidak ada data Program"
+            >
                 {items.map(item => (
                     <div key={item.id} className="program-card">
                         <div className="program-card-header">
@@ -187,7 +201,7 @@ export default function AdminPrograms() {
                         )}
                     </div>
                 ))}
-            </div>
+            </DataList>
             <ConfirmDialog
                 open={deleteDialog.open}
                 message="Apakah Anda yakin ingin menghapus program ini?"

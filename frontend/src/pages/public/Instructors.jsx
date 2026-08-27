@@ -5,18 +5,32 @@ import FlexIcon from '../../components/FlexIcon';
 import Image from '../../components/Image';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import SocialLinks from '../../components/SocialLinks';
+import Pagination from '../../components/Pagination';
 import './Instructors.css';
+
+const PAGE_SIZE = 9;
 
 export default function Instructors() {
     const [instructors, setInstructors] = useState([]);
+    const [total, setTotal] = useState(0);
+    const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        publicApi.getInstructors().then(data => {
-            setInstructors(data);
+    function load() {
+        setLoading(true);
+        publicApi.getInstructors({ limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }).then(result => {
+            if (result && typeof result === 'object' && 'data' in result) {
+                setInstructors(result.data);
+                setTotal(result.total);
+            } else {
+                setInstructors(result);
+                setTotal(result?.length || 0);
+            }
             setLoading(false);
         }).catch(() => setLoading(false));
-    }, []);
+    }
+
+    useEffect(() => { load(); }, [page]);
 
     if (loading) return <div className="container"><LoadingSpinner /></div>;
 
@@ -48,6 +62,7 @@ export default function Instructors() {
                         </div>
                     ))}
                 </div>
+                <Pagination total={total} page={page} pageSize={PAGE_SIZE} onPageChange={setPage} />
             </div>
         </div>
     );

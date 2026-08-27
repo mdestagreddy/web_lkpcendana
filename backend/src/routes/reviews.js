@@ -9,6 +9,29 @@ const captchaStore = require('../utils/captcha');
 const captchaRateLimiter = createLimiter(10, 60 * 1000);
 const reviewRateLimiter = createLimiter(3, 60 * 1000);
 
+function sendPaginated(req, res, baseQuery, params = []) {
+    const limit = parseInt(req.query.limit) || 0;
+    const offset = parseInt(req.query.offset) || 0;
+
+    if (limit <= 0) {
+        db.query(baseQuery, params, (err, results) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json(results);
+        });
+        return;
+    }
+
+    const countQuery = `SELECT COUNT(*) as total FROM (${baseQuery}) as t`;
+    db.query(countQuery, params, (err, countResults) => {
+        if (err) return res.status(500).json({ error: err.message });
+        const total = countResults[0]?.total || 0;
+        db.query(`${baseQuery} LIMIT ? OFFSET ?`, [...params, limit, offset], (err, results) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ data: results, total, offset, limit });
+        });
+    });
+}
+
 router.get('/captcha', captchaRateLimiter, (req, res) => {
     const svgCaptcha = require('svg-captcha');
     const captchaId = captchaStore.createSignedId();
@@ -31,11 +54,7 @@ router.get('/captcha', captchaRateLimiter, (req, res) => {
 });
 
 router.get('/', (req, res) => {
-    const query = 'SELECT * FROM reviews WHERE is_active = 1 ORDER BY created_at DESC';
-    db.query(query, (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
-    });
+    sendPaginated(req, res, 'SELECT * FROM reviews WHERE is_active = 1 ORDER BY created_at DESC');
 });
 
 router.post('/', reviewRateLimiter, honeypotMiddleware, (req, res) => {

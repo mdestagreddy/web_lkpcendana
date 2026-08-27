@@ -42,7 +42,15 @@
     transition: var(--transition);
     position: relative;
     overflow: hidden;
+    animation: fadeInUp 0.5s ease-out backwards;
 }
+
+.instructor-card:nth-child(1) { animation-delay: 0.05s; }
+.instructor-card:nth-child(2) { animation-delay: 0.1s; }
+.instructor-card:nth-child(3) { animation-delay: 0.15s; }
+.instructor-card:nth-child(4) { animation-delay: 0.2s; }
+.instructor-card:nth-child(5) { animation-delay: 0.25s; }
+.instructor-card:nth-child(6) { animation-delay: 0.3s; }
 
 .instructor-card::before {
     content: '';

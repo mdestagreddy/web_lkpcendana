@@ -6,12 +6,18 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import FormField from '../../components/FormField';
 import CRUDCard from '../../components/CRUDCard';
+import DataList from '../../components/DataList';
 import useCRUD from '../../hooks/useCRUD';
 import './AdminCRUD.css';
+
+const PAGE_SIZE = 10;
 
 export default function AdminOrgChart() {
     const {
         items,
+        total,
+        page,
+        handlePageChange,
         loading,
         editing,
         form,
@@ -26,6 +32,7 @@ export default function AdminOrgChart() {
     } = useCRUD({
         api: adminApi.orgChart,
         initialForm: { nama: '', role: '', parent_id: '', foto: '', sort_order: 0 },
+        pageSize: PAGE_SIZE,
     });
 
     if (loading) return <div className="container"><LoadingSpinner /></div>;
@@ -62,9 +69,14 @@ export default function AdminOrgChart() {
                     {editing && <button type="button" onClick={resetForm} className="btn btn-secondary"><FlexIcon Icon={X} size={16}>Batal</FlexIcon></button>}
                 </div>
             </form>
-            {items.length === 0 && <p className="items-empty">Tidak ada data Organisasi</p>}
-
-            <div className={`items-list${items.length === 0 ? ' is-empty' : ''}`}>
+            <DataList
+                items={items}
+                total={total}
+                page={page}
+                pageSize={PAGE_SIZE}
+                onPageChange={handlePageChange}
+                emptyMessage="Tidak ada data Organisasi"
+            >
                 {items.map(item => (
                     <CRUDCard
                         key={item.id}
@@ -81,7 +93,7 @@ export default function AdminOrgChart() {
                         }
                     />
                 ))}
-            </div>
+            </DataList>
             <ConfirmDialog
                 open={deleteDialog.open}
                 message="Apakah Anda yakin ingin menghapus data organisasi ini?"

@@ -10,28 +10,42 @@ import CustomCheckbox from '../../components/CustomCheckbox';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import FormField from '../../components/FormField';
+import DataList from '../../components/DataList';
 import './AdminCRUD.css';
+
+const PAGE_SIZE = 10;
 
 export default function AdminInstructors() {
     const [items, setItems] = useState([]);
+    const [total, setTotal] = useState(0);
+    const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(null);
     const [form, setForm] = useState({ nama: '', slug: '', role: '', bio: '', foto: '', facebook_url: '', twitter_url: '', instagram_url: '', youtube_url: '', sort_order: 0, is_active: true });
     const [deleteDialog, setDeleteDialog] = useState({ open: false, id: null });
 
-    useEffect(() => { load(); }, []);
-
     function load() {
         setLoading(true);
-        adminApi.instructors.list().then(data => { setItems(data); setLoading(false); }).catch(() => setLoading(false));
+        adminApi.instructors.list({ limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }).then(result => {
+            if (result && typeof result === 'object' && 'data' in result) {
+                setItems(result.data);
+                setTotal(result.total);
+            } else {
+                setItems(result);
+                setTotal(result?.length || 0);
+            }
+            setLoading(false);
+        }).catch(() => setLoading(false));
     }
+
+    useEffect(() => { load(); }, [page]);
 
     function handleSubmit(e) {
         e.preventDefault();
         if (editing) {
-            adminApi.instructors.update(editing.id, form).then(load).then(() => setEditing(null)).catch(() => { });
+            adminApi.instructors.update(editing.id, form).then(() => { load(); setEditing(null); }).catch(() => { });
         } else {
-            adminApi.instructors.create(form).then(load).then(() => resetForm()).catch(() => { });
+            adminApi.instructors.create(form).then(() => { load(); resetForm(); }).catch(() => { });
         }
     }
 
@@ -51,7 +65,7 @@ export default function AdminInstructors() {
 
     function confirmDelete() {
         if (deleteDialog.id) {
-            adminApi.instructors.delete(deleteDialog.id).then(load).catch(() => { });
+            adminApi.instructors.delete(deleteDialog.id).then(() => { load(); }).catch(() => { });
         }
         setDeleteDialog({ open: false, id: null });
     }
@@ -105,9 +119,14 @@ export default function AdminInstructors() {
                     {(editing || form.nama || form.slug) && <button type="button" onClick={resetForm} className="btn btn-secondary"><FlexIcon Icon={X} size={16}>Batal</FlexIcon></button>}
                 </div>
             </form>
-            {items.length === 0 && <p className="items-empty">Tidak ada data Instruktur</p>}
-
-            <div className={`items-list${items.length === 0 ? ' is-empty' : ''}`}>
+            <DataList
+                items={items}
+                total={total}
+                page={page}
+                pageSize={PAGE_SIZE}
+                onPageChange={setPage}
+                emptyMessage="Tidak ada data Instruktur"
+            >
                 {items.map(item => (
                     <div key={item.id} className="generic-card">
                         <div className="admin-instructor-photo">
@@ -140,7 +159,7 @@ export default function AdminInstructors() {
                         )}
                     </div>
                 ))}
-            </div>
+            </DataList>
             <ConfirmDialog
                 open={deleteDialog.open}
                 message="Apakah Anda yakin ingin menghapus instruktur ini?"

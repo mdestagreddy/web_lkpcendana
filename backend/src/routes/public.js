@@ -2,6 +2,29 @@
 const router = express.Router();
 const db = require('../database/db');
 
+function sendPaginated(req, res, baseQuery, params = []) {
+    const limit = parseInt(req.query.limit) || 0;
+    const offset = parseInt(req.query.offset) || 0;
+
+    if (limit <= 0) {
+        db.query(baseQuery, params, (err, results) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json(results);
+        });
+        return;
+    }
+
+    const countQuery = `SELECT COUNT(*) as total FROM (${baseQuery}) as t`;
+    db.query(countQuery, params, (err, countResults) => {
+        if (err) return res.status(500).json({ error: err.message });
+        const total = countResults[0]?.total || 0;
+        db.query(`${baseQuery} LIMIT ? OFFSET ?`, [...params, limit, offset], (err, results) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ data: results, total, offset, limit });
+        });
+    });
+}
+
 router.get('/programs', (req, res) => {
     const { type, level, category, featured } = req.query;
     let query = 'SELECT * FROM programs WHERE is_active = 1';
@@ -13,11 +36,7 @@ router.get('/programs', (req, res) => {
     if (featured === 'true') { query += ' AND is_featured = 1'; }
 
     query += ' ORDER BY sort_order ASC, created_at DESC';
-
-    db.query(query, params, (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
-    });
+    sendPaginated(req, res, query, params);
 });
 
 router.get('/programs/featured', (req, res) => {
@@ -43,10 +62,7 @@ router.get('/programs/:id/modules', (req, res) => {
 });
 
 router.get('/instructors', (req, res) => {
-    db.query('SELECT * FROM instructors WHERE is_active = 1 ORDER BY sort_order ASC, created_at DESC', (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
-    });
+    sendPaginated(req, res, 'SELECT * FROM instructors WHERE is_active = 1 ORDER BY sort_order ASC, created_at DESC');
 });
 
 router.get('/instructors/:id', (req, res) => {
@@ -62,10 +78,7 @@ router.get('/testimonials', (req, res) => {
     let query = 'SELECT * FROM testimonials WHERE is_active = 1';
     if (featured === 'true') query += ' AND is_featured = 1';
     query += ' ORDER BY sort_order ASC, created_at DESC';
-    db.query(query, (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
-    });
+    sendPaginated(req, res, query);
 });
 
 router.get('/gallery', (req, res) => {
@@ -74,10 +87,7 @@ router.get('/gallery', (req, res) => {
     const params = [];
     if (category) { query += ' AND kategori = ?'; params.push(category); }
     query += ' ORDER BY kategori ASC, sort_order ASC';
-    db.query(query, params, (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
-    });
+    sendPaginated(req, res, query, params);
 });
 
 router.get('/institution', (req, res) => {
@@ -113,10 +123,7 @@ router.get('/posts', (req, res) => {
     if (status) { query += ' AND p.status = ?'; params.push(status); }
     else { query += ' AND p.status = "published"'; }
     query += ' ORDER BY p.published_at DESC';
-    db.query(query, params, (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
-    });
+    sendPaginated(req, res, query, params);
 });
 
 router.get('/posts/:id', (req, res) => {

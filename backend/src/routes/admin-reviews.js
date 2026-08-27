@@ -3,6 +3,29 @@ const router = express.Router();
 const db = require('../database/db');
 const { authMiddleware } = require('../middleware/auth');
 
+function sendPaginated(req, res, baseQuery, params = []) {
+    const limit = parseInt(req.query.limit) || 0;
+    const offset = parseInt(req.query.offset) || 0;
+
+    if (limit <= 0) {
+        db.query(baseQuery, params, (err, results) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json(results);
+        });
+        return;
+    }
+
+    const countQuery = `SELECT COUNT(*) as total FROM (${baseQuery}) as t`;
+    db.query(countQuery, params, (err, countResults) => {
+        if (err) return res.status(500).json({ error: err.message });
+        const total = countResults[0]?.total || 0;
+        db.query(`${baseQuery} LIMIT ? OFFSET ?`, [...params, limit, offset], (err, results) => {
+            if (err) return res.status(500).json({ error: err.message });
+            res.json({ data: results, total, offset, limit });
+        });
+    });
+}
+
 router.use(authMiddleware);
 
 router.get('/reviews', (req, res) => {
@@ -14,10 +37,7 @@ router.get('/reviews', (req, res) => {
         params.push(is_active === 'true' || is_active === '1' ? 1 : 0);
     }
     query += ' ORDER BY created_at DESC';
-    db.query(query, params, (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
-    });
+    sendPaginated(req, res, query, params);
 });
 
 router.post('/reviews', (req, res) => {

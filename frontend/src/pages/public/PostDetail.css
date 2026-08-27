@@ -25,6 +25,7 @@
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
     overflow: hidden;
+    animation: fadeInUp 0.5s ease-out backwards;
 }
 
 .post-detail-header {

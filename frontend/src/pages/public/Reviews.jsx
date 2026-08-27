@@ -7,10 +7,15 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import StarRating from '../../components/StarRating';
 import Alert from '../../components/Alert';
 import SecurityCaptcha from '../../components/SecurityCaptcha';
+import Pagination from '../../components/Pagination';
 import './Reviews.css';
+
+const PAGE_SIZE = 10;
 
 export default function Reviews() {
     const [reviews, setReviews] = useState([]);
+    const [total, setTotal] = useState(0);
+    const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [captchaId, setCaptchaId] = useState(null);
@@ -26,7 +31,21 @@ export default function Reviews() {
     const [form, setForm] = useState({ nama: '', email: '', rating: 5, isi: '', images: [] });
     const [hpConfirm, setHpConfirm] = useState('');
 
-    useEffect(() => { loadReviews(); }, []);
+    function loadReviews() {
+        setLoading(true);
+        publicApi.getReviews({ limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }).then(result => {
+            if (result && typeof result === 'object' && 'data' in result) {
+                setReviews(result.data);
+                setTotal(result.total);
+            } else {
+                setReviews(result);
+                setTotal(result?.length || 0);
+            }
+            setLoading(false);
+        }).catch(() => setLoading(false));
+    }
+
+    useEffect(() => { loadReviews(); }, [page]);
 
     const autoResize = useCallback(() => {
         const el = isiRef.current;
@@ -36,14 +55,6 @@ export default function Reviews() {
     }, []);
 
     useEffect(() => { autoResize(); }, [form.isi, autoResize]);
-
-    function loadReviews() {
-        setLoading(true);
-        publicApi.getReviews().then(data => {
-            setReviews(data);
-            setLoading(false);
-        }).catch(() => setLoading(false));
-    }
 
     useEffect(() => {
         if (!captchaId) loadCaptcha();
@@ -168,35 +179,40 @@ export default function Reviews() {
                         <h2>Ulasan dari Peserta</h2>
                         {loading ? (
                             <LoadingSpinner />
-                        ) : reviews.length === 0 ? (
-                            <p className="empty-message">Belum ada ulasan. Jadilah yang pertama!</p>
                         ) : (
-                            <div className="reviews-list">
-                                {reviews.map(review => (
-                                    <div key={review.id} className="review-card">
-                                        <div className="review-card-header">
-                                            <div className="review-avatar">
-                                                {review.nama?.charAt(0)?.toUpperCase() || 'U'}
+                            <>
+                                <div className="reviews-list">
+                                    {reviews.map(review => {
+                                        let imgs = [];
+                                        if (review.images) {
+                                            if (Array.isArray(review.images)) {
+                                                imgs = review.images;
+                                            } else if (typeof review.images === 'string') {
+                                                try { imgs = JSON.parse(review.images); } catch { imgs = []; }
+                                            }
+                                        }
+                                        return (
+                                            <div key={review.id} className="review-card">
+                                                <div className="review-card-header">
+                                                    <div className="review-avatar">
+                                                        {review.nama?.charAt(0)?.toUpperCase() || 'U'}
+                                                    </div>
+                                                    <div className="review-meta">
+                                                        <h4>{review.nama}</h4>
+                                                        <div className="review-stars-small"><StarRating rating={review.rating} /></div>
+                                                    </div>
+                                                </div>
+                                                <p className="review-text">{review.isi}</p>
+                                                {imgs.length > 0 && (
+                                                    <ImageLightbox style={{ marginBottom: '0.5rem' }} items={imgs.map(src => ({ src, author: review.nama, text: review.isi }))} />
+                                                )}
+                                                <span className="review-date">{formatDate(review.created_at)}</span>
                                             </div>
-                                            <div className="review-meta">
-                                                <h4>{review.nama}</h4>
-                                                <div className="review-stars-small"><StarRating rating={review.rating} /></div>
-                                            </div>
-                                        </div>
-                                        <p className="review-text">{review.isi}</p>
-                                {(() => {
-                                    let imgs = review.images;
-                                    if (typeof imgs === 'string') {
-                                        try { imgs = JSON.parse(imgs); } catch { imgs = []; }
-                                    }
-                                    return (imgs && imgs.length > 0) ? (
-                                        <ImageLightbox style={{ marginBottom: '0.5rem' }} items={imgs.map(src => ({ src, author: review.nama, text: review.isi }))} />
-                                    ) : null;
-                                })()}
-                                        <span className="review-date">{formatDate(review.created_at)}</span>
-                                    </div>
-                                ))}
-                            </div>
+                                        );
+                                    })}
+                                </div>
+                                <Pagination total={total} page={page} pageSize={PAGE_SIZE} onPageChange={setPage} />
+                            </>
                         )}
                     </div>
 

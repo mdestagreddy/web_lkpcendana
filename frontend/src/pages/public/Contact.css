@@ -44,7 +44,11 @@
     position: relative;
     overflow: hidden;
     transition: var(--transition);
+    animation: fadeInUp 0.5s ease-out backwards;
 }
+
+.contact-info { animation-delay: 0.05s; }
+.social-info { animation-delay: 0.15s; }
 
 .contact-info::before,
 .social-info::before {

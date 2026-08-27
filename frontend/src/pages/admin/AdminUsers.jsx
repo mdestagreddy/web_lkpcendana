@@ -6,28 +6,42 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import FormField from '../../components/FormField';
 import CRUDCard from '../../components/CRUDCard';
+import DataList from '../../components/DataList';
 import './AdminCRUD.css';
+
+const PAGE_SIZE = 10;
 
 export default function AdminUsers() {
     const [items, setItems] = useState([]);
+    const [total, setTotal] = useState(0);
+    const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
     const [editing, setEditing] = useState(null);
     const [form, setForm] = useState({ nama: '', email: '', password: '', role: 'admin', avatar: '' });
     const [deleteDialog, setDeleteDialog] = useState({ open: false, id: null });
 
-    useEffect(() => { load(); }, []);
-
     function load() {
         setLoading(true);
-        adminApi.users.list().then(data => { setItems(data); setLoading(false); }).catch(() => setLoading(false));
+        adminApi.users.list({ limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }).then(result => {
+            if (result && typeof result === 'object' && 'data' in result) {
+                setItems(result.data);
+                setTotal(result.total);
+            } else {
+                setItems(result);
+                setTotal(result?.length || 0);
+            }
+            setLoading(false);
+        }).catch(() => setLoading(false));
     }
+
+    useEffect(() => { load(); }, [page]);
 
     function handleSubmit(e) {
         e.preventDefault();
         if (editing) {
-            adminApi.users.update(editing.id, form).then(load).then(() => setEditing(null)).catch(() => {});
+            adminApi.users.update(editing.id, form).then(() => { load(); setEditing(null); }).catch(() => {});
         } else {
-            adminApi.users.create(form).then(load).then(() => resetForm()).catch(() => {});
+            adminApi.users.create(form).then(() => { load(); resetForm(); }).catch(() => {});
         }
     }
 
@@ -47,7 +61,7 @@ export default function AdminUsers() {
 
     function confirmDelete() {
         if (deleteDialog.id) {
-            adminApi.users.delete(deleteDialog.id).then(load).catch(() => {});
+            adminApi.users.delete(deleteDialog.id).then(() => { load(); }).catch(() => {});
         }
         setDeleteDialog({ open: false, id: null });
     }
@@ -79,9 +93,14 @@ export default function AdminUsers() {
                     {editing && <button type="button" onClick={resetForm} className="btn btn-secondary"><FlexIcon Icon={X} size={16}>Batal</FlexIcon></button>}
                 </div>
             </form>
-            {items.length === 0 && <p className="items-empty">Tidak ada data Pengguna</p>}
-
-            <div className={`items-list${items.length === 0 ? ' is-empty' : ''}`}>
+            <DataList
+                items={items}
+                total={total}
+                page={page}
+                pageSize={PAGE_SIZE}
+                onPageChange={setPage}
+                emptyMessage="Tidak ada data Pengguna"
+            >
                 {items.map(item => (
                     <CRUDCard
                         key={item.id}
@@ -95,7 +114,7 @@ export default function AdminUsers() {
                         }
                     />
                 ))}
-            </div>
+            </DataList>
             <ConfirmDialog
                 open={deleteDialog.open}
                 message="Apakah Anda yakin ingin menghapus pengguna ini?"
