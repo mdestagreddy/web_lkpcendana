@@ -30,20 +30,39 @@
     padding: 0 1.25rem 1.25rem;
     border-bottom: 1px solid var(--border-light);
     margin-bottom: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
-.sidebar-header-top {
+.sidebar-header-row {
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 0.5rem;
+}
+
+.sidebar-brand {
+    display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-bottom: 0.25rem;
+}
+
+.sidebar-logo {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
 }
 
 .sidebar-header h2 {
     color: var(--blue-700);
-    font-size: 1.15rem;
+    font-size: 0.75rem;
     font-weight: 800;
+}
+
+.sidebar-header .user-name {
+    color: var(--text-muted);
+    font-size: 0.8rem;
 }
 
 .theme-toggle-btn {
@@ -77,12 +96,6 @@
     background: #1e293b;
     border-color: var(--blue-500);
     color: var(--blue-500);
-}
-
-.user-name {
-    color: var(--text-muted);
-    font-size: 0.8rem;
-    margin-top: 0.2rem;
 }
 
 .sidebar-nav {
@@ -144,6 +157,29 @@
     background: #f8fafc;
 }
 
+.admin-layout .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    width: 100%;
+    background-image: linear-gradient(to top, transparent, var(--bg-body));
+    gap: 0.5rem;
+}
+
+.header-page-title {
+    display: none;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    opacity: 0;
+}
+
 .sidebar-toggle {
     display: none;
     flex-direction: column;
@@ -152,7 +188,6 @@
     background: none;
     border: none;
     cursor: pointer;
-    margin-bottom: 0.75rem;
 }
 
 .sidebar-toggle span {
@@ -162,6 +197,14 @@
     background: var(--text-primary);
     border-radius: 2px;
     transition: var(--transition);
+}
+
+.header-page-title {
+    display: none;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
 }
 
 .sidebar-overlay {
@@ -176,6 +219,7 @@
 @media (max-width: 768px) {
     .admin-layout {
         flex-direction: column;
+        margin-top: 2.5rem;
     }
 
     .admin-sidebar {
@@ -193,7 +237,6 @@
         transform: translateX(0);
     }
 
-    .sidebar-header,
     .sidebar-footer {
         display: block;
     }
@@ -215,6 +258,10 @@
 
     .sidebar-toggle {
         display: flex;
+    }
+
+    .header-page-title {
+        display: block;
     }
 
     .sidebar-overlay {
