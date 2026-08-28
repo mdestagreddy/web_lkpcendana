@@ -1,5 +1,10 @@
 require('dotenv').config();
 const mysql = require('mysql2');
+const path = require('path');
+const fs = require('fs');
+
+const sslValidate = process.env.DB_SSL_REQUIRED && process.env.DB_SSL_REQUIRED == "true";
+const caValidate = sslValidate && process.env.DB_SSL_CA_PATH && process.env.DB_SSL_CA_PATH != "";
 
 const connectionPool = mysql.createPool({
     host: process.env.DB_HOST || '127.0.0.1', 
@@ -10,7 +15,13 @@ const connectionPool = mysql.createPool({
     multipleStatements: true,
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 0
+    queueLimit: 0,
+    ...(sslValidate ? {
+        ssl: {
+            ...(caValidate ? { ca: fs.readFileSync(path.join(__dirname, process.env.DB_SSL_CA_PATH)) } : {}),
+            rejectUnauthorized: caValidate
+        }
+    } : {})
 });
 
 connectionPool.getConnection((err, connection) => {
