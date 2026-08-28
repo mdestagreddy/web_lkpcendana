@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { publicApi } from '../../services/api';
 import { Calendar, Tag, ArrowRight } from 'lucide-react';
@@ -18,7 +18,7 @@ export default function Posts() {
     const [filter, setFilter] = useState({});
     const [loading, setLoading] = useState(true);
 
-    function load() {
+    const load = useCallback(() => {
         setLoading(true);
         Promise.all([
             publicApi.getPosts({ ...filter, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }),
@@ -34,9 +34,9 @@ export default function Posts() {
             setCategories(cats);
             setLoading(false);
         }).catch(() => setLoading(false));
-    }
+    }, [filter, page]);
 
-    useEffect(() => { load(); }, [filter, page]);
+    useEffect(() => { load(); }, [load]);
 
     return (
         <div className="posts-page">

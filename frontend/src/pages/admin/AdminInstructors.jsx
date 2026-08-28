@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { adminApi } from '../../services/api';
 import ImageUpload from '../../components/ImageUpload';
 import { Plus, Save, X, Pencil, Trash2, User } from 'lucide-react';
@@ -24,7 +24,7 @@ export default function AdminInstructors() {
     const [form, setForm] = useState({ nama: '', slug: '', role: '', bio: '', foto: '', facebook_url: '', twitter_url: '', instagram_url: '', youtube_url: '', sort_order: 0, is_active: true });
     const [deleteDialog, setDeleteDialog] = useState({ open: false, id: null });
 
-    function load() {
+    const load = useCallback(() => {
         setLoading(true);
         adminApi.instructors.list({ limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }).then(result => {
             if (result && typeof result === 'object' && 'data' in result) {
@@ -36,9 +36,9 @@ export default function AdminInstructors() {
             }
             setLoading(false);
         }).catch(() => setLoading(false));
-    }
+    }, [page]);
 
-    useEffect(() => { load(); }, [page]);
+    useEffect(() => { load(); }, [load]);
 
     function handleSubmit(e) {
         e.preventDefault();

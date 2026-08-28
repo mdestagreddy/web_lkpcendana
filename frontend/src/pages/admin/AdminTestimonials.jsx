@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { adminApi } from '../../services/api';
 import ImageUpload from '../../components/ImageUpload';
 import Image from '../../components/Image';
@@ -22,7 +22,7 @@ export default function AdminTestimonials() {
     const [form, setForm] = useState({ nama: '', lokasi: '', isi: '', foto: '', is_featured: false, sort_order: 0, is_active: true });
     const [deleteDialog, setDeleteDialog] = useState({ open: false, id: null });
 
-    function load() {
+    const load = useCallback(() => {
         setLoading(true);
         adminApi.testimonials.list({ limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }).then(result => {
             if (result && typeof result === 'object' && 'data' in result) {
@@ -34,9 +34,9 @@ export default function AdminTestimonials() {
             }
             setLoading(false);
         }).catch(() => setLoading(false));
-    }
+    }, [page]);
 
-    useEffect(() => { load(); }, [page]);
+    useEffect(() => { load(); }, [load]);
 
     function handleSubmit(e) {
         e.preventDefault();

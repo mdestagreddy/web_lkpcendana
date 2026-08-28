@@ -22,7 +22,6 @@ export default function AdminReviews() {
     const [editing, setEditing] = useState(null);
     const [form, setForm] = useState({
         nama: '',
-        email: '',
         rating: 5,
         isi: '',
         images: [],
@@ -31,7 +30,7 @@ export default function AdminReviews() {
     });
     const [deleteDialog, setDeleteDialog] = useState({ open: false, id: null });
 
-    function load() {
+    const load = useCallback(() => {
         setLoading(true);
         adminApi.reviews.list({ limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }).then(result => {
             if (result && typeof result === 'object' && 'data' in result) {
@@ -45,9 +44,9 @@ export default function AdminReviews() {
         }).catch(() => {
             setLoading(false);
         });
-    }
+    }, [page]);
 
-    useEffect(() => { load(); }, [page]);
+    useEffect(() => { load(); }, [load]);
 
     function handleSubmit(e) {
         e.preventDefault();
@@ -59,7 +58,7 @@ export default function AdminReviews() {
     }
 
     function resetForm() {
-        setForm({ nama: '', email: '', rating: 5, isi: '', images: [], is_active: true, created_at: '' });
+        setForm({ nama: '', rating: 5, isi: '', images: [], is_active: true, created_at: '' });
         setEditing(null);
     }
 
@@ -75,7 +74,6 @@ export default function AdminReviews() {
         }
         setForm({
             nama: item.nama || '',
-            email: item.email || '',
             rating: item.rating || 5,
             isi: item.isi || '',
             images: imagesArr,
@@ -110,7 +108,6 @@ export default function AdminReviews() {
                 <div className="form-section">
                     <h3 className="form-section-title">Informasi Reviewer</h3>
                     <FormField id="nama" label="Nama *" value={form.nama} onChange={nama => setForm({ ...form, nama })} placeholder="Nama lengkap" required />
-                    <FormField id="email" label="Email" type="email" value={form.email} onChange={email => setForm({ ...form, email })} placeholder="email@contoh.com" />
                     <FormField id="created_at" label="Tanggal Unggah" type="date" value={form.created_at} onChange={created_at => setForm({ ...form, created_at })} />
                     <span className="form-help">Kosongkan untuk gunakan tanggal hari ini.</span>
                 </div>

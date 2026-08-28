@@ -6,7 +6,6 @@ import { ThemeProvider } from '../../context/ThemeContext';
 import { LayoutDashboard, GraduationCap, Users, MessageSquare, Star, Image, UserCog, Building2, Target, Settings, FileText, Tag, GitBranch, Shield, LogOut, Sun, Moon, Monitor } from 'lucide-react';
 import FlexIcon from '../../components/FlexIcon';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import AppImage from '../../components/Image';
 import { publicApi } from '../../services/api';
 import './AdminLayout.css';
 

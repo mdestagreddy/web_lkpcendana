@@ -58,8 +58,8 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', reviewRateLimiter, honeypotMiddleware, (req, res) => {
-    const { nama, email, rating, isi, images, captchaId, captchaText } = req.body;
-    console.log('[Review] Create request:', { nama, email, rating, images, captchaId });
+    const { nama, rating, isi, images, captchaId, captchaText } = req.body;
+    console.log('[Review] Create request:', { nama, rating, images, captchaId });
 
     if (!nama || !isi) {
         return res.status(400).json({ error: 'Nama dan isi ulasan wajib diisi' });
@@ -91,8 +91,8 @@ router.post('/', reviewRateLimiter, honeypotMiddleware, (req, res) => {
     }
 
     db.query(
-        'INSERT INTO reviews (nama, email, rating, isi, images, is_active) VALUES (?, ?, ?, ?, ?, ?)',
-        [nama, email || null, rating || 5, isi, imagesJson, 0],
+        'INSERT INTO reviews (nama, rating, isi, images, is_active) VALUES (?, ?, ?, ?, ?)',
+        [nama, rating || 5, isi, imagesJson, 0],
         (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
             res.status(201).json({

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { adminApi } from '../../services/api';
 import { Plus, Save, X } from 'lucide-react';
 import FlexIcon from '../../components/FlexIcon';
@@ -43,7 +43,7 @@ export default function AdminPrivacyPolicies() {
     const [form, setForm] = useState({ content: '', version: '', effective_date: '', is_current: true });
     const [deleteDialog, setDeleteDialog] = useState({ open: false, id: null });
 
-    function load() {
+    const load = useCallback(() => {
         setLoading(true);
         adminApi.privacyPolicies.list({ limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }).then(result => {
             if (result && typeof result === 'object' && 'data' in result) {
@@ -55,9 +55,9 @@ export default function AdminPrivacyPolicies() {
             }
             setLoading(false);
         }).catch(() => setLoading(false));
-    }
+    }, [page]);
 
-    useEffect(() => { load(); }, [page]);
+    useEffect(() => { load(); }, [load]);
 
     function handleSubmit(e) {
         e.preventDefault();

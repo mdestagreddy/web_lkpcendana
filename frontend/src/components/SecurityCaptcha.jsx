@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Send, RefreshCw } from 'lucide-react';
+import { Send } from 'lucide-react';
 import FlexIcon from './FlexIcon';
 import './SecurityCaptcha.css';
 

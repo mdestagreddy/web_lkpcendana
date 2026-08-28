@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { publicApi } from '../../services/api';
 import { User } from 'lucide-react';
 import FlexIcon from '../../components/FlexIcon';
@@ -16,7 +16,7 @@ export default function Instructors() {
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
 
-    function load() {
+    const load = useCallback(() => {
         setLoading(true);
         publicApi.getInstructors({ limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }).then(result => {
             if (result && typeof result === 'object' && 'data' in result) {
@@ -28,9 +28,9 @@ export default function Instructors() {
             }
             setLoading(false);
         }).catch(() => setLoading(false));
-    }
+    }, [page]);
 
-    useEffect(() => { load(); }, [page]);
+    useEffect(() => { load(); }, [load]);
 
     if (loading) return <div className="container"><LoadingSpinner /></div>;
 

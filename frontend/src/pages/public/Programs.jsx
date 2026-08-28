@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { publicApi } from '../../services/api';
 import { Search, Tag, Signal, ArrowRight } from 'lucide-react';
@@ -17,7 +17,7 @@ export default function Programs() {
     const [filter, setFilter] = useState({});
     const [loading, setLoading] = useState(true);
 
-    function load() {
+    const load = useCallback(() => {
         setLoading(true);
         publicApi.getPrograms({ ...filter, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }).then(result => {
             if (result && typeof result === 'object' && 'data' in result) {
@@ -29,9 +29,9 @@ export default function Programs() {
             }
             setLoading(false);
         }).catch(() => setLoading(false));
-    }
+    }, [filter, page]);
 
-    useEffect(() => { load(); }, [filter, page]);
+    useEffect(() => { load(); }, [load]);
 
     return (
         <div className="programs-page">

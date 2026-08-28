@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { adminApi } from '../../services/api';
 import ImageUpload from '../../components/ImageUpload';
 import { Plus, Save, X, Pencil, Trash2, ZoomIn } from 'lucide-react';
@@ -24,7 +24,7 @@ export default function AdminGallery() {
     const [deleteDialog, setDeleteDialog] = useState({ open: false, id: null });
     const lightboxRef = useRef(null);
 
-    function load() {
+    const load = useCallback(() => {
         setLoading(true);
         adminApi.gallery.list({ limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }).then(result => {
             if (result && typeof result === 'object' && 'data' in result) {
@@ -36,9 +36,9 @@ export default function AdminGallery() {
             }
             setLoading(false);
         }).catch(() => setLoading(false));
-    }
+    }, [page]);
 
-    useEffect(() => { load(); }, [page]);
+    useEffect(() => { load(); }, [load]);
 
     function handleSubmit(e) {
         e.preventDefault();

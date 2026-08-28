@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { publicApi } from '../../services/api';
 import { LayoutGrid, Filter, ZoomIn } from 'lucide-react';
 import FlexIcon from '../../components/FlexIcon';
@@ -18,7 +18,7 @@ export default function Gallery() {
     const [loading, setLoading] = useState(true);
     const lightboxRef = useRef(null);
 
-    function load() {
+    const load = useCallback(() => {
         setLoading(true);
         publicApi.getGallery({ ...(filter ? { category: filter } : {}), limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }).then(result => {
             if (result && typeof result === 'object' && 'data' in result) {
@@ -30,9 +30,9 @@ export default function Gallery() {
             }
             setLoading(false);
         }).catch(() => setLoading(false));
-    }
+    }, [filter, page]);
 
-    useEffect(() => { load(); }, [filter, page]);
+    useEffect(() => { load(); }, [load]);
 
     const categories = useMemo(() => [...new Set(items.map(item => item.kategori))], [items]);
 

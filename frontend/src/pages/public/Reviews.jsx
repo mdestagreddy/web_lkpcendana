@@ -28,10 +28,10 @@ export default function Reviews() {
     const fileInputRef = useRef(null);
     const isiRef = useRef(null);
 
-    const [form, setForm] = useState({ nama: '', email: '', rating: 5, isi: '', images: [] });
+    const [form, setForm] = useState({ nama: '', rating: 5, isi: '', images: [] });
     const [hpConfirm, setHpConfirm] = useState('');
 
-    function loadReviews() {
+    const loadReviews = useCallback(() => {
         setLoading(true);
         publicApi.getReviews({ limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }).then(result => {
             if (result && typeof result === 'object' && 'data' in result) {
@@ -43,9 +43,9 @@ export default function Reviews() {
             }
             setLoading(false);
         }).catch(() => setLoading(false));
-    }
+    }, [page]);
 
-    useEffect(() => { loadReviews(); }, [page]);
+    useEffect(() => { loadReviews(); }, [loadReviews]);
 
     const autoResize = useCallback(() => {
         const el = isiRef.current;
@@ -137,7 +137,6 @@ export default function Reviews() {
 
             await publicApi.createReview({
                 nama: form.nama,
-                email: form.email || undefined,
                 rating: parseInt(form.rating),
                 isi: form.isi,
                 images: uploadedImageUrls,
@@ -148,7 +147,7 @@ export default function Reviews() {
             console.log('[Review] Created with images:', uploadedImageUrls);
 
             setSuccess('Ulasan berhasil dikirim dan sedang menunggu persetujuan admin.');
-            setForm({ nama: '', email: '', rating: 5, isi: '', images: [] });
+            setForm({ nama: '', rating: 5, isi: '', images: [] });
             setPreviewImages([]);
             setCaptchaId(null);
             loadReviews();
@@ -227,16 +226,6 @@ export default function Reviews() {
                                     value={form.nama}
                                     onChange={e => setForm({ ...form, nama: e.target.value })}
                                     required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="email">Email (opsional)</label>
-                                <input
-                                    id="email"
-                                    type="email"
-                                    placeholder="email@contoh.com"
-                                    value={form.email}
-                                    onChange={e => setForm({ ...form, email: e.target.value })}
                                 />
                             </div>
                             <div className="form-group">
