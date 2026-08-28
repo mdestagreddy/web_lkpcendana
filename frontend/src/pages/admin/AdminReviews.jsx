@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { adminApi } from '../../services/api';
 import { Plus, Save, X, Pencil, Trash2, Calendar, Image, Star } from 'lucide-react';
 import FlexIcon from '../../components/FlexIcon';
