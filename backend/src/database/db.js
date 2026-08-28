@@ -3,8 +3,27 @@ const mysql = require('mysql2');
 const path = require('path');
 const fs = require('fs');
 
+if (process.env.DB_SSL_CA_CONTENT && process.env.DB_SSL_CA_PATH) {
+    try {
+        const targetPath = process.env.DB_SSL_CA_PATH;
+        const dir = path.dirname(targetPath);
+        if (!fs.existsSync(dir)){
+            fs.mkdirSync(dir, { recursive: true });
+        }
+
+        fs.writeFileSync(targetPath, process.env.DB_SSL_CA_CONTENT, 'utf8');
+        console.log("📝 Berhasil menulis sertifikat CA ke:", targetPath);
+    } catch (err) {
+        console.error("⚠️ Gagal menulis file CA di Vercel:", err.message);
+    }
+}
+
+
 const hasCaPath = process.env.DB_SSL_CA_PATH && process.env.DB_SSL_CA_PATH.trim() !== "";
-const caFilePath = hasCaPath ? path.join(__dirname, process.env.DB_SSL_CA_PATH) : null;
+const caFilePath = hasCaPath 
+    ? (process.env.DB_SSL_CA_PATH.startsWith('/') ? process.env.DB_SSL_CA_PATH : path.join(__dirname, process.env.DB_SSL_CA_PATH))
+    : null;
+
 const isVerifyCA = caFilePath && fs.existsSync(caFilePath);
 const isSSLRequired = (process.env.DB_SSL_REQUIRED === "true") || isVerifyCA;
 
