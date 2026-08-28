@@ -3,8 +3,10 @@ const mysql = require('mysql2');
 const path = require('path');
 const fs = require('fs');
 
-const sslValidate = process.env.DB_SSL_REQUIRED && process.env.DB_SSL_REQUIRED == "true";
-const caValidate = sslValidate && fs.existsSync(path.join(__dirname, process.env.DB_SSL_CA_PATH)) && process.env.DB_SSL_CA_PATH && process.env.DB_SSL_CA_PATH != "";
+const hasCaPath = process.env.DB_SSL_CA_PATH && process.env.DB_SSL_CA_PATH.trim() !== "";
+const caFilePath = hasCaPath ? path.join(__dirname, process.env.DB_SSL_CA_PATH) : null;
+const isVerifyCA = caFilePath && fs.existsSync(caFilePath);
+const isSSLRequired = (process.env.DB_SSL_REQUIRED === "true") || isVerifyCA;
 
 const connectionPool = mysql.createPool({
     host: process.env.DB_HOST || '127.0.0.1', 
@@ -16,10 +18,10 @@ const connectionPool = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
-    ...(sslValidate ? {
+    ...(isSSLRequired ? {
         ssl: {
-            ...(caValidate ? { ca: fs.readFileSync(path.join(__dirname, process.env.DB_SSL_CA_PATH)) } : {}),
-            rejectUnauthorized: caValidate
+            ...(isVerifyCA ? { ca: fs.readFileSync(caFilePath) } : {}),
+            rejectUnauthorized: isVerifyCA
         }
     } : {})
 });
@@ -29,7 +31,8 @@ connectionPool.getConnection((err, connection) => {
         console.error("Gagal menghubungkan MySQL:", err.message);
         throw err;
     }
-    console.log("Berhasil menghubungkan MySQL melalui Connection Pool!");
+    const mode = isVerifyCA ? "VERIFY_CA" : (isSSLRequired ? "REQUIRED" : "DISABLED");
+    console.log(`Berhasil menghubungkan MySQL melalui Connection Pool! (SSL Mode: ${mode})`);
     connection.release();
 });
 
