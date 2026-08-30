@@ -8,6 +8,7 @@ const { honeypotMiddleware } = require('../middleware/honeypot');
 const captchaStore = require('../utils/captcha');
 const { authMiddleware, JWT_SECRET, getFingerprint } = require('../middleware/auth');
 const tokenBlacklist = require('../middleware/tokenBlacklist');
+const otplib = require('otplib');
 
 const captchaRateLimiter = createLimiter(10, 60 * 1000);
 const loginRateLimiter = createLimiter(5, 60 * 1000);
@@ -81,6 +82,15 @@ router.post('/login', loginRateLimiter, honeypotMiddleware, (req, res) => {
                 return res.status(500).json({ error: 'Authentication error' });
             }
 
+            if (user.twofa_enabled) {
+                const tempToken = jwt.sign(
+                    { id: user.id, email: user.email, role: user.role, token_version: user.token_version || 0, step: '2fa', fingerprint: getFingerprint(req) },
+                    JWT_SECRET,
+                    { expiresIn: '5m' }
+                );
+                return res.json({ requiresTwoFactor: true, tempToken });
+            }
+
             const token = jwt.sign(
                 { id: user.id, email: user.email, role: user.role, token_version: user.token_version || 0, fingerprint: getFingerprint(req) },
                 JWT_SECRET,
@@ -98,6 +108,61 @@ router.post('/login', loginRateLimiter, honeypotMiddleware, (req, res) => {
             });
         }
     );
+});
+
+router.post('/2fa/setup', authMiddleware, (req, res) => {
+    const secret = otplib.generateSecret();
+    db.query('UPDATE users SET twofa_secret = ? WHERE id = ?', [secret, req.user.id], (err) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ secret, otpauth: otplib.generateURI({ label: req.user.email, issuer: 'LKP Cendana', secret }) });
+    });
+});
+
+router.post('/2fa/enable', authMiddleware, (req, res) => {
+    const { code } = req.body;
+    db.query('SELECT twofa_secret FROM users WHERE id = ? LIMIT 1', [req.user.id], (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+        const secret = results[0]?.twofa_secret;
+        if (!secret || !otplib.verify({ token: code, secret })) {
+            return res.status(400).json({ error: 'Kode 2FA salah' });
+        }
+        db.query('UPDATE users SET twofa_enabled = 1 WHERE id = ?', [req.user.id], (err2) => {
+            if (err2) return res.status(500).json({ error: err2.message });
+            res.json({ message: '2FA berhasil diaktifkan' });
+        });
+    });
+});
+
+router.post('/2fa/verify', (req, res) => {
+    const { tempToken, code } = req.body;
+    if (!tempToken || !code) {
+        return res.status(400).json({ error: 'tempToken dan kode 2FA wajib diisi' });
+    }
+
+    try {
+        const decoded = jwt.verify(tempToken, JWT_SECRET);
+        if (!decoded || decoded.step !== '2fa') {
+            return res.status(401).json({ error: 'Sesi 2FA tidak valid' });
+        }
+
+        db.query('SELECT twofa_secret FROM users WHERE id = ? LIMIT 1', [decoded.id], (err, results) => {
+            if (err) return res.status(500).json({ error: err.message });
+            const secret = results[0]?.twofa_secret;
+            if (!secret || !otplib.verify({ token: code, secret })) {
+                return res.status(400).json({ error: 'Kode 2FA salah' });
+            }
+
+            const token = jwt.sign(
+                { id: decoded.id, email: decoded.email, role: decoded.role, token_version: decoded.token_version || 0, fingerprint: decoded.fingerprint },
+                JWT_SECRET,
+                { expiresIn: '24h' }
+            );
+
+            res.json({ token, user: { id: decoded.id, email: decoded.email, role: decoded.role } });
+        });
+    } catch {
+        return res.status(401).json({ error: 'Sesi 2FA tidak valid' });
+    }
 });
 
 router.post('/logout', authMiddleware, (req, res) => {

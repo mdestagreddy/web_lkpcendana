@@ -26,6 +26,7 @@ import AdminPosts from './pages/admin/AdminPosts';
 import AdminCategories from './pages/admin/AdminCategories';
 import AdminOrgChart from './pages/admin/AdminOrgChart';
 import AdminPrivacyPolicies from './pages/admin/AdminPrivacyPolicies';
+import AdminSecurity from './pages/admin/AdminSecurity';
 import AdminLogin from './pages/admin/AdminLogin';
 import Reviews from './pages/public/Reviews';
 import AdminReviews from './pages/admin/AdminReviews';
@@ -65,6 +66,7 @@ export default function App() {
                             <Route path="categories" element={<AdminCategories />} />
                             <Route path="org-chart" element={<AdminOrgChart />} />
                             <Route path="privacy-policies" element={<AdminPrivacyPolicies />} />
+                            <Route path="security" element={<AdminSecurity />} />
                         </Route>
                         <Route path="/admin/login" element={<AdminLogin />} />
                     </Routes>

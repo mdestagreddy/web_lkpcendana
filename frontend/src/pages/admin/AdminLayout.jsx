@@ -133,6 +133,7 @@ function AdminLayoutInner() {
                     <NavLink to="/admin/categories" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setSidebarOpen(false)}><FlexIcon Icon={Tag} size={18}>Kategori</FlexIcon></NavLink>
                     <NavLink to="/admin/org-chart" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setSidebarOpen(false)}><FlexIcon Icon={GitBranch} size={18}>Struktur Organisasi</FlexIcon></NavLink>
                     <NavLink to="/admin/privacy-policies" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setSidebarOpen(false)}><FlexIcon Icon={Shield} size={18}>Kebijakan Privasi</FlexIcon></NavLink>
+                    <NavLink to="/admin/security" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setSidebarOpen(false)}><FlexIcon Icon={Shield} size={18}>Keamanan</FlexIcon></NavLink>
                 </nav>
                 <div className="sidebar-footer">
                     <button onClick={handleLogout} className="logout-btn"><FlexIcon Icon={LogOut} size={18}>Keluar</FlexIcon></button>

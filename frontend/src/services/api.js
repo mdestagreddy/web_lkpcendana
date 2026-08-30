@@ -52,6 +52,21 @@ export const publicApi = {
         body: JSON.stringify(credentials),
     }),
 
+    verifyTwoFactor: (payload) => request('/auth/2fa/verify', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+    }),
+
+    setupTwoFactor: () => request('/auth/2fa/setup', { method: 'POST', isAdmin: true }),
+
+    enableTwoFactor: (payload) => request('/auth/2fa/enable', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        isAdmin: true,
+    }),
+
+    logout: () => request('/auth/logout', { method: 'POST' }),
+
     uploadImage: (formData) => {
         const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
         const url = `${API_BASE_URL}/upload/upload`;

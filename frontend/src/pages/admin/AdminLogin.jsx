@@ -19,6 +19,9 @@ export default function AdminLogin() {
     const [hpConfirm, setHpConfirm] = useState('');
     const [hpToken, setHpToken] = useState(null);
     const hpTokenRef = useRef(null);
+    const [twoFactorCode, setTwoFactorCode] = useState('');
+    const [requiresTwoFactor, setRequiresTwoFactor] = useState(false);
+    const [tempToken, setTempToken] = useState(null);
     const { login, user, loading: authLoading } = useAuth();
     const navigate = useNavigate();
 
@@ -48,7 +51,29 @@ export default function AdminLogin() {
     function handleSubmit(e) {
         e.preventDefault();
         setError('');
-        setLoading(true);
+
+        if (requiresTwoFactor && tempToken) {
+            if (!twoFactorCode) {
+                setError('Silakan isi kode 2FA');
+                return;
+            }
+            setLoading(true);
+            publicApi.verifyTwoFactor({ tempToken, code: twoFactorCode })
+                .then(data => {
+                    login(data.user, data.token);
+                    setRequiresTwoFactor(false);
+                    setTempToken(null);
+                    setTwoFactorCode('');
+                    setLoading(false);
+                    navigate('/admin');
+                })
+                .catch(err => {
+                    setError(err.message || 'Verifikasi 2FA gagal');
+                    setLoading(false);
+                    setTwoFactorCode('');
+                });
+            return;
+        }
 
         if (!captchaInput || !captchaId) {
             setError('Silakan isi kode captcha');
@@ -56,11 +81,21 @@ export default function AdminLogin() {
             return;
         }
 
+        setLoading(true);
         const hpTokenValue = hpTokenRef.current ? hpTokenRef.current.value : hpToken;
         publicApi.login({ email, password, captchaId, captchaText: captchaInput, hp_confirm: hpConfirm, hp_token: hpTokenValue })
             .then(data => {
-                login(data.user, data.token);
-                navigate('/admin');
+                if (data.requiresTwoFactor) {
+                    setRequiresTwoFactor(true);
+                    setTempToken(data.tempToken);
+                    setTwoFactorCode('');
+                    setError('');
+                    setLoading(false);
+                } else {
+                    login(data.user, data.token);
+                    setLoading(false);
+                    navigate('/admin');
+                }
             })
             .catch(err => {
                 setError(err.message || 'Login gagal');
@@ -114,10 +149,24 @@ export default function AdminLogin() {
                     />
                 </div>
 
+                {requiresTwoFactor && (
+                    <div className="form-group">
+                        <label htmlFor="twoFactorCode">Kode 2FA *</label>
+                        <input
+                            id="twoFactorCode"
+                            placeholder="Masukkan kode 2FA dari aplikasi Authenticator"
+                            value={twoFactorCode}
+                            onChange={e => setTwoFactorCode(e.target.value)}
+                            required
+                            autoFocus
+                        />
+                    </div>
+                )}
+
                 <input type="text" name="hp_confirm" value={hpConfirm} onChange={e => setHpConfirm(e.target.value)} style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }} tabIndex={-1} autoComplete="off" />
                 <input type="hidden" name="hp_token" ref={hpTokenRef} autoComplete="off" readOnly />
                 <button type="submit" className="btn-login" disabled={loading}>
-                    <FlexIcon Icon={LogIn} size={18} /> {loading ? 'Sedang masuk...' : 'Masuk'}
+                    <FlexIcon Icon={LogIn} size={18} /> {loading ? 'Sedang memverifikasi...' : requiresTwoFactor ? 'Verifikasi 2FA' : 'Masuk'}
                 </button>
             </form>
         </div>

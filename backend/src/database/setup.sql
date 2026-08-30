@@ -6,9 +6,14 @@ CREATE TABLE IF NOT EXISTS users (
     role ENUM('admin', 'superadmin') DEFAULT 'admin',
     avatar VARCHAR(255),
     token_version INT DEFAULT 0,
+    twofa_secret VARCHAR(255),
+    twofa_enabled TINYINT(1) DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS twofa_secret VARCHAR(255);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS twofa_enabled TINYINT(1) DEFAULT 0;
 
 CREATE TABLE IF NOT EXISTS institution_info (
     id INT AUTO_INCREMENT PRIMARY KEY,
