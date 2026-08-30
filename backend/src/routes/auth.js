@@ -110,30 +110,33 @@ router.post('/login', loginRateLimiter, honeypotMiddleware, (req, res) => {
     );
 });
 
-router.post('/2fa/setup', authMiddleware, (req, res) => {
-    const secret = otplib.generateSecret();
-    db.query('UPDATE users SET twofa_secret = ? WHERE id = ?', [secret, req.user.id], (err) => {
-        if (err) return res.status(500).json({ error: err.message });
+router.post('/2fa/setup', authMiddleware, async (req, res) => {
+    try {
+        const secret = otplib.generateSecret();
+        await db.promise().query('UPDATE users SET twofa_secret = ? WHERE id = ?', [secret, req.user.id]);
         res.json({ secret, otpauth: otplib.generateURI({ label: req.user.email, issuer: 'LKP Cendana', secret }) });
-    });
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
 });
 
-router.post('/2fa/enable', authMiddleware, (req, res) => {
+router.post('/2fa/enable', authMiddleware, async (req, res) => {
     const { code } = req.body;
-    db.query('SELECT twofa_secret FROM users WHERE id = ? LIMIT 1', [req.user.id], (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
+    try {
+        const [results] = await db.promise().query('SELECT twofa_secret FROM users WHERE id = ? LIMIT 1', [req.user.id]);
         const secret = results[0]?.twofa_secret;
-        if (!secret || !otplib.verify({ token: code, secret })) {
+        const result = secret ? await otplib.verify({ token: code, secret }) : { valid: false };
+        if (!result || !result.valid) {
             return res.status(400).json({ error: 'Kode 2FA salah' });
         }
-        db.query('UPDATE users SET twofa_enabled = 1 WHERE id = ?', [req.user.id], (err2) => {
-            if (err2) return res.status(500).json({ error: err2.message });
-            res.json({ message: '2FA berhasil diaktifkan' });
-        });
-    });
+        await db.promise().query('UPDATE users SET twofa_enabled = 1 WHERE id = ?', [req.user.id]);
+        res.json({ message: '2FA berhasil diaktifkan' });
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
 });
 
-router.post('/2fa/verify', (req, res) => {
+router.post('/2fa/verify', async (req, res) => {
     const { tempToken, code } = req.body;
     if (!tempToken || !code) {
         return res.status(400).json({ error: 'tempToken dan kode 2FA wajib diisi' });
@@ -145,21 +148,20 @@ router.post('/2fa/verify', (req, res) => {
             return res.status(401).json({ error: 'Sesi 2FA tidak valid' });
         }
 
-        db.query('SELECT twofa_secret FROM users WHERE id = ? LIMIT 1', [decoded.id], (err, results) => {
-            if (err) return res.status(500).json({ error: err.message });
-            const secret = results[0]?.twofa_secret;
-            if (!secret || !otplib.verify({ token: code, secret })) {
-                return res.status(400).json({ error: 'Kode 2FA salah' });
-            }
+        const [results] = await db.promise().query('SELECT twofa_secret FROM users WHERE id = ? LIMIT 1', [decoded.id]);
+        const secret = results[0]?.twofa_secret;
+        const result = secret ? await otplib.verify({ token: code, secret }) : { valid: false };
+        if (!result || !result.valid) {
+            return res.status(400).json({ error: 'Kode 2FA salah' });
+        }
 
-            const token = jwt.sign(
-                { id: decoded.id, email: decoded.email, role: decoded.role, token_version: decoded.token_version || 0, fingerprint: decoded.fingerprint },
-                JWT_SECRET,
-                { expiresIn: '24h' }
-            );
+        const token = jwt.sign(
+            { id: decoded.id, email: decoded.email, role: decoded.role, token_version: decoded.token_version || 0, fingerprint: decoded.fingerprint },
+            JWT_SECRET,
+            { expiresIn: '24h' }
+        );
 
-            res.json({ token, user: { id: decoded.id, email: decoded.email, role: decoded.role } });
-        });
+        res.json({ token, user: { id: decoded.id, email: decoded.email, role: decoded.role } });
     } catch {
         return res.status(401).json({ error: 'Sesi 2FA tidak valid' });
     }
