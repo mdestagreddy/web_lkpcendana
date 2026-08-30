@@ -57,11 +57,24 @@ export const publicApi = {
         body: JSON.stringify(payload),
     }),
 
+    recoveryDisableTwoFactor: (payload) => request('/auth/2fa/recovery-disable', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+    }),
+
+    resetTwoFactor: () => request('/auth/2fa/reset', { method: 'POST', isAdmin: true }),
+
     setupTwoFactor: () => request('/auth/2fa/setup', { method: 'POST', isAdmin: true }),
 
     getTwoFactorStatus: () => request('/auth/2fa/status', { method: 'GET', isAdmin: true }),
 
     enableTwoFactor: (payload) => request('/auth/2fa/enable', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+        isAdmin: true,
+    }),
+
+    disableTwoFactor: (payload) => request('/auth/2fa/disable', {
         method: 'POST',
         body: JSON.stringify(payload),
         isAdmin: true,

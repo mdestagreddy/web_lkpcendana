@@ -6,12 +6,14 @@ import { Mail, Lock, LogIn, RefreshCw } from 'lucide-react';
 import FlexIcon from '../../components/FlexIcon';
 import Alert from '../../components/Alert';
 import SecurityCaptcha from '../../components/SecurityCaptcha';
+import Verify2FA from '../../components/Verify2FA';
 import './AdminLogin.css';
 
 export default function AdminLogin() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
     const [captchaId, setCaptchaId] = useState(null); // eslint-disable-line no-unused-vars
     const [captchaSvg, setCaptchaSvg] = useState(''); // eslint-disable-line no-unused-vars
@@ -19,7 +21,6 @@ export default function AdminLogin() {
     const [hpConfirm, setHpConfirm] = useState('');
     const [hpToken, setHpToken] = useState(null);
     const hpTokenRef = useRef(null);
-    const [twoFactorCode, setTwoFactorCode] = useState('');
     const [requiresTwoFactor, setRequiresTwoFactor] = useState(false);
     const [tempToken, setTempToken] = useState(null);
     const { login, user, loading: authLoading } = useAuth();
@@ -52,29 +53,6 @@ export default function AdminLogin() {
         e.preventDefault();
         setError('');
 
-        if (requiresTwoFactor && tempToken) {
-            if (!twoFactorCode) {
-                setError('Silakan isi kode 2FA');
-                return;
-            }
-            setLoading(true);
-            publicApi.verifyTwoFactor({ tempToken, code: twoFactorCode })
-                .then(data => {
-                    login(data.user, data.token);
-                    setRequiresTwoFactor(false);
-                    setTempToken(null);
-                    setTwoFactorCode('');
-                    setLoading(false);
-                    navigate('/admin');
-                })
-                .catch(err => {
-                    setError(err.message || 'Verifikasi 2FA gagal');
-                    setLoading(false);
-                    setTwoFactorCode('');
-                });
-            return;
-        }
-
         if (!captchaInput || !captchaId) {
             setError('Silakan isi kode captcha');
             setLoading(false);
@@ -88,7 +66,6 @@ export default function AdminLogin() {
                 if (data.requiresTwoFactor) {
                     setRequiresTwoFactor(true);
                     setTempToken(data.tempToken);
-                    setTwoFactorCode('');
                     setError('');
                     setLoading(false);
                 } else {
@@ -111,6 +88,7 @@ export default function AdminLogin() {
                 <p className="login-subtitle">LKP Cendana Samarinda</p>
 
                 {error && <Alert type="error">{error}</Alert>}
+                {success && <Alert type="success">{success}</Alert>}
 
                 <div className="form-group">
                     <label htmlFor="email"><FlexIcon Icon={Mail} size={16}>Email</FlexIcon></label>
@@ -149,25 +127,63 @@ export default function AdminLogin() {
                     />
                 </div>
 
-                {requiresTwoFactor && (
-                    <div className="form-group">
-                        <label htmlFor="twoFactorCode">Kode 2FA *</label>
-                        <input
-                            id="twoFactorCode"
-                            placeholder="Masukkan kode 2FA dari aplikasi Authenticator"
-                            value={twoFactorCode}
-                            onChange={e => setTwoFactorCode(e.target.value)}
-                            required
-                            autoFocus
+                {requiresTwoFactor && tempToken && (
+                    <div>
+                        <Verify2FA
+                            tempToken={tempToken}
+                            onVerified={(result) => {
+                                if (result && result.token) {
+                                    login(result.user, result.token);
+                                    setRequiresTwoFactor(false);
+                                    setTempToken(null);
+                                    setLoading(false);
+                                    navigate('/admin');
+                                } else {
+                                    setLoading(false);
+                                }
+                            }}
+                            title="Verifikasi 2FA"
+                            description="Masukkan 6 digit kode dari aplikasi Authenticator untuk melanjutkan login."
+                            submitLabel="Verifikasi 2FA"
+                            loading={loading}
+                            error={error}
                         />
+                        <button
+                            type="button"
+                            className="recovery-link"
+                            onClick={() => {
+                                if (!email || !password) {
+                                    setError('Masukkan email dan kata sandi untuk recovery');
+                                    return;
+                                }
+                                setLoading(true);
+                                publicApi.recoveryDisableTwoFactor({ email, password })
+                                    .then(() => {
+                                        setError('');
+                                        setRequiresTwoFactor(false);
+                                        setTempToken(null);
+                                        setLoading(false);
+                                        setSuccess('2FA berhasil dinonaktifkan. Silakan login kembali.');
+                                    })
+                                    .catch(err => {
+                                        setError(err.message || 'Recovery gagal');
+                                        setLoading(false);
+                                    });
+                            }}
+                            disabled={loading}
+                        >
+                            Lupa 2FA? Disable dengan kata sandi
+                        </button>
                     </div>
                 )}
 
                 <input type="text" name="hp_confirm" value={hpConfirm} onChange={e => setHpConfirm(e.target.value)} style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }} tabIndex={-1} autoComplete="off" />
                 <input type="hidden" name="hp_token" ref={hpTokenRef} autoComplete="off" readOnly />
-                <button type="submit" className="btn-login" disabled={loading}>
-                    <FlexIcon Icon={LogIn} size={18} /> {loading ? 'Sedang memverifikasi...' : requiresTwoFactor ? 'Verifikasi 2FA' : 'Masuk'}
-                </button>
+                {!requiresTwoFactor && (
+                    <button type="submit" className="btn-login" disabled={loading}>
+                        <FlexIcon Icon={LogIn} size={18} /> {loading ? 'Sedang masuk...' : 'Masuk'}
+                    </button>
+                )}
             </form>
         </div>
     );

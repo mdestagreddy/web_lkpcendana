@@ -143,6 +143,34 @@
     border: 1px solid #fecaca;
 }
 
+.recovery-link {
+    margin-top: 0.5rem;
+    background: none;
+    border: none;
+    color: var(--blue-700);
+    font-size: 0.875rem;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+}
+
+.recovery-link:hover:not(:disabled) {
+    color: var(--blue-500);
+}
+
+.recovery-link:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+[data-theme="dark"] .recovery-link {
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .recovery-link:hover:not(:disabled) {
+    color: #93c5fd;
+}
+
 @media (max-width: 480px) {
     .login-page {
         padding: 0;

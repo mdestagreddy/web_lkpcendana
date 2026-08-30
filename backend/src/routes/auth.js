@@ -118,10 +118,23 @@ router.get('/2fa/status', authMiddleware, (req, res) => {
     });
 });
 
+router.post('/2fa/reset', authMiddleware, async (req, res) => {
+    try {
+        await db.promise().query('UPDATE users SET twofa_secret = NULL, twofa_enabled = 0 WHERE id = ?', [req.user.id]);
+        res.json({ message: '2FA berhasil direset' });
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+});
+
 router.post('/2fa/setup', authMiddleware, async (req, res) => {
     try {
-        const secret = otplib.generateSecret();
-        await db.promise().query('UPDATE users SET twofa_secret = ? WHERE id = ?', [secret, req.user.id]);
+        const [results] = await db.promise().query('SELECT twofa_secret FROM users WHERE id = ? LIMIT 1', [req.user.id]);
+        let secret = results[0]?.twofa_secret;
+        if (!secret) {
+            secret = otplib.generateSecret();
+            await db.promise().query('UPDATE users SET twofa_secret = ? WHERE id = ?', [secret, req.user.id]);
+        }
         res.json({ secret, otpauth: otplib.generateURI({ label: req.user.email, issuer: 'LKP Cendana', secret }) });
     } catch (err) {
         return res.status(500).json({ error: err.message });
@@ -173,6 +186,53 @@ router.post('/2fa/verify', async (req, res) => {
     } catch {
         return res.status(401).json({ error: 'Sesi 2FA tidak valid' });
     }
+});
+
+router.post('/2fa/disable', authMiddleware, async (req, res) => {
+    const { code } = req.body;
+    try {
+        const [results] = await db.promise().query('SELECT twofa_secret FROM users WHERE id = ? LIMIT 1', [req.user.id]);
+        const secret = results[0]?.twofa_secret;
+        const result = secret ? await otplib.verify({ token: code, secret }) : { valid: false };
+        if (!result || !result.valid) {
+            return res.status(400).json({ error: 'Kode 2FA salah' });
+        }
+        await db.promise().query('UPDATE users SET twofa_enabled = 0 WHERE id = ?', [req.user.id]);
+        res.json({ message: '2FA berhasil dinonaktifkan' });
+    } catch (err) {
+        return res.status(500).json({ error: err.message });
+    }
+});
+
+router.post('/2fa/recovery-disable', (req, res) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(400).json({ error: 'Email dan kata sandi wajib diisi' });
+    }
+
+    db.query('SELECT * FROM users WHERE email = ? LIMIT 1', [email], async (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (results.length === 0) {
+            return res.status(401).json({ error: 'Email atau kata sandi salah' });
+        }
+
+        const user = results[0];
+        try {
+            const valid = await bcrypt.compare(password, user.password);
+            if (!valid) {
+                return res.status(401).json({ error: 'Email atau kata sandi salah' });
+            }
+        } catch (compareErr) {
+            return res.status(500).json({ error: 'Authentication error' });
+        }
+
+        try {
+            await db.promise().query('UPDATE users SET twofa_enabled = 0 WHERE id = ?', [user.id]);
+            res.json({ message: '2FA berhasil dinonaktifkan melalui recovery' });
+        } catch (dbErr) {
+            return res.status(500).json({ error: dbErr.message });
+        }
+    });
 });
 
 router.post('/logout', authMiddleware, (req, res) => {

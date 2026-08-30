@@ -1,9 +1,8 @@
-.admin-security {
-    padding: 1.5rem;
-}
-
 .admin-security h1 {
     margin-bottom: 0.25rem;
+    color: var(--blue-900);
+    font-weight: 800;
+    font-size: 1.75rem;
 }
 
 .page-subtitle {
@@ -39,6 +38,71 @@
 
 .security-actions {
     margin-top: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.security-actions .btn-primary {
+    align-self: flex-start;
+    padding: 0.65rem 1rem;
+    background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+    letter-spacing: 0.02em;
+}
+
+.security-actions .btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.35);
+    filter: brightness(1.1);
+}
+
+.security-actions .btn-primary:disabled {
+    background: #cbd5e1;
+    color: #94a3b8;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.security-actions .btn-secondary {
+    padding: 0.65rem 1rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.security-actions .btn-secondary:hover:not(:disabled) {
+    filter: brightness(0.95);
+}
+
+.security-actions .btn-secondary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+[data-theme="dark"] .security-actions .btn-primary:disabled {
+    background: #334155;
+    color: #64748b;
+}
+
+[data-theme="dark"] .security-actions .btn-secondary {
+    background: #334155;
+    color: #cbd5e1;
+    border-color: #475569;
+}
+
+[data-theme="dark"] .security-actions .btn-secondary:hover:not(:disabled) {
+    background: #475569;
 }
 
 .qr-placeholder {
@@ -184,6 +248,12 @@
 
 .twofa-active p {
     margin: 0;
+}
+
+@media (max-width: 640px) {
+    .security-card {
+        border-radius: var(--radius-md);
+    }
 }
 
 [data-theme="dark"] .qr-placeholder {

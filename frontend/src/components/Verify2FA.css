@@ -1,0 +1,111 @@
+.verify-2fa {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.verify-2fa-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.verify-2fa-description {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.verify-2fa-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.verify-2fa-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.verify-2fa-form .form-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.verify-2fa-form .form-group input {
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    background: var(--bg-white);
+    color: var(--text-primary);
+    width: 100%;
+    max-width: 260px;
+    box-sizing: border-box;
+}
+
+.verify-2fa-form .form-group input:focus {
+    outline: none;
+    border-color: var(--blue-700);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+[data-theme="dark"] .verify-2fa-form .form-group input {
+    background: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .verify-2fa-form .form-group input:focus {
+    background-color: #1e293b;
+    border-color: var(--blue-500);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.verify-2fa-form .btn-primary {
+    align-self: flex-start;
+    padding: 0.65rem 1rem;
+    background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+    letter-spacing: 0.02em;
+}
+
+.verify-2fa-form .btn {
+    padding: 0.65rem 1rem;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 700;
+    transition: var(--transition);
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.verify-2fa-form .btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.35);
+    filter: brightness(1.1);
+}
+
+.verify-2fa-form .btn-primary:disabled {
+    background: #cbd5e1;
+    color: #94a3b8;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+[data-theme="dark"] .verify-2fa-form .btn-primary:disabled {
+    background: #334155;
+    color: #64748b;
+}
