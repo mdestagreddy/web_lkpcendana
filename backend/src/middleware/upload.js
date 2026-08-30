@@ -7,7 +7,13 @@ if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const storage = multer.diskStorage({
+const isLocalhost = (req) => {
+    const hostname = req.hostname || '';
+    return hostname === 'localhost' || hostname === '127.0.0.1';
+};
+
+const memoryStorage = multer.memoryStorage();
+const diskStorage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, uploadDir);
     },
@@ -28,7 +34,13 @@ const fileFilter = (req, file, cb) => {
 };
 
 const upload = multer({
-    storage: storage,
+    storage: function (req, file, cb) {
+        if (isLocalhost(req)) {
+            cb(null, diskStorage);
+        } else {
+            cb(null, memoryStorage);
+        }
+    },
     limits: {
         fileSize: 10 * 1024 * 1024,
     },

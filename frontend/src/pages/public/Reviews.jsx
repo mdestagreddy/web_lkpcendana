@@ -27,6 +27,7 @@ export default function Reviews() {
     const [success, setSuccess] = useState('');
     const [hpConfirm, setHpConfirm] = useState('');
     const [hpToken, setHpToken] = useState(null);
+    const hpTokenRef = useRef(null);
     const fileInputRef = useRef(null);
     const isiRef = useRef(null);
 
@@ -69,6 +70,12 @@ export default function Reviews() {
             setHpToken(data.hpToken || null);
         }).catch(() => {});
     }
+
+    useEffect(() => {
+        if (hpTokenRef.current) {
+            hpTokenRef.current.value = JSON.stringify(hpToken || '');
+        }
+    }, [hpToken]);
 
     function handleFileChange(e) {
         const files = Array.from(e.target.files || []);
@@ -145,7 +152,7 @@ export default function Reviews() {
                 captchaId,
                 captchaText: captchaInput,
                 hp_confirm: hpConfirm,
-                hp_token: hpToken,
+                hp_token: hpTokenRef.current ? hpTokenRef.current.value : hpToken,
             });
             console.log('[Review] Created with images:', uploadedImageUrls);
 
@@ -289,7 +296,7 @@ export default function Reviews() {
                                 loading={submitting}
                             />
                             <input type="text" name="hp_confirm" value={hpConfirm} onChange={e => setHpConfirm(e.target.value)} style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }} tabIndex={-1} autoComplete="off" />
-                            <input type="hidden" name="hp_token" value={JSON.stringify(hpToken || '')} />
+                            <input type="hidden" name="hp_token" ref={hpTokenRef} autoComplete="off" readOnly />
                             <button type="submit" className="btn btn-primary submit-btn" disabled={submitting}>
                                     {submitting ? <LoadingSpinner text="Mengirim..." size="sm" className="inline" /> : <FlexIcon Icon={Send} size={16}>Kirim Ulasan</FlexIcon>}
                             </button>

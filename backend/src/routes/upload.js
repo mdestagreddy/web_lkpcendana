@@ -4,10 +4,55 @@ const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
 const upload = require('../middleware/upload');
 const { authMiddleware } = require('../middleware/auth');
 
 const uploadDir = path.join(__dirname, '../../uploads');
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const isLocalhost = (req) => {
+    const hostname = req.hostname || '';
+    return hostname === 'localhost' || hostname === '127.0.0.1';
+};
+
+const isCloudinaryUrl = (url) => {
+    try {
+        const urlObj = new URL(url);
+        return urlObj.hostname.includes('cloudinary.com');
+    } catch {
+        return false;
+    }
+};
+
+const getPublicIdFromUrl = (url) => {
+    try {
+        const urlObj = new URL(url);
+        const parts = urlObj.pathname.split('/');
+        const uploadIndex = parts.indexOf('upload');
+        if (uploadIndex !== -1 && parts[uploadIndex + 1] && parts[uploadIndex + 1].startsWith('v')) {
+            const publicIdParts = parts.slice(uploadIndex + 2);
+            const publicId = publicIdParts.join('/').replace(/\.[^/.]+$/, '');
+            return publicId;
+        }
+    } catch {
+        // ignore
+    }
+    return null;
+};
+
+const deleteFromCloudinary = async (url) => {
+    const publicId = getPublicIdFromUrl(url);
+    if (!publicId) {
+        throw new Error('Could not extract public_id from Cloudinary URL');
+    }
+    return cloudinary.uploader.destroy(publicId);
+};
 
 router.post('/upload', authMiddleware, upload.single('file'), async (req, res) => {
     if (!req.file) {
@@ -32,28 +77,36 @@ router.post('/upload', authMiddleware, upload.single('file'), async (req, res) =
     }
 });
 
-router.delete('/upload', authMiddleware, (req, res) => {
+router.delete('/upload', authMiddleware, async (req, res) => {
     const { url } = req.body;
 
     if (!url) {
         return res.status(400).json({ error: 'URL gambar wajib diisi' });
     }
 
-    let filename;
     try {
-        filename = path.basename(new URL(url).pathname);
-    } catch {
-        filename = path.basename(url);
-    }
-    filename = decodeURIComponent(filename);
-    const filePath = path.join(uploadDir, filename);
+        if (isCloudinaryUrl(url)) {
+            const result = await deleteFromCloudinary(url);
+            if (result.result !== 'ok' && result.result !== 'not found') {
+                return res.status(500).json({ error: 'Gagal menghapus gambar dari Cloudinary' });
+            }
+            return res.json({ message: 'Gambar berhasil dihapus dari Cloudinary', url });
+        }
 
-    if (!fs.existsSync(filePath)) {
-        console.warn('Delete image: file not found', { url, filename, filePath });
-        return res.status(404).json({ error: 'File tidak ditemukan', filename, filePath });
-    }
+        let filename;
+        try {
+            filename = path.basename(new URL(url).pathname);
+        } catch {
+            filename = path.basename(url);
+        }
+        filename = decodeURIComponent(filename);
+        const filePath = path.join(uploadDir, filename);
 
-    try {
+        if (!fs.existsSync(filePath)) {
+            console.warn('Delete image: file not found', { url, filename, filePath });
+            return res.status(404).json({ error: 'File tidak ditemukan', filename, filePath });
+        }
+
         fs.unlinkSync(filePath);
         res.json({ message: 'Gambar berhasil dihapus', filename });
     } catch (err) {
@@ -62,28 +115,36 @@ router.delete('/upload', authMiddleware, (req, res) => {
     }
 });
 
-router.post('/delete', authMiddleware, (req, res) => {
+router.post('/delete', authMiddleware, async (req, res) => {
     const { url } = req.body;
 
     if (!url) {
         return res.status(400).json({ error: 'URL gambar wajib diisi' });
     }
 
-    let filename;
     try {
-        filename = path.basename(new URL(url).pathname);
-    } catch {
-        filename = path.basename(url);
-    }
-    filename = decodeURIComponent(filename);
-    const filePath = path.join(uploadDir, filename);
+        if (isCloudinaryUrl(url)) {
+            const result = await deleteFromCloudinary(url);
+            if (result.result !== 'ok' && result.result !== 'not found') {
+                return res.status(500).json({ error: 'Gagal menghapus gambar dari Cloudinary' });
+            }
+            return res.json({ message: 'Gambar berhasil dihapus dari Cloudinary', url });
+        }
 
-    if (!fs.existsSync(filePath)) {
-        console.warn('Delete image: file not found', { url, filename, filePath });
-        return res.status(404).json({ error: 'File tidak ditemukan', filename, filePath });
-    }
+        let filename;
+        try {
+            filename = path.basename(new URL(url).pathname);
+        } catch {
+            filename = path.basename(url);
+        }
+        filename = decodeURIComponent(filename);
+        const filePath = path.join(uploadDir, filename);
 
-    try {
+        if (!fs.existsSync(filePath)) {
+            console.warn('Delete image: file not found', { url, filename, filePath });
+            return res.status(404).json({ error: 'File tidak ditemukan', filename, filePath });
+        }
+
         fs.unlinkSync(filePath);
         res.json({ message: 'Gambar berhasil dihapus', filename });
     } catch (err) {
@@ -110,17 +171,27 @@ router.post('/upload/batch', authMiddleware, upload.array('files', 10), async (r
     }
 });
 
+const reviewStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname).toLowerCase();
+        cb(null, `${uniqueSuffix}${ext}`);
+    }
+});
+
+const reviewMemoryStorage = multer.memoryStorage();
+
 const publicReviewUpload = multer({
-    storage: multer.diskStorage({
-        destination: function (req, file, cb) {
-            cb(null, uploadDir);
-        },
-        filename: function (req, file, cb) {
-            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-            const ext = path.extname(file.originalname).toLowerCase();
-            cb(null, `${uniqueSuffix}${ext}`);
+    storage: function (req, file, cb) {
+        if (isLocalhost(req)) {
+            cb(null, reviewStorage);
+        } else {
+            cb(null, reviewMemoryStorage);
         }
-    }),
+    },
     limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter: upload.fileFilter,
 });
@@ -154,7 +225,7 @@ async function processImage(file, params, req) {
     } = params;
 
     try {
-        const imageBuffer = fs.readFileSync(file.path);
+        const imageBuffer = file.buffer || fs.readFileSync(file.path);
         let image = sharp(imageBuffer);
         const metadata = await image.metadata();
 
@@ -195,11 +266,45 @@ async function processImage(file, params, req) {
         const processedFilename = `${nameBase}_${uniqueSuffix}.${outputFormat}`;
         const processedPath = path.join(uploadDir, processedFilename);
 
-        fs.writeFileSync(processedPath, outputBuffer);
-        try {
-            fs.unlinkSync(file.path);
-        } catch (unlinkErr) {
-            console.warn('Failed to delete temp file:', unlinkErr.message);
+        if (isLocalhost(req)) {
+            fs.writeFileSync(processedPath, outputBuffer);
+            try {
+                if (file.path) fs.unlinkSync(file.path);
+            } catch (unlinkErr) {
+                console.warn('Failed to delete temp file:', unlinkErr.message);
+            }
+        } else {
+            try {
+                if (file.path) fs.unlinkSync(file.path);
+            } catch (unlinkErr) {
+                console.warn('Failed to delete temp file:', unlinkErr.message);
+            }
+
+            const uploadResult = await new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                    {
+                        folder: process.env.CLOUDINARY_FOLDER || 'lkpcendana',
+                        resource_type: 'auto',
+                    },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }
+                );
+                stream.end(outputBuffer);
+            });
+
+            const outputMetadata = await image.metadata();
+
+            return {
+                filename: processedFilename,
+                originalname: file.originalname,
+                url: uploadResult.secure_url,
+                width: outputMetadata.width,
+                height: outputMetadata.height,
+                format: outputFormat,
+                size: uploadResult.bytes || outputBuffer.length,
+            };
         }
 
         const outputMetadata = await image.metadata();
@@ -221,7 +326,7 @@ async function processImage(file, params, req) {
             size: outputBuffer.length,
         };
     } catch (err) {
-        if (fs.existsSync(file.path)) {
+        if (file.path && fs.existsSync(file.path)) {
             try {
                 fs.unlinkSync(file.path);
             } catch (unlinkErr) {
