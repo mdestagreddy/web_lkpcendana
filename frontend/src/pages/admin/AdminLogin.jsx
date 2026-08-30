@@ -17,6 +17,7 @@ export default function AdminLogin() {
     const [captchaSvg, setCaptchaSvg] = useState(''); // eslint-disable-line no-unused-vars
     const [captchaInput, setCaptchaInput] = useState('');
     const [hpConfirm, setHpConfirm] = useState('');
+    const [hpToken, setHpToken] = useState(null);
     const { login, user, loading: authLoading } = useAuth();
     const navigate = useNavigate();
 
@@ -25,6 +26,7 @@ export default function AdminLogin() {
             setCaptchaId(data.captchaId);
             setCaptchaSvg(data.svg);
             setCaptchaInput('');
+            setHpToken(data.hpToken || null);
         }).catch(() => {});
     }
 
@@ -47,7 +49,7 @@ export default function AdminLogin() {
             return;
         }
 
-        publicApi.login({ email, password, captchaId, captchaText: captchaInput, hp_confirm: hpConfirm })
+        publicApi.login({ email, password, captchaId, captchaText: captchaInput, hp_confirm: hpConfirm, hp_token: hpToken })
             .then(data => {
                 login(data.user, data.token);
                 navigate('/admin');
@@ -105,6 +107,7 @@ export default function AdminLogin() {
                 </div>
 
                 <input type="text" name="hp_confirm" value={hpConfirm} onChange={e => setHpConfirm(e.target.value)} style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }} tabIndex={-1} autoComplete="off" />
+                <input type="hidden" name="hp_token" value={JSON.stringify(hpToken || '')} />
                 <button type="submit" className="btn-login" disabled={loading}>
                     <FlexIcon Icon={LogIn} size={18} /> {loading ? 'Sedang masuk...' : 'Masuk'}
                 </button>

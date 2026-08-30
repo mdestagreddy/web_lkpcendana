@@ -81,6 +81,46 @@ function delete_(id) {
     store.delete(id);
 }
 
+function createHoneypotToken(id) {
+    const valid = verifySignedId(id);
+    if (!valid) return null;
+    const iv = crypto.randomBytes(12);
+    const key = crypto.scryptSync(secret, 'honeypot-salt', 32);
+    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+    const encrypted = Buffer.concat([cipher.update(id, 'utf8'), cipher.final()]);
+    const tag = cipher.getAuthTag();
+    return {
+        content: encrypted.toString('base64'),
+        iv: iv.toString('hex'),
+        tag: tag.toString('hex'),
+    };
+}
+
+function verifyHoneypotToken(id, tokenData) {
+    if (!id || tokenData === undefined || tokenData === null) return false;
+    let parsed = tokenData;
+    if (typeof tokenData === 'string') {
+        try {
+            parsed = JSON.parse(tokenData);
+        } catch {
+            return false;
+        }
+    }
+    if (typeof parsed !== 'object' || Array.isArray(parsed)) return false;
+    try {
+        const iv = Buffer.from(parsed.iv, 'hex');
+        const tag = Buffer.from(parsed.tag, 'hex');
+        const encrypted = Buffer.from(parsed.content, 'base64');
+        const key = crypto.scryptSync(secret, 'honeypot-salt', 32);
+        const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
+        decipher.setAuthTag(tag);
+        const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
+        return decrypted.toString('utf8') === id;
+    } catch {
+        return false;
+    }
+}
+
 function cleanup(now) {
     for (const id of store.keys()) {
         const ts = id.split('.')[1];
@@ -92,4 +132,4 @@ function cleanup(now) {
 
 setInterval(() => cleanup(Date.now()), 60 * 1000);
 
-module.exports = { createSignedId, verifySignedId, set, get, delete: delete_, cleanup };
+module.exports = { createSignedId, verifySignedId, set, get, delete: delete_, createHoneypotToken, verifyHoneypotToken, cleanup };

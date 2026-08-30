@@ -25,11 +25,12 @@ export default function Reviews() {
     const [uploadingImages, setUploadingImages] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [hpConfirm, setHpConfirm] = useState('');
+    const [hpToken, setHpToken] = useState(null);
     const fileInputRef = useRef(null);
     const isiRef = useRef(null);
 
     const [form, setForm] = useState({ nama: '', rating: 5, isi: '', images: [] });
-    const [hpConfirm, setHpConfirm] = useState('');
 
     const loadReviews = useCallback(() => {
         setLoading(true);
@@ -65,6 +66,7 @@ export default function Reviews() {
             setCaptchaId(data.captchaId);
             setCaptchaSvg(data.svg);
             setCaptchaInput('');
+            setHpToken(data.hpToken || null);
         }).catch(() => {});
     }
 
@@ -143,6 +145,7 @@ export default function Reviews() {
                 captchaId,
                 captchaText: captchaInput,
                 hp_confirm: hpConfirm,
+                hp_token: hpToken,
             });
             console.log('[Review] Created with images:', uploadedImageUrls);
 
@@ -286,6 +289,7 @@ export default function Reviews() {
                                 loading={submitting}
                             />
                             <input type="text" name="hp_confirm" value={hpConfirm} onChange={e => setHpConfirm(e.target.value)} style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }} tabIndex={-1} autoComplete="off" />
+                            <input type="hidden" name="hp_token" value={JSON.stringify(hpToken || '')} />
                             <button type="submit" className="btn btn-primary submit-btn" disabled={submitting}>
                                     {submitting ? <LoadingSpinner text="Mengirim..." size="sm" className="inline" /> : <FlexIcon Icon={Send} size={16}>Kirim Ulasan</FlexIcon>}
                             </button>

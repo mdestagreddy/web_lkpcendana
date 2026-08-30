@@ -27,9 +27,11 @@ router.get('/captcha', captchaRateLimiter, (req, res) => {
         lineWidth: 2,
     });
     captchaStore.set(captchaId, captcha.text.toLowerCase(), req);
+    const honeypotToken = captchaStore.createHoneypotToken(captchaId);
     res.json({
         captchaId,
         svg: captcha.data,
+        hpToken: honeypotToken,
     });
 });
 
