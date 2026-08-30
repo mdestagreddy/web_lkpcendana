@@ -110,6 +110,14 @@ router.post('/login', loginRateLimiter, honeypotMiddleware, (req, res) => {
     );
 });
 
+router.get('/2fa/status', authMiddleware, (req, res) => {
+    db.query('SELECT twofa_enabled, twofa_secret FROM users WHERE id = ? LIMIT 1', [req.user.id], (err, results) => {
+        if (err) return res.status(500).json({ error: err.message });
+        const row = results[0] || {};
+        res.json({ twofaEnabled: !!row.twofa_enabled, hasSecret: !!row.twofa_secret });
+    });
+});
+
 router.post('/2fa/setup', authMiddleware, async (req, res) => {
     try {
         const secret = otplib.generateSecret();

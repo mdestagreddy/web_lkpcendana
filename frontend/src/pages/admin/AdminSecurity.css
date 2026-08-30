@@ -37,6 +37,10 @@
     margin-bottom: 0.75rem;
 }
 
+.security-actions {
+    margin-top: 0.5rem;
+}
+
 .qr-placeholder {
     background: var(--bg-light);
     border: 1px dashed var(--border-light);

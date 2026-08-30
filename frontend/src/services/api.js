@@ -59,6 +59,8 @@ export const publicApi = {
 
     setupTwoFactor: () => request('/auth/2fa/setup', { method: 'POST', isAdmin: true }),
 
+    getTwoFactorStatus: () => request('/auth/2fa/status', { method: 'GET', isAdmin: true }),
+
     enableTwoFactor: (payload) => request('/auth/2fa/enable', {
         method: 'POST',
         body: JSON.stringify(payload),

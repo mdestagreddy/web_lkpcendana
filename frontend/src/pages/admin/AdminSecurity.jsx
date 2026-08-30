@@ -17,9 +17,23 @@ export default function AdminSecurity() {
     const [success, setSuccess] = useState('');
     const [copied, setCopied] = useState(false);
 
-    useEffect(() => { load(); }, []);
+    useEffect(() => { loadStatus(); }, []);
 
-    function load() {
+    function loadStatus() {
+        setLoading(true);
+        setError('');
+        publicApi.getTwoFactorStatus()
+            .then(data => {
+                setTwofaEnabled(!!data.twofaEnabled);
+                setLoading(false);
+            })
+            .catch(() => {
+                setError('Gagal memuat pengaturan 2FA');
+                setLoading(false);
+            });
+    }
+
+    function startSetup() {
         setLoading(true);
         setError('');
         publicApi.setupTwoFactor()
@@ -79,7 +93,15 @@ export default function AdminSecurity() {
                     Tambahkan lapisan keamanan ekstra dengan verifikasi dua faktor menggunakan aplikasi Authenticator.
                 </p>
 
-                {!twofaEnabled && (
+                {!twofaEnabled && !secret && (
+                    <div className="security-actions">
+                        <button type="button" className="btn btn-primary" onClick={startSetup} disabled={loading}>
+                            <FlexIcon Icon={Shield} size={16}>Mulai Setup 2FA</FlexIcon>
+                        </button>
+                    </div>
+                )}
+
+                {!twofaEnabled && secret && (
                     <form onSubmit={handleEnable} className="twofa-form">
                         {secret && (
                             <div className="form-section">
