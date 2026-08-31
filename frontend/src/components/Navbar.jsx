@@ -48,10 +48,11 @@ export default function Navbar({ menuOpen, onToggleSidebar }) {
         if (!el) return;
         updateGradient();
         el.addEventListener('scroll', updateGradient, { passive: true });
-        window.addEventListener('resize', updateGradient);
+        let menuResize = new ResizeObserver(updateGradient);
+        menuResize.observe(el);
         return () => {
             el.removeEventListener('scroll', updateGradient);
-            window.removeEventListener('resize', updateGradient);
+            menuResize.disconnect();
         };
     }, []);
 
