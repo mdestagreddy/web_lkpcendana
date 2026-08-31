@@ -42,13 +42,12 @@ export async function compressImage(file, options = {}) {
         });
 
     const img = await loadImage();
-    let { width, height } = img;
+    const originalWidth = img.width;
+    const originalHeight = img.height;
 
-    const scale = Math.min(1, maxWidth / width, maxHeight / height);
-    width = Math.round(width * scale);
-    height = Math.round(height * scale);
-
-    let quality = 0.85;
+    let quality = 1.0;
+    let width = originalWidth;
+    let height = originalHeight;
     let blob = await toBlob(img, width, height, quality);
 
     while (blob.size > maxSizeBytes && quality > 0.1) {
@@ -59,10 +58,37 @@ export async function compressImage(file, options = {}) {
     if (blob.size > maxSizeBytes) {
         const scaleW = maxWidth / width;
         const scaleH = maxHeight / height;
-        const ratio = Math.min(scaleW, scaleH, 0.8);
-        width = Math.max(1, Math.round(width * ratio));
-        height = Math.max(1, Math.round(height * ratio));
-        blob = await toBlob(img, width, height, 0.7);
+        const maxScale = Math.min(scaleW, scaleH, 1);
+
+        if (maxScale < 1) {
+            width = Math.max(1, Math.round(width * maxScale));
+            height = Math.max(1, Math.round(height * maxScale));
+            blob = await toBlob(img, width, height, 0.7);
+        }
+
+        while (blob.size > maxSizeBytes && quality > 0.1) {
+            quality -= 0.1;
+            blob = await toBlob(img, width, height, quality);
+        }
+    }
+
+    if (blob.size > maxSizeBytes) {
+        const ratios = [0.8, 0.6, 0.4, 0.25];
+        for (const ratio of ratios) {
+            width = Math.max(1, Math.round(originalWidth * ratio));
+            height = Math.max(1, Math.round(originalHeight * ratio));
+            quality = 0.7;
+            blob = await toBlob(img, width, height, quality);
+
+            while (blob.size > maxSizeBytes && quality > 0.1) {
+                quality -= 0.1;
+                blob = await toBlob(img, width, height, quality);
+            }
+
+            if (blob.size <= maxSizeBytes) {
+                break;
+            }
+        }
     }
 
     return new File([blob], file.name, {
