@@ -150,7 +150,7 @@ export default function MultiImageUpload({ value = [], onChange, label = 'Gambar
             >
                 {images.map((url, idx) => (
                     <div key={idx} className="upload-thumb">
-                        <ImageComponent src={url} alt={`Upload ${idx + 1}`} />
+                        <ImageComponent src={url} alt={`Upload ${idx + 1}`} thumbnailWidth={300} thumbnailHeight={300} />
                         <button
                             type="button"
                             onClick={() => handleRemove(idx)}

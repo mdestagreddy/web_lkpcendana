@@ -10,7 +10,10 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import FormField from '../../components/FormField';
 import DataList from '../../components/DataList';
+import { getCloudinaryThumbnail } from '../../utils/cloudinary';
 import './AdminCRUD.css';
+
+const API_BASE_URL = import.meta.env.VITE_BACKEND || 'http://localhost:5000';
 
 const PAGE_SIZE = 10;
 
@@ -40,6 +43,25 @@ export default function AdminGallery() {
 
     useEffect(() => { load(); }, [load]);
 
+    useEffect(() => {
+        if (form.image_url && !form.thumbnail_url) {
+            let thumb = getCloudinaryThumbnail(form.image_url, { width: 480, height: 480 });
+            if (!thumb || thumb === form.image_url) {
+                const resolved = form.image_url.startsWith('http') ? form.image_url : `${API_BASE_URL}/uploads/${form.image_url}`;
+                if (!resolved.includes('cloudinary.com')) {
+                    const urlObj = new URL(resolved, API_BASE_URL);
+                    const pathname = urlObj.pathname;
+                    const ext = path.extname(pathname);
+                    const base = pathname.slice(0, -ext.length);
+                    thumb = `${urlObj.origin}${base}_thumb${ext}`;
+                }
+            }
+            if (thumb && thumb !== form.image_url) {
+                setForm(prev => ({ ...prev, thumbnail_url: thumb }));
+            }
+        }
+    }, [form.image_url, form.thumbnail_url]);
+
     function handleSubmit(e) {
         e.preventDefault();
         if (editing) {
@@ -55,8 +77,25 @@ export default function AdminGallery() {
     }
 
     function startEdit(item) {
+        let thumbnailUrl = item.thumbnail_url || '';
+        if (!thumbnailUrl && item.image_url) {
+            thumbnailUrl = getCloudinaryThumbnail(item.image_url, { width: 480, height: 480 });
+            if (!thumbnailUrl || thumbnailUrl === item.image_url) {
+                const resolved = item.image_url.startsWith('http') ? item.image_url : `${API_BASE_URL}/uploads/${item.image_url}`;
+                if (!resolved.includes('cloudinary.com')) {
+                    const urlObj = new URL(resolved, API_BASE_URL);
+                    const pathname = urlObj.pathname;
+                    const ext = path.extname(pathname);
+                    const base = pathname.slice(0, -ext.length);
+                    thumbnailUrl = `${urlObj.origin}${base}_thumb${ext}`;
+                }
+            }
+        }
         setEditing(item);
-        setForm(item);
+        setForm({
+            ...item,
+            thumbnail_url: thumbnailUrl || '',
+        });
     }
 
     function handleDelete(id) {
@@ -100,7 +139,9 @@ export default function AdminGallery() {
                             label="URL Thumbnail"
                             value={form.thumbnail_url}
                             onChange={url => setForm({ ...form, thumbnail_url: url })}
+                            disabled={!!form.thumbnail_url}
                         />
+                        {form.thumbnail_url && <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>Thumbnail di-generate otomatis dari gambar utama</p>}
                     </div>
                     <FormField id="alt_text" label="Teks Alt" value={form.alt_text} onChange={alt_text => setForm({ ...form, alt_text })} placeholder="Deskripsi untuk aksesibilitas" />
                 </div>
@@ -133,7 +174,7 @@ export default function AdminGallery() {
                         <div className="gallery-card-preview">
                             {item.image_url ? (
                                 <div className="gallery-card-image" onClick={() => lightboxRef.current?.openLightbox(lightboxItems, mapIdx)}>
-                                    <Image src={item.image_url} alt={item.alt_text || item.caption || 'Galeri'} loading="lazy" />
+                                    <Image src={item.image_url} alt={item.alt_text || item.caption || 'Galeri'} loading="lazy" thumbnailWidth={480} thumbnailHeight={480} />
                                     <div className="gallery-card-overlay">
                                         <FlexIcon Icon={ZoomIn} size={20} />
                                     </div>

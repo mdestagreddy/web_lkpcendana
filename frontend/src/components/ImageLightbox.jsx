@@ -6,6 +6,7 @@ import 'yet-another-react-lightbox/plugins/captions.css';
 import Zoom from 'yet-another-react-lightbox/plugins/zoom';
 import { ZoomIn } from 'lucide-react';
 import FlexIcon from './FlexIcon';
+import { getCloudinaryThumbnail } from '../utils/cloudinary';
 import './ImageLightbox.css';
 
 const API_BASE_URL = import.meta.env.VITE_BACKEND || 'http://localhost:5000';
@@ -14,6 +15,22 @@ function resolveImageUrl(src) {
     if (!src) return '';
     if (src.startsWith('http://') || src.startsWith('https://') || src.startsWith('data:')) return src;
     return `${API_BASE_URL}/uploads/${src}`;
+}
+
+function getThumbUrl(src, thumbWidth, thumbHeight) {
+    const resolved = resolveImageUrl(src);
+    if (!resolved) return resolved;
+    if (resolved.includes('cloudinary.com')) {
+        return getCloudinaryThumbnail(resolved, {
+            width: thumbWidth || 100,
+            height: thumbHeight || 100,
+        });
+    }
+    const urlObj = new URL(resolved, API_BASE_URL);
+    const pathname = urlObj.pathname;
+    const ext = path.extname(pathname);
+    const base = pathname.slice(0, -ext.length);
+    return `${urlObj.origin}${base}_thumb${ext}`;
 }
 
 const ImageLightboxComponent = ({ items, style, multiTrigger, open: controlledOpen, onClose, index: controlledIndex, hidden, rounded, className, thumbWidth, thumbHeight, onOpen }, ref) => {
@@ -38,9 +55,17 @@ const ImageLightboxComponent = ({ items, style, multiTrigger, open: controlledOp
     const slides = useMemo(() => {
         return activeItems
             .map(item => typeof item === 'string' ? { src: item } : item)
-            .map(item => ({ src: resolveImageUrl(item.src), title: item.author, description: item.text }))
+            .map(item => {
+                const src = resolveImageUrl(item.src);
+                return {
+                    src,
+                    thumbSrc: getThumbUrl(item.src, thumbWidth, thumbHeight),
+                    title: item.author,
+                    description: item.text,
+                };
+            })
             .filter(slide => slide.src);
-    }, [activeItems]);
+    }, [activeItems, thumbWidth, thumbHeight]);
 
     const handleClose = useCallback(() => {
         if (onClose) {
@@ -97,7 +122,7 @@ const ImageLightboxComponent = ({ items, style, multiTrigger, open: controlledOp
                                 height: thumbHeight ?? '100px'
                             }}
                         >
-                            <img src={slide.src} alt={slide.title ? `Ulasan oleh ${slide.title}` : `Ulasan gambar ${idx + 1}`} loading="lazy" />
+                            <img src={slide.thumbSrc || slide.src} alt={slide.title ? `Ulasan oleh ${slide.title}` : `Ulasan gambar ${idx + 1}`} loading="lazy" />
                             <span className="lightbox-overlay">
                                 <FlexIcon Icon={ZoomIn} size={20} />
                             </span>

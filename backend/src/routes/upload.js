@@ -108,6 +108,13 @@ router.delete('/upload', authMiddleware, async (req, res) => {
         }
 
         fs.unlinkSync(filePath);
+
+        const thumbName = path.parse(filename).name + '_thumb' + path.extname(filename);
+        const thumbPath = path.join(uploadDir, thumbName);
+        if (fs.existsSync(thumbPath)) {
+            fs.unlinkSync(thumbPath);
+        }
+
         res.json({ message: 'Gambar berhasil dihapus', filename });
     } catch (err) {
         console.error('Delete image error:', err);
@@ -146,6 +153,13 @@ router.post('/delete', authMiddleware, async (req, res) => {
         }
 
         fs.unlinkSync(filePath);
+
+        const thumbName = path.parse(filename).name + '_thumb' + path.extname(filename);
+        const thumbPath = path.join(uploadDir, thumbName);
+        if (fs.existsSync(thumbPath)) {
+            fs.unlinkSync(thumbPath);
+        }
+
         res.json({ message: 'Gambar berhasil dihapus', filename });
     } catch (err) {
         console.error('Delete image error:', err);
@@ -208,6 +222,16 @@ router.post('/review', publicReviewUpload.array('images', 5), async (req, res) =
         res.status(500).json({ error: 'Failed to upload review images: ' + err.message });
     }
 });
+
+const THUMB_SIZE = { width: 480, height: 480 };
+
+async function generateThumbnail(image) {
+    return image
+        .clone()
+        .resize({ width: THUMB_SIZE.width, height: THUMB_SIZE.height, fit: 'inside', withoutEnlargement: true })
+        .jpeg({ quality: 80, progressive: true })
+        .toBuffer();
+}
 
 async function processImage(file, params, req) {
     const {
@@ -291,10 +315,33 @@ async function processImage(file, params, req) {
 
             const outputMetadata = await image.metadata();
 
+            let thumbnailUrl = uploadResult.secure_url;
+            try {
+                const thumbBuffer = await generateThumbnail(image);
+                const thumbUploadResult = await new Promise((resolve, reject) => {
+                    const stream = cloudinary.uploader.upload_stream(
+                        {
+                            folder: process.env.CLOUDINARY_FOLDER || 'lkpcendana',
+                            resource_type: 'auto',
+                            public_id: `${processedFilename.replace(/\.[^/.]+$/, '')}_thumb`,
+                        },
+                        (error, result) => {
+                            if (error) reject(error);
+                            else resolve(result);
+                        }
+                    );
+                    stream.end(thumbBuffer);
+                });
+                thumbnailUrl = thumbUploadResult.secure_url;
+            } catch (thumbErr) {
+                console.error('Thumbnail generation/upload error:', thumbErr);
+            }
+
             return {
                 filename: processedFilename,
                 originalname: file.originalname,
                 url: uploadResult.secure_url,
+                thumbnail_url: thumbnailUrl,
                 width: outputMetadata.width,
                 height: outputMetadata.height,
                 format: outputFormat,
@@ -306,6 +353,19 @@ async function processImage(file, params, req) {
         const actualWidth = outputMetadata.width;
         const actualHeight = outputMetadata.height;
 
+        let thumbnailUrl = null;
+        try {
+            const thumbBuffer = await generateThumbnail(image);
+            const thumbName = `${nameBase}_thumb.${outputFormat}`;
+            const thumbPath = path.join(uploadDir, thumbName);
+            fs.writeFileSync(thumbPath, thumbBuffer);
+            const protocol = (req.protocol === 'https' || req.secure) ? 'https' : 'http';
+            const host = req.get('host');
+            thumbnailUrl = `${protocol}://${host}/uploads/${encodeURIComponent(thumbName)}`;
+        } catch (thumbErr) {
+            console.error('Thumbnail generation error:', thumbErr);
+        }
+
         const protocol = (req.protocol === 'https' || req.secure) ? 'https' : 'http';
         const host = req.get('host');
         const encodedFilename = encodeURIComponent(processedFilename);
@@ -315,6 +375,7 @@ async function processImage(file, params, req) {
             filename: processedFilename,
             originalname: file.originalname,
             url: fileUrl,
+            thumbnail_url: thumbnailUrl,
             width: actualWidth,
             height: actualHeight,
             format: outputFormat,
