@@ -131,6 +131,7 @@ export default function AdminGallery() {
                             label="URL Gambar"
                             value={form.image_url}
                             onChange={url => setForm({ ...form, image_url: url })}
+                            generateThumbnail={true}
                         />
                     </div>
                     <div className="form-group">

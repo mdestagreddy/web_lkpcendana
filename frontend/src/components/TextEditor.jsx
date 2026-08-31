@@ -713,6 +713,7 @@ export default function TextEditor({ value = '', onChange, placeholder = 'Tulis 
             formData.append('resize_height', '')
             formData.append('quality', 80)
             formData.append('format', format)
+            formData.append('generate_thumbnail', 'true')
             const token = localStorage.getItem('admin_token')
             const res = await fetch(`${API_BASE_URL}/api/upload/upload`, {
                 method: 'POST',

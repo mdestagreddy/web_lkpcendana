@@ -240,6 +240,7 @@ async function processImage(file, params, req) {
         quality = 80,
         format,
         custom_filename,
+        generate_thumbnail = 'false',
     } = params;
 
     try {
@@ -315,26 +316,28 @@ async function processImage(file, params, req) {
 
             const outputMetadata = await image.metadata();
 
-            let thumbnailUrl = uploadResult.secure_url;
-            try {
-                const thumbBuffer = await generateThumbnail(image);
-                const thumbUploadResult = await new Promise((resolve, reject) => {
-                    const stream = cloudinary.uploader.upload_stream(
-                        {
-                            folder: process.env.CLOUDINARY_FOLDER || 'lkpcendana',
-                            resource_type: 'auto',
-                            public_id: `${processedFilename.replace(/\.[^/.]+$/, '')}_thumb`,
-                        },
-                        (error, result) => {
-                            if (error) reject(error);
-                            else resolve(result);
-                        }
-                    );
-                    stream.end(thumbBuffer);
-                });
-                thumbnailUrl = thumbUploadResult.secure_url;
-            } catch (thumbErr) {
-                console.error('Thumbnail generation/upload error:', thumbErr);
+            let thumbnailUrl = null;
+            if (generate_thumbnail === 'true') {
+                try {
+                    const thumbBuffer = await generateThumbnail(image);
+                    const thumbUploadResult = await new Promise((resolve, reject) => {
+                        const stream = cloudinary.uploader.upload_stream(
+                            {
+                                folder: process.env.CLOUDINARY_FOLDER || 'lkpcendana',
+                                resource_type: 'auto',
+                                public_id: `${processedFilename.replace(/\.[^/.]+$/, '')}_thumb`,
+                            },
+                            (error, result) => {
+                                if (error) reject(error);
+                                else resolve(result);
+                            }
+                        );
+                        stream.end(thumbBuffer);
+                    });
+                    thumbnailUrl = thumbUploadResult.secure_url;
+                } catch (thumbErr) {
+                    console.error('Thumbnail generation/upload error:', thumbErr);
+                }
             }
 
             return {
@@ -354,16 +357,18 @@ async function processImage(file, params, req) {
         const actualHeight = outputMetadata.height;
 
         let thumbnailUrl = null;
-        try {
-            const thumbBuffer = await generateThumbnail(image);
-            const thumbName = `${nameBase}_thumb.${outputFormat}`;
-            const thumbPath = path.join(uploadDir, thumbName);
-            fs.writeFileSync(thumbPath, thumbBuffer);
-            const protocol = (req.protocol === 'https' || req.secure) ? 'https' : 'http';
-            const host = req.get('host');
-            thumbnailUrl = `${protocol}://${host}/uploads/${encodeURIComponent(thumbName)}`;
-        } catch (thumbErr) {
-            console.error('Thumbnail generation error:', thumbErr);
+        if (generate_thumbnail === 'true') {
+            try {
+                const thumbBuffer = await generateThumbnail(image);
+                const thumbName = `${nameBase}_thumb.${outputFormat}`;
+                const thumbPath = path.join(uploadDir, thumbName);
+                fs.writeFileSync(thumbPath, thumbBuffer);
+                const protocol = (req.protocol === 'https' || req.secure) ? 'https' : 'http';
+                const host = req.get('host');
+                thumbnailUrl = `${protocol}://${host}/uploads/${encodeURIComponent(thumbName)}`;
+            } catch (thumbErr) {
+                console.error('Thumbnail generation error:', thumbErr);
+            }
         }
 
         const protocol = (req.protocol === 'https' || req.secure) ? 'https' : 'http';

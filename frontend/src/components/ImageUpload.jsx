@@ -13,6 +13,7 @@ export default function ImageUpload({
     onChange,
     label = 'Gambar',
     disabled = false,
+    generateThumbnail = false,
 }) {
     const [uploading, setUploading] = useState(false);
     const [preview, setPreview] = useState(value || '');
@@ -66,6 +67,7 @@ export default function ImageUpload({
             formData.append('resize_height', settings.resize_height || '');
             formData.append('quality', settings.quality);
             formData.append('format', format);
+            formData.append('generate_thumbnail', generateThumbnail ? 'true' : 'false');
 
             const token = localStorage.getItem('admin_token');
 
