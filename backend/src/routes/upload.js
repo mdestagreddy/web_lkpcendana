@@ -186,7 +186,7 @@ const reviewMemoryStorage = multer.memoryStorage();
 
 const publicReviewUpload = multer({
     storage: multer.memoryStorage(),
-    limits: { fileSize: 5 * 1024 * 1024 },
+    limits: { fileSize: 10 * 1024 * 1024 },
     fileFilter: upload.fileFilter,
 });
 
@@ -279,6 +279,7 @@ async function processImage(file, params, req) {
                     {
                         folder: process.env.CLOUDINARY_FOLDER || 'lkpcendana',
                         resource_type: 'auto',
+                        public_id: processedFilename.replace(/\.[^/.]+$/, ''),
                     },
                     (error, result) => {
                         if (error) reject(error);
