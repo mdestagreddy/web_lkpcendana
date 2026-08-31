@@ -84,7 +84,7 @@ export const publicApi = {
 
     uploadImage: (formData) => {
         const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
-        const url = `${API_BASE_URL}/upload/upload`;
+        const url = `${API_BASE_URL}/api/upload/upload`;
 
         return fetch(url, {
             method: 'POST',
