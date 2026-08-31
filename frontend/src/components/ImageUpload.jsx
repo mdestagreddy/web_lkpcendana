@@ -51,14 +51,14 @@ export default function ImageUpload({
         setError('');
 
         try {
+            const format = settings.format || 'jpeg';
+            const mimeType = `image/${format === 'jpg' ? 'jpeg' : format}`;
             const fileToUpload = await compressImage(file, {
                 maxWidth: 1920,
                 maxHeight: 1920,
                 maxSizeBytes: 4.5 * 1024 * 1024,
-                mimeType: file.type,
+                mimeType: mimeType,
             });
-
-            const format = (fileToUpload.type || file.type).split('/')[1] || 'jpeg';
             const formData = new FormData();
             formData.append('file', fileToUpload);
             formData.append('custom_filename', settings.custom_filename || '');
