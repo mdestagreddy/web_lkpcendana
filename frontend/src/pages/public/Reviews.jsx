@@ -8,6 +8,7 @@ import StarRating from '../../components/StarRating';
 import Alert from '../../components/Alert';
 import SecurityCaptcha from '../../components/SecurityCaptcha';
 import Pagination from '../../components/Pagination';
+import { compressImage } from '../../utils/imageCompress';
 import './Reviews.css';
 
 const PAGE_SIZE = 10;
@@ -93,8 +94,15 @@ export default function Reviews() {
         const uploaded = [];
         try {
             for (const file of previewImages) {
+                const compressedFile = await compressImage(file, {
+                    maxWidth: 1920,
+                    maxHeight: 1920,
+                    maxSizeBytes: 4.5 * 1024 * 1024,
+                    mimeType: file.type,
+                });
+
                 const formData = new FormData();
-                formData.append('images', file);
+                formData.append('images', compressedFile);
                 const res = await fetch(`${API_BASE_URL}/api/upload/review`, {
                     method: 'POST',
                     body: formData,

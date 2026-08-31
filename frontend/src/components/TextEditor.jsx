@@ -21,6 +21,7 @@ import CustomColorPicker from './CustomColorPicker';
 import HTMLEditor from './HTMLEditor';
 import { ThemeContext } from '../context/ThemeContext';
 import { Figure, Figcaption, EmbedWrapper, FontSize, CustomImage, Highlight } from './TipTapExtensions';
+import { compressImage } from '../utils/imageCompress';
 import './TextEditor.css';
 
 export default function TextEditor({ value = '', onChange, placeholder = 'Tulis konten di sini...', id }) {
@@ -690,50 +691,56 @@ export default function TextEditor({ value = '', onChange, placeholder = 'Tulis 
         }
     }, []);
 
-    const handleImageFileUpload = useCallback(() => {
+    const handleImageFileUpload = useCallback(async () => {
         const file = imageFileRef.current?.files?.[0]
         if (!file || !editor) return
         setImageUploading(true)
         setImageUploadError('')
-        const formData = new FormData()
-        formData.append('file', file)
-        formData.append('custom_filename', '')
-        formData.append('resize_width', '')
-        formData.append('resize_height', '')
-        formData.append('quality', 80)
-        formData.append('format', 'jpeg')
-        const token = localStorage.getItem('admin_token')
-        fetch(`${API_BASE_URL}/api/upload/upload`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
-            body: formData,
-        })
-            .then(async (res) => {
-                const data = await res.json().catch(() => ({}))
-                if (!res.ok) {
-                    throw { status: res.status, data }
-                }
-                return data
+
+        try {
+            const compressedFile = await compressImage(file, {
+                maxWidth: 1920,
+                maxHeight: 1920,
+                maxSizeBytes: 4.5 * 1024 * 1024,
+                mimeType: file.type,
             })
-            .then((data) => {
-                if (data.url) {
-                    setImageUrl(data.url)
-                    setImageUploadMode(false)
-                    setImageUploadError('')
-                } else if (data.error) {
-                    setImageUploadError(data.error)
-                } else {
-                    setImageUploadError('Gagal upload gambar')
-                }
-                setImageUploading(false)
+
+            const format = (compressedFile.type || file.type).split('/')[1] || 'jpeg'
+            const formData = new FormData()
+            formData.append('file', compressedFile)
+            formData.append('custom_filename', '')
+            formData.append('resize_width', '')
+            formData.append('resize_height', '')
+            formData.append('quality', 80)
+            formData.append('format', format)
+            const token = localStorage.getItem('admin_token')
+            const res = await fetch(`${API_BASE_URL}/api/upload/upload`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: formData,
             })
-            .catch((err) => {
-                console.error('Upload error:', err)
-                setImageUploadError('Gagal upload gambar: ' + (err.data?.error || err.message || 'Network error'))
-                setImageUploading(false)
-            })
+            const data = await res.json()
+            if (!res.ok) {
+                throw { status: res.status, data }
+            }
+
+            if (data.url) {
+                setImageUrl(data.url)
+                setImageUploadMode(false)
+                setImageUploadError('')
+            } else if (data.error) {
+                setImageUploadError(data.error)
+            } else {
+                setImageUploadError('Gagal upload gambar')
+            }
+        } catch (err) {
+            console.error('Upload error:', err)
+            setImageUploadError('Gagal upload gambar: ' + (err.data?.error || err.message || 'Network error'))
+        } finally {
+            setImageUploading(false)
+        }
     }, [API_BASE_URL, editor])
 
     const handleImageModeToggle = useCallback((mode) => {

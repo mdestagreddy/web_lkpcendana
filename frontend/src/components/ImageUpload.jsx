@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Camera, MoveHorizontal, MoveVertical, Gauge, Image, Upload, Trash2, FileText } from 'lucide-react';
 import FlexIcon from './FlexIcon';
 import ImageComponent from './Image';
+import { compressImage } from '../utils/imageCompress';
 import './ImageUpload.css';
 import './FormField.css';
 
@@ -42,48 +43,57 @@ export default function ImageUpload({
         reader.readAsDataURL(file);
     }
 
-    function handleUpload() {
+    async function handleUpload() {
         const file = fileInputRef.current?.files?.[0];
         if (!file) return;
 
         setUploading(true);
         setError('');
 
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('custom_filename', settings.custom_filename || '');
-        formData.append('resize_width', settings.resize_width || '');
-        formData.append('resize_height', settings.resize_height || '');
-        formData.append('quality', settings.quality);
-        formData.append('format', settings.format);
-
-        const token = localStorage.getItem('admin_token');
-
-        fetch(`${API_BASE_URL}/api/upload/upload`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-            },
-            body: formData,
-        })
-            .then(res => res.json().then(data => ({ status: res.status, data })))
-            .then(({ data }) => {
-                if (data.url) {
-                    onChange(data.url);
-                    setPreview(data.url);
-                } else if (data.error) {
-                    setError(data.error);
-                    console.error('Upload error:', data.error);
-                } else {
-                    setError('Gagal upload gambar');
-                }
-                setUploading(false);
-            })
-            .catch(err => {
-                console.error('Upload error:', err);
-                setError('Gagal upload gambar: ' + (err.message || 'Network error'));
-                setUploading(false);
+        try {
+            const fileToUpload = await compressImage(file, {
+                maxWidth: 1920,
+                maxHeight: 1920,
+                maxSizeBytes: 4.5 * 1024 * 1024,
+                mimeType: file.type,
             });
+
+            const format = (fileToUpload.type || file.type).split('/')[1] || 'jpeg';
+            const formData = new FormData();
+            formData.append('file', fileToUpload);
+            formData.append('custom_filename', settings.custom_filename || '');
+            formData.append('resize_width', settings.resize_width || '');
+            formData.append('resize_height', settings.resize_height || '');
+            formData.append('quality', settings.quality);
+            formData.append('format', format);
+
+            const token = localStorage.getItem('admin_token');
+
+            const res = await fetch(`${API_BASE_URL}/api/upload/upload`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: formData,
+            });
+
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.error || 'Upload failed');
+            }
+
+            if (data.url) {
+                onChange(data.url);
+                setPreview(data.url);
+            } else {
+                setError('Gagal upload gambar');
+            }
+        } catch (err) {
+            console.error('Upload error:', err);
+            setError('Gagal upload gambar: ' + (err.message || 'Network error'));
+        } finally {
+            setUploading(false);
+        }
     }
 
     async function handleRemove() {

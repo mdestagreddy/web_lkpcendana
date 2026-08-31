@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { Upload, Trash2, Plus } from 'lucide-react';
 import FlexIcon from './FlexIcon';
 import ImageComponent from './Image';
+import { compressImage } from '../utils/imageCompress';
 import './MultiImageUpload.css';
 
 const API_BASE_URL = import.meta.env.VITE_BACKEND || 'http://localhost:5000';
@@ -29,8 +30,15 @@ export default function MultiImageUpload({ value = [], onChange, label = 'Gambar
 
         try {
             for (const file of files) {
+                const compressedFile = await compressImage(file, {
+                    maxWidth: 1920,
+                    maxHeight: 1920,
+                    maxSizeBytes: 4.5 * 1024 * 1024,
+                    mimeType: file.type,
+                });
+
                 const formData = new FormData();
-                formData.append('file', file);
+                formData.append('file', compressedFile);
 
                 const res = await fetch(`${API_BASE_URL}/api/upload/upload`, {
                     method: 'POST',
