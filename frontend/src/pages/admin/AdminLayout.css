@@ -13,8 +13,9 @@
     width: 260px;
     border-radius: 16px;
     background: var(--bg-white);
-    border-right: 1px solid var(--border-light);
+    border: 1px solid var(--border-light);
     display: flex;
+    box-sizing: border-box;
     flex-direction: column;
     padding: 1rem 0;
     box-shadow: var(--shadow-sm);
