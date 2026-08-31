@@ -27,7 +27,7 @@ export default function TextEditor({ value = '', onChange, placeholder = 'Tulis 
     const htmlEditorRef = useRef(null);
     const imageFileRef = useRef(null);
     const { theme } = useContext(ThemeContext);
-    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const API_BASE_URL = import.meta.env.VITE_BACKEND || 'http://localhost:5000';
     const [isFocused, setIsFocused] = useState(false);
     const [activeFormats, setActiveFormats] = useState({});
     const [foreColor, setForeColor] = useState('');
@@ -703,7 +703,7 @@ export default function TextEditor({ value = '', onChange, placeholder = 'Tulis 
         formData.append('quality', 80)
         formData.append('format', 'jpeg')
         const token = localStorage.getItem('admin_token')
-        fetch(`${API_BASE_URL}/upload/upload`, {
+        fetch(`${API_BASE_URL}/api/upload/upload`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -900,7 +900,7 @@ export default function TextEditor({ value = '', onChange, placeholder = 'Tulis 
         setImageDeleteLoading(true)
         try {
             const token = localStorage.getItem('admin_token')
-            const response = await fetch(`${API_BASE_URL}/upload/delete`, {
+            const response = await fetch(`${API_BASE_URL}/api/upload/delete`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

@@ -4,7 +4,7 @@ import FlexIcon from './FlexIcon';
 import ImageComponent from './Image';
 import './MultiImageUpload.css';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_BACKEND || 'http://localhost:5000';
 
 export default function MultiImageUpload({ value = [], onChange, label = 'Gambar', disabled = false }) {
     const [uploading, setUploading] = useState(false);
@@ -32,7 +32,7 @@ export default function MultiImageUpload({ value = [], onChange, label = 'Gambar
                 const formData = new FormData();
                 formData.append('file', file);
 
-                const res = await fetch(`${API_BASE_URL}/upload/upload`, {
+                const res = await fetch(`${API_BASE_URL}/api/upload/upload`, {
                     method: 'POST',
                     headers: { Authorization: `Bearer ${token}` },
                     body: formData,
@@ -60,7 +60,7 @@ export default function MultiImageUpload({ value = [], onChange, label = 'Gambar
 
         if (urlToRemove) {
             try {
-                const res = await fetch(`${API_BASE_URL}/upload/upload`, {
+                const res = await fetch(`${API_BASE_URL}/api/upload/upload`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`,
