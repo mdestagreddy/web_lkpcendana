@@ -28,7 +28,7 @@ function getThumbUrl(src, thumbWidth, thumbHeight) {
     }
     const urlObj = new URL(resolved, API_BASE_URL);
     const pathname = urlObj.pathname;
-    const ext = path.extname(pathname);
+    const ext = pathname.split('.').pop() || '';
     const base = pathname.slice(0, -ext.length);
     return `${urlObj.origin}${base}_thumb${ext}`;
 }
