@@ -185,12 +185,8 @@ const reviewStorage = multer.diskStorage({
 const reviewMemoryStorage = multer.memoryStorage();
 
 const publicReviewUpload = multer({
-    storage: function (req, file, cb) {
-        if (isLocalhost(req)) {
-            cb(null, reviewStorage);
-        } else {
-            cb(null, reviewMemoryStorage);
-        }
+    storage: function (req) {
+        return isLocalhost(req) ? reviewStorage : reviewMemoryStorage;
     },
     limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter: upload.fileFilter,
