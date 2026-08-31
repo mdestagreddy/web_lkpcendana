@@ -1,6 +1,6 @@
 ﻿import { Link, useLocation } from 'react-router-dom';
 import { publicApi } from '../services/api';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Home, GraduationCap, Users, Image, ClipboardList, Info, Phone, Shield, X, Sun, Moon, Monitor, FileText, Star } from 'lucide-react';
 import FlexIcon from './FlexIcon';
 import { useTheme } from '../context/useTheme';
@@ -12,6 +12,8 @@ export default function Navbar({ menuOpen, onToggleSidebar }) {
     const [settings, setSettings] = useState({});
     const { themeMode, toggleTheme } = useTheme();
     const location = useLocation();
+    const menuRef = useRef(null);
+    const [menuGradient, setMenuGradient] = useState('');
 
     useEffect(() => {
         publicApi.getInstitution().then(data => {
@@ -22,6 +24,35 @@ export default function Navbar({ menuOpen, onToggleSidebar }) {
             }
         });
         publicApi.getSiteSettings().then(setSettings);
+    }, []);
+
+    const updateGradient = () => {
+        const el = menuRef.current;
+        if (!el) return;
+        const hasOverflow = el.scrollWidth > el.clientWidth + 2;
+        if (!hasOverflow) {
+            setMenuGradient('no-overflow');
+            return;
+        }
+        if (el.scrollLeft <= 0) {
+            setMenuGradient('at-left');
+        } else if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 2) {
+            setMenuGradient('at-right');
+        } else {
+            setMenuGradient('in-middle');
+        }
+    };
+
+    useEffect(() => {
+        const el = menuRef.current;
+        if (!el) return;
+        updateGradient();
+        el.addEventListener('scroll', updateGradient, { passive: true });
+        window.addEventListener('resize', updateGradient);
+        return () => {
+            el.removeEventListener('scroll', updateGradient);
+            window.removeEventListener('resize', updateGradient);
+        };
     }, []);
 
     const isActive = (path) => location.pathname === path ? 'active' : '';
@@ -47,7 +78,7 @@ export default function Navbar({ menuOpen, onToggleSidebar }) {
                 </Link>
 
                 <div className="navbar-right">
-                    <ul className={`navbar-menu${menuOpen ? ' open' : ''}`}>
+                    <ul className={`navbar-menu${menuOpen ? ' open' : ''} ${menuGradient}`} ref={menuRef}>
                         <li className="menu-header">
                             <span className="menu-title">Menu</span>
                             <button className="menu-close" onClick={onToggleSidebar} aria-label="Close menu">
