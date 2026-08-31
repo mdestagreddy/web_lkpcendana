@@ -34,9 +34,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 const upload = multer({
-    storage: function (req) {
-        return isLocalhost(req) ? diskStorage : memoryStorage;
-    },
+    storage: multer.memoryStorage(),
     limits: {
         fileSize: 10 * 1024 * 1024,
     },
