@@ -39,7 +39,7 @@ function queryAsync(sql, params) {
 }
 
 router.post('/payment/create-transaction', async (req, res) => {
-    const { program_id, customer_name, customer_email, customer_phone, amount } = req.body;
+    const { program_id, customer_name, customer_email, customer_phone, amount, redirect_url } = req.body;
 
     if (!program_id || !customer_name || !customer_email || !customer_phone || !amount) {
         return res.status(400).json({ error: 'Semua field wajib diisi' });
@@ -50,7 +50,8 @@ router.post('/payment/create-transaction', async (req, res) => {
         if (programs.length === 0) return res.status(404).json({ error: 'Program tidak ditemukan' });
 
         const program = programs[0];
-        const orderId = `REG-${Date.now()}-${program_id}`;
+        const baseUrl = getBaseUrl(req);
+        const orderId = `REG-${Date.now().toString(36)}-${program_id}`;
         const grossAmount = Math.round(parseFloat(amount));
 
         const transactionDetails = {
@@ -77,6 +78,8 @@ router.post('/payment/create-transaction', async (req, res) => {
             transaction_details: transactionDetails,
             customer_details: customerDetails,
             item_details: itemDetails,
+            redirect_url: redirect_url || `${baseUrl}/registration`,
+            callback_url: `${baseUrl}/api/public/payment/notification`,
         };
 
         const snap = getSnap();

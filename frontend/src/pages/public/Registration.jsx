@@ -108,21 +108,22 @@ export default function Registration() {
                 customer_email: customerEmail,
                 customer_phone: customerPhone,
                 amount: parseInt(amount, 10),
+                redirect_url: window.location.href,
             });
 
             if (window.snap && result.token) {
                 window.snap.pay(result.token, {
-                    onSuccess: (result) => {
+                    onSuccess: (paymentResult) => {
                         alert('Pembayaran berhasil!');
-                        console.log('Payment success:', result);
+                        console.log('Payment success:', paymentResult);
                     },
-                    onPending: (result) => {
+                    onPending: (paymentResult) => {
                         alert('Menunggu pembayaran Anda.');
-                        console.log('Payment pending:', result);
+                        console.log('Payment pending:', paymentResult);
                     },
-                    onError: (result) => {
+                    onError: (paymentResult) => {
                         alert('Pembayaran gagal.');
-                        console.log('Payment error:', result);
+                        console.log('Payment error:', paymentResult);
                     },
                     onClose: () => {
                         alert('Popup pembayaran ditutup.');
