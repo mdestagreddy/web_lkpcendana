@@ -5,7 +5,7 @@ Web resmi LKP Cendana - website publik dan panel admin untuk manajemen konten in
 ## Tech Stack
 
 - **Frontend**: React 19 + Vite + React Router DOM + Tiptap + CodeMirror + Lucide React
-- **Backend**: Express 5 + MySQL2 + JWT + Multer + Sharp + Cloudinary + bcrypt + otplib + svg-captcha
+- **Backend**: Express 5 + MySQL2 + JWT + Multer + Sharp + Cloudinary + Midtrans + bcrypt + otplib + svg-captcha
 - **Package Manager**: npm (CommonJS + ESM hybrid)
 
 ## Project Structure
@@ -33,6 +33,8 @@ web_lkpcendana/
 │   │       ├── admin.js
 │   │       ├── auth.js
 │   │       ├── upload.js
+│   │       ├── payment.js
+│   │       ├── admin-payments.js
 │   │       ├── reviews.js
 │   │       └── admin-reviews.js
 │   ├── uploads/
@@ -96,7 +98,8 @@ web_lkpcendana/
 │   │   │       ├── AdminVisionMission.jsx
 │   │   │       ├── AdminOrgChart.jsx
 │   │   │       ├── AdminSecurity.jsx
-│   │   │       └── AdminReviews.jsx
+│   │   │       ├── AdminReviews.jsx
+│   │   │       └── AdminPayments.jsx
 │   │   ├── services/
 │   │   │   └── api.js
 │   │   ├── App.jsx
@@ -160,12 +163,19 @@ SERVER_PORT=5000
 ADMIN_API_KEY=your_admin_api_key_here
 JWT_SECRET=your_jwt_secret_here
 CAPTCHA_SECRET=your_captcha_secret_here
+
+# Midtrans Configuration
+MIDTRANS_SERVER_KEY=your_midtrans_server_key
+MIDTRANS_CLIENT_KEY=your_midtrans_client_key
+MIDTRANS_IS_PRODUCTION=false
+MIDTRANS_MERCHANT_ID=your_merchant_id
 ```
 
 ### Frontend (`frontend/.env`)
 
 ```env
 VITE_BACKEND=http://localhost:5000
+VITE_MIDTRANS_CLIENT_KEY=your_midtrans_client_key
 ```
 
 ## Database Setup
@@ -227,6 +237,8 @@ cd frontend && npm run lint
 - `/api/auth` - Authentication (login, register, forgot password, 2FA)
 - `/api/admin` - Admin routes (CRUD programs, gallery, users, posts, dll.)
 - `/api/upload` - Upload file (gambar)
+- `/api/payment` - Payment routes (create transaction, notification, status)
+- `/api/admin/payments` - Admin payment management
 - `/api/reviews` - Reviews publik
 - `/api/admin/reviews` - Admin reviews
 - `/uploads` - Static file serving
@@ -234,7 +246,7 @@ cd frontend && npm run lint
 ## Features
 
 - Publik: Home, About, Programs, Gallery, Instructors, Posts, Contact, Registration, Privacy Policy, Reviews
-- Admin: Dashboard, Site Settings, Programs, Gallery, Instructors, Institution, Users, Posts, Categories, Testimonials, Privacy Policies, Vision & Mission, Organization Chart, Security, Reviews
+- Admin: Dashboard, Site Settings, Programs, Gallery, Instructors, Institution, Users, Posts, Categories, Testimonials, Privacy Policies, Vision & Mission, Organization Chart, Security, Reviews, Payments
 - Image upload with thumbnail generation (Sharp) and Cloudinary integration
 - JWT-based authentication with token blacklist
 - Two-factor authentication (2FA) with otplib
@@ -245,3 +257,5 @@ cd frontend && npm run lint
 - Role-based access control (admin)
 - Error boundary for React
 - Oxlint for code quality
+- Midtrans payment integration with Snap JS
+- Program pricing and payment tracking
