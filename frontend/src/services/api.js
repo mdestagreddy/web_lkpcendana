@@ -216,6 +216,11 @@ export const publicApi = {
             return result;
         });
     },
+
+    createPayment: (data) => request('/public/payment/create-transaction', {
+        method: 'POST',
+        body: JSON.stringify(data),
+    }),
 };
 
 export const adminApi = {
@@ -541,5 +546,25 @@ export const adminApi = {
             method: 'DELETE',
             isAdmin: true,
         }),
+    },
+
+    payments: {
+        list: (params = {}) => {
+            const query = new URLSearchParams();
+            Object.entries(params).forEach(([key, value]) => {
+                if (value !== undefined && value !== null && value !== '') {
+                    query.append(key, value);
+                }
+            });
+            const qs = query.toString();
+            return request(`/admin/payments${qs ? `?${qs}` : ''}`, { isAdmin: true });
+        },
+        get: (id) => request(`/admin/payments/${id}`, { isAdmin: true }),
+        update: (id, data) => request(`/admin/payments/${id}`, {
+            method: 'PUT',
+            isAdmin: true,
+            body: JSON.stringify(data),
+        }),
+        getByOrderId: (orderId) => request(`/admin/payments/order/${encodeURIComponent(orderId)}`, { isAdmin: true }),
     },
 };

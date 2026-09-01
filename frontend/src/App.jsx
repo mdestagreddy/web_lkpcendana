@@ -36,6 +36,7 @@ const AdminPrivacyPolicies = lazy(() => import('./pages/admin/AdminPrivacyPolici
 const AdminSecurity = lazy(() => import('./pages/admin/AdminSecurity'));
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
 const AdminReviews = lazy(() => import('./pages/admin/AdminReviews'));
+const AdminPayments = lazy(() => import('./pages/admin/AdminPayments'));
 
 export default function App() {
     return (
@@ -63,8 +64,9 @@ export default function App() {
                                 <Route path="programs" element={<AdminPrograms />} />
                                 <Route path="instructors" element={<AdminInstructors />} />
                                 <Route path="testimonials" element={<AdminTestimonials />} />
-                                <Route path="reviews" element={<AdminReviews />} />
-                                <Route path="gallery" element={<AdminGallery />} />
+                            <Route path="reviews" element={<AdminReviews />} />
+                            <Route path="payments" element={<AdminPayments />} />
+                            <Route path="gallery" element={<AdminGallery />} />
                                 <Route path="users" element={<AdminUsers />} />
                                 <Route path="institution" element={<AdminInstitution />} />
                                 <Route path="vision-mission" element={<AdminVisionMission />} />

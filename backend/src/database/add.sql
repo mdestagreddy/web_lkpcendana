@@ -79,16 +79,16 @@ INSERT IGNORE INTO vision_mission (type, content, sort_order) VALUES
 ('mission', 'Membangun Kerjasama dan Networking DUDI', 4),
 ('mission', 'Menjalin Kerjasama dengan Instansi terkait', 5);
 
-INSERT IGNORE INTO programs (title, slug, category, level, duration_minutes, description, type, is_featured, sort_order) VALUES
-('Driving Training Program', 'driving-training-program', 'mengemudi', 'Pemula', 0, 'Pelatihan mengemudi mobil yang sangat cocok untuk pemula. Disusun berdasarkan Standar Kompetensi Kurikulum Nasional dengan materi lengkap mulai dari Defensive Driving, Zero Accident, Good Driving, dan 8+ materi lainnya.', 'offline', 1, 1),
-('Belajar Menggunakan Aplikasi Desain Grafis', 'belajar-aplikasi-desain-grafis', 'desain grafis', 'Pemula', 144, 'Pelatihan dasar penggunaan aplikasi desain grafis untuk pemula.', 'online', 0, 1),
-('Membuat Desain Digital & Cetak Untuk Menjadi Perancang Grafis', 'desain-digital-cetak-perancang-grafis', 'desain grafis', 'Intermediate', 198, 'Pelatihan menengah untuk membuat desain digital dan cetak profesional.', 'online', 0, 2),
-('Mudah Bikin Website Pakai WordPress', 'mudah-bikin-website-wordpress', 'web desain', 'Intermediate', 276, 'Pelatihan menengah pembuatan website menggunakan WordPress.', 'online', 0, 3),
-('Menguasai Dasar Pemasaran Digital bagi Tenaga Spesialis Pemasaran', 'dasar-pemasaran-digital-spesialis', 'digital marketing', 'Pemula', 144, 'Pelatihan dasar pemasaran digital untuk tenaga spesialis pemasaran.', 'online', 0, 4),
-('Belajar Digital Marketing untuk Wirausaha Online', 'digital-marketing-wirausaha-online', 'digital marketing', 'Intermediate', 198, 'Pelatihan menengah digital marketing untuk wirausaha online.', 'online', 0, 5),
-('Teknik Membersihkan Data Untuk Para Data Analisis', 'teknik-membersihkan-data-analisis', 'data mining', 'Expert', 276, 'Pelatihan expert teknik membersihkan data untuk analisis data.', 'online', 0, 6),
-('Office Application', 'office-application', 'office application', 'Pemula', 0, 'Pelatihan aplikasi perkantoran untuk pemula.', 'offline', 0, 7),
-('Hidroponik', 'hidroponik', 'hidroponik', 'Pemula', 0, 'Pelatihan budidaya hidroponik untuk pemula.', 'offline', 0, 8);
+INSERT IGNORE INTO programs (title, slug, category, level, duration_minutes, description, type, is_featured, sort_order, price) VALUES
+('Driving Training Program', 'driving-training-program', 'mengemudi', 'Pemula', 0, 'Pelatihan mengemudi mobil yang sangat cocok untuk pemula. Disusun berdasarkan Standar Kompetensi Kurikulum Nasional dengan materi lengkap mulai dari Defensive Driving, Zero Accident, Good Driving, dan 8+ materi lainnya.', 'offline', 1, 1, 2500000),
+('Belajar Menggunakan Aplikasi Desain Grafis', 'belajar-aplikasi-desain-grafis', 'desain grafis', 'Pemula', 144, 'Pelatihan dasar penggunaan aplikasi desain grafis untuk pemula.', 'online', 0, 1, 750000),
+('Membuat Desain Digital & Cetak Untuk Menjadi Perancang Grafis', 'desain-digital-cetak-perancang-grafis', 'desain grafis', 'Intermediate', 198, 'Pelatihan menengah untuk membuat desain digital dan cetak profesional.', 'online', 0, 2, 1200000),
+('Mudah Bikin Website Pakai WordPress', 'mudah-bikin-website-wordpress', 'web desain', 'Intermediate', 276, 'Pelatihan menengah pembuatan website menggunakan WordPress.', 'online', 0, 3, 1500000),
+('Menguasai Dasar Pemasaran Digital bagi Tenaga Spesialis Pemasaran', 'dasar-pemasaran-digital-spesialis', 'digital marketing', 'Pemula', 144, 'Pelatihan dasar pemasaran digital untuk tenaga spesialis pemasaran.', 'online', 0, 4, 800000),
+('Belajar Digital Marketing untuk Wirausaha Online', 'digital-marketing-wirausaha-online', 'digital marketing', 'Intermediate', 198, 'Pelatihan menengah digital marketing untuk wirausaha online.', 'online', 0, 5, 1300000),
+('Teknik Membersihkan Data Untuk Para Data Analisis', 'teknik-membersihkan-data-analisis', 'data mining', 'Expert', 276, 'Pelatihan expert teknik membersihkan data untuk analisis data.', 'online', 0, 6, 2000000),
+('Office Application', 'office-application', 'office application', 'Pemula', 0, 'Pelatihan aplikasi perkantoran untuk pemula.', 'offline', 0, 7, 600000),
+('Hidroponik', 'hidroponik', 'hidroponik', 'Pemula', 0, 'Pelatihan budidaya hidroponik untuk pemula.', 'offline', 0, 8, 900000);
 
 INSERT IGNORE INTO program_modules (program_id, name, sort_order) VALUES
 (1, 'Defensive Driving', 1),

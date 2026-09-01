@@ -3,7 +3,7 @@ import { Outlet, NavLink, useNavigate, Navigate, useLocation } from 'react-route
 import { useAuth } from '../../context/useAuth';
 import { useTheme } from '../../context/useTheme';
 import { ThemeProvider } from '../../context/ThemeContext';
-import { LayoutDashboard, GraduationCap, Users, MessageSquare, Star, Image, UserCog, Building2, Target, Settings, FileText, Tag, GitBranch, Shield, LogOut, Sun, Moon, Monitor } from 'lucide-react';
+import { LayoutDashboard, GraduationCap, Users, MessageSquare, Star, Image, UserCog, Building2, Target, Settings, FileText, Tag, GitBranch, Shield, LogOut, Sun, Moon, Monitor, CreditCard } from 'lucide-react';
 import FlexIcon from '../../components/FlexIcon';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { publicApi } from '../../services/api';
@@ -25,6 +25,7 @@ function AdminLayoutInner() {
         '/admin/instructors': 'Instruktur',
         '/admin/testimonials': 'Testimoni',
         '/admin/reviews': 'Ulasan',
+        '/admin/payments': 'Pembayaran',
         '/admin/gallery': 'Galeri',
         '/admin/users': 'Pengguna',
         '/admin/institution': 'Institusi',
@@ -124,6 +125,7 @@ function AdminLayoutInner() {
                     <NavLink to="/admin/instructors" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setSidebarOpen(false)}><FlexIcon Icon={Users} size={18}>Instruktur</FlexIcon></NavLink>
                     <NavLink to="/admin/testimonials" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setSidebarOpen(false)}><FlexIcon Icon={MessageSquare} size={18}>Testimoni</FlexIcon></NavLink>
                     <NavLink to="/admin/reviews" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setSidebarOpen(false)}><FlexIcon Icon={Star} size={18}>Ulasan</FlexIcon></NavLink>
+                    <NavLink to="/admin/payments" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setSidebarOpen(false)}><FlexIcon Icon={CreditCard} size={18}>Pembayaran</FlexIcon></NavLink>
                     <NavLink to="/admin/gallery" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setSidebarOpen(false)}><FlexIcon Icon={Image} size={18}>Galeri</FlexIcon></NavLink>
                     <NavLink to="/admin/users" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setSidebarOpen(false)}><FlexIcon Icon={UserCog} size={18}>Pengguna</FlexIcon></NavLink>
                     <NavLink to="/admin/institution" className={({ isActive }) => isActive ? 'active' : ''} onClick={() => setSidebarOpen(false)}><FlexIcon Icon={Building2} size={18}>Institusi</FlexIcon></NavLink>

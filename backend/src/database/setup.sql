@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS programs (
     is_active TINYINT(1) DEFAULT 1,
     sort_order INT DEFAULT 0,
     image_url VARCHAR(500),
+    price INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -160,4 +161,21 @@ CREATE TABLE IF NOT EXISTS privacy_policies (
     effective_date DATE,
     is_current TINYINT(1) DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS payments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id VARCHAR(100) NOT NULL UNIQUE,
+    program_id INT NOT NULL,
+    program_title VARCHAR(255) NOT NULL,
+    customer_name VARCHAR(255) NOT NULL,
+    customer_email VARCHAR(255) NOT NULL,
+    customer_phone VARCHAR(50) NOT NULL,
+    amount INT NOT NULL,
+    status ENUM('pending', 'success', 'failed', 'challenge', 'cancelled') DEFAULT 'pending',
+    midtrans_transaction_id VARCHAR(100),
+    token VARCHAR(255),
+    redirect_url TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

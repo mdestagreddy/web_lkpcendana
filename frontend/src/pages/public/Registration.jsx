@@ -1,5 +1,7 @@
-import { Monitor, Car } from 'lucide-react';
+import { Monitor, Car, CreditCard } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import FlexIcon from '../../components/FlexIcon';
+import { publicApi } from '../../services/api';
 import './Registration.css';
 
 const FORMS = [
@@ -17,38 +19,267 @@ const FORMS = [
     },
 ];
 
+function formatRupiah(value) {
+    const number = parseInt(value, 10);
+    if (isNaN(number) || number <= 0) return '';
+    return 'Rp ' + number.toLocaleString('id-ID');
+}
+
+function parseNumericInput(rawValue) {
+    const digits = rawValue.replace(/[^0-9]/g, '');
+    return digits ? parseInt(digits, 10) : '';
+}
+
 export default function Registration() {
+    const [activeTab, setActiveTab] = useState('form');
+    const [programs, setPrograms] = useState([]);
+    const [loadingPrograms, setLoadingPrograms] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [snapScriptLoaded, setSnapScriptLoaded] = useState(false);
+
+    const [selectedProgramId, setSelectedProgramId] = useState('');
+    const [customerName, setCustomerName] = useState('');
+    const [customerEmail, setCustomerEmail] = useState('');
+    const [customerPhone, setCustomerPhone] = useState('');
+    const [amount, setAmount] = useState('');
+    const [amountDisplay, setAmountDisplay] = useState('');
+
+    useEffect(() => {
+        const loadPrograms = async () => {
+            setLoadingPrograms(true);
+            try {
+                const data = await publicApi.getPrograms({ is_active: 1 });
+                const activePrograms = data.data || data;
+                setPrograms(activePrograms);
+            } catch (err) {
+                console.error('Failed to load programs:', err);
+            } finally {
+                setLoadingPrograms(false);
+            }
+        };
+        loadPrograms();
+    }, []);
+
+    useEffect(() => {
+        if (!snapScriptLoaded) {
+            const script = document.createElement('script');
+            script.src = 'https://app.midtrans.com/snap/snap.js';
+            script.setAttribute('data-client-key', import.meta.env.VITE_MIDTRANS_CLIENT_KEY || '');
+            script.async = true;
+            script.onload = () => setSnapScriptLoaded(true);
+            script.onerror = () => console.error('Failed to load MidTrans Snap script');
+            document.body.appendChild(script);
+        }
+    }, [snapScriptLoaded]);
+
+    const handleProgramChange = (e) => {
+        const id = e.target.value;
+        setSelectedProgramId(id);
+        const program = programs.find(p => p.id === parseInt(id, 10));
+        if (program && program.price) {
+            const priceString = String(program.price);
+            setAmount(priceString);
+            setAmountDisplay(formatRupiah(priceString));
+        } else {
+            setAmount('');
+            setAmountDisplay('');
+        }
+    };
+
+    const handleAmountChange = (e) => {
+        const rawValue = e.target.value;
+        const numericValue = parseNumericInput(rawValue);
+        setAmount(String(numericValue));
+        setAmountDisplay(formatRupiah(numericValue));
+    };
+
+    const handlePay = async (e) => {
+        e.preventDefault();
+        if (!selectedProgramId || !customerName || !customerEmail || !customerPhone || !amount) {
+            alert('Semua field wajib diisi');
+            return;
+        }
+
+        setSubmitting(true);
+        try {
+            const result = await publicApi.createPayment({
+                program_id: parseInt(selectedProgramId, 10),
+                customer_name: customerName,
+                customer_email: customerEmail,
+                customer_phone: customerPhone,
+                amount: parseInt(amount, 10),
+            });
+
+            if (window.snap && result.token) {
+                window.snap.pay(result.token, {
+                    onSuccess: (result) => {
+                        alert('Pembayaran berhasil!');
+                        console.log('Payment success:', result);
+                    },
+                    onPending: (result) => {
+                        alert('Menunggu pembayaran Anda.');
+                        console.log('Payment pending:', result);
+                    },
+                    onError: (result) => {
+                        alert('Pembayaran gagal.');
+                        console.log('Payment error:', result);
+                    },
+                    onClose: () => {
+                        alert('Popup pembayaran ditutup.');
+                    },
+                });
+            } else if (result.redirect_url) {
+                window.location.href = result.redirect_url;
+            } else {
+                alert('Gagal memulai pembayaran');
+            }
+        } catch (err) {
+            alert(err.message || 'Gagal membuat transaksi pembayaran');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
     return (
         <div className="registration-page">
             <div className="container">
                 <h1>Pendaftaran</h1>
                 <p className="registration-subtitle">Pilih formulir pendaftaran sesuai program yang Anda inginkan</p>
-                <div className="iframe-forms-grid">
-                    {FORMS.map(form => {
-                        const Icon = form.icon;
-                        return (
-                            <div key={form.title} className="iframe-card">
-                                <div className="iframe-card-header">
-                                <div className="iframe-icon">
-                                    <FlexIcon Icon={Icon} size={24} />
-                                </div>
-                                    <div>
-                                        <h3>{form.title}</h3>
-                                        <p>{form.description}</p>
-                                    </div>
-                                </div>
-                                <iframe
-                                    src={form.url}
-                                    title={form.title}
-                                    className="registration-iframe"
-                                    allow="geolocation"
-                                >
-                                    Memuat formulir...
-                                </iframe>
-                            </div>
-                        );
-                    })}
+
+                <div className="registration-tabs">
+                    <button
+                        className={`registration-tab ${activeTab === 'form' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('form')}
+                    >
+                        Formulir Pendaftaran
+                    </button>
+                    <button
+                        className={`registration-tab ${activeTab === 'payment' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('payment')}
+                    >
+                        <FlexIcon Icon={CreditCard} size={16} />
+                        Pembayaran
+                    </button>
                 </div>
+
+                {activeTab === 'form' && (
+                    <div className="iframe-forms-grid">
+                        {FORMS.map(form => {
+                            const Icon = form.icon;
+                            return (
+                                <div key={form.title} className="iframe-card">
+                                    <div className="iframe-card-header">
+                                        <div className="iframe-icon">
+                                            <FlexIcon Icon={Icon} size={24} />
+                                        </div>
+                                        <div>
+                                            <h3>{form.title}</h3>
+                                            <p>{form.description}</p>
+                                        </div>
+                                    </div>
+                                    <iframe
+                                        src={form.url}
+                                        title={form.title}
+                                        className="registration-iframe"
+                                        allow="geolocation"
+                                    >
+                                        Memuat formulir...
+                                    </iframe>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+
+                {activeTab === 'payment' && (
+                    <div className="payment-card">
+                        <div className="payment-card-header">
+                            <div className="iframe-icon">
+                                <FlexIcon Icon={CreditCard} size={24} />
+                            </div>
+                            <div>
+                                <h3>Pembayaran Pendaftaran</h3>
+                                <p>Selesaikan pembayaran untuk program yang Anda pilih</p>
+                            </div>
+                        </div>
+
+                        <form className="payment-form" onSubmit={handlePay}>
+                            <div className="form-group">
+                                <label htmlFor="program">Program Pelatihan</label>
+                                <select
+                                    id="program"
+                                    value={selectedProgramId}
+                                    onChange={handleProgramChange}
+                                    required
+                                >
+                                    <option value="">-- Pilih Program --</option>
+                                    {loadingPrograms && <option value="">Memuat program...</option>}
+                                    {programs.map(program => (
+                                        <option key={program.id} value={program.id}>
+                                            {program.title} {program.price ? `- ${formatRupiah(program.price)}` : ''}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="amount">Nominal Pembayaran</label>
+                                <input
+                                    id="amount"
+                                    type="text"
+                                    inputMode="numeric"
+                                    value={amountDisplay}
+                                    onChange={handleAmountChange}
+                                    placeholder="Contoh: 2500000"
+                                    required
+                                />
+                                {amount && (
+                                    <input type="hidden" name="amount" value={amount} readOnly />
+                                )}
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="name">Nama Lengkap</label>
+                                <input
+                                    id="name"
+                                    type="text"
+                                    value={customerName}
+                                    onChange={(e) => setCustomerName(e.target.value)}
+                                    placeholder="Masukkan nama lengkap"
+                                    required
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="email">Email</label>
+                                <input
+                                    id="email"
+                                    type="email"
+                                    value={customerEmail}
+                                    onChange={(e) => setCustomerEmail(e.target.value)}
+                                    placeholder="contoh@email.com"
+                                    required
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="phone">Nomor Telepon</label>
+                                <input
+                                    id="phone"
+                                    type="tel"
+                                    value={customerPhone}
+                                    onChange={(e) => setCustomerPhone(e.target.value)}
+                                    placeholder="0812-3456-7890"
+                                    required
+                                />
+                            </div>
+
+                            <button type="submit" className="btn-pay" disabled={submitting}>
+                                {submitting ? 'Memproses...' : 'Bayar Sekarang'}
+                            </button>
+                        </form>
+                    </div>
+                )}
             </div>
         </div>
     );
