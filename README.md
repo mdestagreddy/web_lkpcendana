@@ -4,8 +4,8 @@ Web resmi LKP Cendana - website publik dan panel admin untuk manajemen konten in
 
 ## Tech Stack
 
-- **Frontend**: React 19 + Vite + React Router DOM
-- **Backend**: Express 5 + MySQL2 + JWT + Multer + Sharp
+- **Frontend**: React 19 + Vite + React Router DOM + Tiptap + CodeMirror + Lucide React
+- **Backend**: Express 5 + MySQL2 + JWT + Multer + Sharp + Cloudinary + bcrypt + otplib + svg-captcha
 - **Package Manager**: npm (CommonJS + ESM hybrid)
 
 ## Project Structure
@@ -22,12 +22,19 @@ web_lkpcendana/
 │   │   │   └── add.sql
 │   │   ├── middleware/
 │   │   │   ├── auth.js
-│   │   │   └── upload.js
+│   │   │   ├── upload.js
+│   │   │   ├── tokenBlacklist.js
+│   │   │   ├── rateLimit.js
+│   │   │   └── honeypot.js
+│   │   ├── utils/
+│   │   │   └── captcha.js
 │   │   └── routes/
 │   │       ├── public.js
 │   │       ├── admin.js
 │   │       ├── auth.js
-│   │       └── upload.js
+│   │       ├── upload.js
+│   │       ├── reviews.js
+│   │       └── admin-reviews.js
 │   ├── uploads/
 │   ├── index.js
 │   ├── package.json
@@ -45,7 +52,14 @@ web_lkpcendana/
 │   │   │   ├── HTMLEditor.jsx
 │   │   │   ├── TextEditor.jsx
 │   │   │   ├── CustomColorPicker.jsx
-│   │   │   └── CustomCheckbox.jsx
+│   │   │   ├── CustomCheckbox.jsx
+│   │   │   ├── ErrorBoundary.jsx
+│   │   │   ├── ImageLightbox.jsx
+│   │   │   ├── MultiImageUpload.jsx
+│   │   │   ├── StarRating.jsx
+│   │   │   ├── SecurityCaptcha.jsx
+│   │   │   ├── Verify2FA.jsx
+│   │   │   └── ...
 │   │   ├── context/
 │   │   │   ├── AuthContext.jsx
 │   │   │   ├── useAuth.js
@@ -63,7 +77,8 @@ web_lkpcendana/
 │   │   │   │   ├── PostDetail.jsx
 │   │   │   │   ├── Contact.jsx
 │   │   │   │   ├── Registration.jsx
-│   │   │   │   └── PrivacyPolicy.jsx
+│   │   │   │   ├── PrivacyPolicy.jsx
+│   │   │   │   └── Reviews.jsx
 │   │   │   └── admin/
 │   │   │       ├── AdminLayout.jsx
 │   │   │       ├── AdminLogin.jsx
@@ -79,7 +94,9 @@ web_lkpcendana/
 │   │   │       ├── AdminTestimonials.jsx
 │   │   │       ├── AdminPrivacyPolicies.jsx
 │   │   │       ├── AdminVisionMission.jsx
-│   │   │       └── AdminOrgChart.jsx
+│   │   │       ├── AdminOrgChart.jsx
+│   │   │       ├── AdminSecurity.jsx
+│   │   │       └── AdminReviews.jsx
 │   │   ├── services/
 │   │   │   └── api.js
 │   │   ├── App.jsx
@@ -118,23 +135,37 @@ cd ../frontend && npm install
 ### Backend (`backend/.env`)
 
 ```env
+# Cloudinary Configuration (untuk server luar)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+CLOUDINARY_FOLDER=lkpcendana
+
+# Frontend URL (digunakan untuk CORS)
 FRONTEND_URL=http://localhost:5173
 
+# Database Configuration
 DB_HOST=localhost
 DB_PORT=3306
-DB_USER=[INSERT USERNAME HERE]
-DB_PASS=[INSERT PASSWORD HERE]
-DB_SCHEME=[INSERT DATABASE SCHEME HERE]
+DB_USER=root
+DB_PASS=root
+DB_SCHEME=db_server
+DB_SSL_REQUIRED=false
+DB_SSL_CA_PATH=./ca-cert.pem
 
-SERVER_PORT=[INSERT PORT HERE]
-ADMIN_API_KEY=[INSERT KEY HERE]
-JWT_SECRET=[INSERT SECRET KEY HERE]
+# Server Configuration
+SERVER_PORT=5000
+
+# Security
+ADMIN_API_KEY=your_admin_api_key_here
+JWT_SECRET=your_jwt_secret_here
+CAPTCHA_SECRET=your_captcha_secret_here
 ```
 
 ### Frontend (`frontend/.env`)
 
 ```env
-VITE_BACKEND=http://localhost:5000/api
+VITE_BACKEND=http://localhost:5000
 ```
 
 ## Database Setup
@@ -147,6 +178,12 @@ npm run setup-db
 ```
 
 Script ini akan membuat tabel-tabel yang dibutuhkan berdasarkan `src/database/setup.sql` dan `src/database/add.sql`.
+
+Untuk menjalankan skrip tambahan:
+
+```bash
+npm run add-sql
+```
 
 ## Running the Application
 
@@ -172,18 +209,39 @@ npm run client
 npm run build
 ```
 
+### Preview Production Build
+
+```bash
+cd frontend && npm run preview
+```
+
+### Lint
+
+```bash
+cd frontend && npm run lint
+```
+
 ## API Routes
 
 - `/api/public` - Routes publik (homepage, gallery, posts, dll.)
-- `/api/auth` - Authentication (login, register, forgot password)
+- `/api/auth` - Authentication (login, register, forgot password, 2FA)
 - `/api/admin` - Admin routes (CRUD programs, gallery, users, posts, dll.)
 - `/api/upload` - Upload file (gambar)
+- `/api/reviews` - Reviews publik
+- `/api/admin/reviews` - Admin reviews
 - `/uploads` - Static file serving
 
 ## Features
 
-- Publik: Home, About, Programs, Gallery, Instructors, Posts, Contact, Registration, Privacy Policy
-- Admin: Dashboard, Site Settings, Programs, Gallery, Instructors, Institution, Users, Posts, Categories, Testimonials, Privacy Policies, Vision & Mission, Organization Chart
-- Image upload with thumbnail generation (Sharp)
-- JWT-based authentication
+- Publik: Home, About, Programs, Gallery, Instructors, Posts, Contact, Registration, Privacy Policy, Reviews
+- Admin: Dashboard, Site Settings, Programs, Gallery, Instructors, Institution, Users, Posts, Categories, Testimonials, Privacy Policies, Vision & Mission, Organization Chart, Security, Reviews
+- Image upload with thumbnail generation (Sharp) and Cloudinary integration
+- JWT-based authentication with token blacklist
+- Two-factor authentication (2FA) with otplib
+- CAPTCHA protection (svg-captcha)
+- Rate limiting and honeypot security middleware
+- Rich text editor (Tiptap) and code editor (CodeMirror)
+- Image lightbox and multi-image upload
 - Role-based access control (admin)
+- Error boundary for React
+- Oxlint for code quality
