@@ -1,4 +1,4 @@
-﻿.programs-page {
+.programs-page {
     padding: 3rem 2rem;
     min-height: 100vh;
     background: #f8fafc;
@@ -93,13 +93,13 @@
     padding-right: 1rem;
 }
 
-.programs-grid {
+.programs-page .programs-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.75rem;
 }
 
-.program-card {
+.programs-page .program-card {
     background: var(--bg-white);
     border: 1px solid var(--border-light);
     border-radius: var(--radius-lg);
@@ -107,9 +107,18 @@
     transition: var(--transition);
     position: relative;
     overflow: hidden;
+    padding: 1.25rem;
+    animation: fadeInUp 0.5s ease-out backwards;
 }
 
-.program-card::before {
+.programs-page .program-card:nth-child(1) { animation-delay: 0.05s; }
+.programs-page .program-card:nth-child(2) { animation-delay: 0.1s; }
+.programs-page .program-card:nth-child(3) { animation-delay: 0.15s; }
+.programs-page .program-card:nth-child(4) { animation-delay: 0.2s; }
+.programs-page .program-card:nth-child(5) { animation-delay: 0.25s; }
+.programs-page .program-card:nth-child(6) { animation-delay: 0.3s; }
+
+.programs-page .program-card::before {
     content: '';
     position: absolute;
     top: 0;
@@ -119,22 +128,22 @@
     background: linear-gradient(90deg, var(--blue-700), var(--blue-500), var(--orange-500));
 }
 
-.program-image-wrapper {
-    width: 100%;
+.programs-page .program-image-wrapper {
+    width: calc(100% + 2.5rem);
     height: 200px;
     overflow: hidden;
     background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
-    margin-bottom: 1rem;
+    margin: calc(-1.25rem + 4px) -1.25rem 1rem -1.25rem;
 }
 
-.program-image {
+.programs-page .program-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
 }
 
-.program-image-placeholder {
+.programs-page .program-image-placeholder {
     width: 100%;
     height: 100%;
     display: flex;
@@ -145,57 +154,61 @@
     font-size: 0.95rem;
 }
 
-.program-card:hover {
+.programs-page .program-card:hover {
     transform: translateY(-6px);
     box-shadow: var(--shadow-md);
     border-color: #cbd5e1;
 }
 
-.badges {
+.programs-page .badges {
     display: flex;
     flex-wrap: wrap;
     gap: 0.6rem;
 }
 
-.badge {
+.programs-page .badge {
     display: inline-block;
     background: linear-gradient(135deg, var(--orange-500), var(--orange-400));
     color: #fff;
-    padding: 0.3rem 0.9rem;
+    padding: 0.3rem 0.6rem;
     border-radius: 999px;
     font-size: 0.8rem;
-    margin-right: 0.5rem;
     font-weight: 700;
-    letter-spacing: 0.02em;
+    line-height: 1;
 }
 
-.level-badge {
+.programs-page .level-badge {
     display: inline-block;
     background: #eff6ff;
     color: var(--blue-700);
-    padding: 0.3rem 0.9rem;
+    padding: 0.3rem 0.6rem;
     border-radius: 999px;
     font-size: 0.8rem;
     border: 1px solid #bfdbfe;
     font-weight: 600;
     line-height: 1;
     height: 100%;
+    box-sizing: border-box;
 }
 
-.program-card h3 {
+.programs-page .badge span, .programs-page .level-badge span {
+    height: 100%;
+}
+
+.programs-page .program-card h3 {
     margin: 0.75rem 0;
     color: var(--blue-900);
     font-size: 1.15rem;
     font-weight: 700;
 }
 
-.program-card p {
+.programs-page .program-card p {
     color: var(--text-secondary);
     line-height: 1.6;
     font-size: 0.95rem;
 }
 
-.program-meta {
+.programs-page .program-meta {
     display: flex;
     gap: 1rem;
     margin: 1rem 0 0.4rem 0;
@@ -231,18 +244,18 @@
         padding: 2rem 0 1rem 0;
     }
 
-    .programs-grid {
+    .programs-page .programs-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
-    .program-card {
+    .programs-page .program-card {
         border-radius: var(--radius-md) !important;
     }
 
     .programs-page .filters {
         flex-direction: column;
         align-items: center;
-        margin-bottom: 0rem !important;
+        margin-bottom: 2rem;
     }
     .programs-page .filters select,
     .programs-page .filters input {
@@ -271,17 +284,18 @@
     background-size: 16px !important;
 }
 
-[data-theme="dark"] .program-card:hover {
+[data-theme="dark"] .programs-page .program-card:hover {
     border-color: #475569;
 }
 
-[data-theme="dark"] .level-badge {
+[data-theme="dark"] .programs-page .level-badge {
     background: #1e3a5f;
     color: #93c5fd;
     border-color: #2563eb;
 }
 
-[data-theme="dark"] .program-image-placeholder {
+[data-theme="dark"] .programs-page .program-image-placeholder {
     background: linear-gradient(135deg, #1e293b, #334155);
     color: #94a3b8;
 }
+

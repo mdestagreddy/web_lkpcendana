@@ -75,7 +75,7 @@
     color: var(--blue-900);
 }
 
-.page-subtitle {
+.reviews-page .page-subtitle {
     color: var(--text-secondary);
     margin-bottom: 1.5rem;
 }
@@ -397,3 +397,4 @@
     border-color: var(--blue-500);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
+

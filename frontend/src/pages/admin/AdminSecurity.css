@@ -5,7 +5,7 @@
     font-size: 1.75rem;
 }
 
-.page-subtitle {
+.admin-security .page-subtitle {
     color: var(--text-muted);
     margin-bottom: 1.5rem;
 }
@@ -270,3 +270,4 @@
     border-color: #334155;
     background: #ffffff;
 }
+

@@ -26,11 +26,12 @@ function getThumbUrl(src, thumbWidth, thumbHeight) {
             height: thumbHeight || 100,
         });
     }
-    const urlObj = new URL(resolved, API_BASE_URL);
-    const pathname = urlObj.pathname;
-    const ext = pathname.split('.').pop() || '';
-    const base = pathname.slice(0, -ext.length);
-    return `${urlObj.origin}${base}_thumb${ext}`;
+    const lastSlash = resolved.lastIndexOf('/');
+    const filename = resolved.slice(lastSlash + 1);
+    const dotIndex = filename.lastIndexOf('.');
+    if (dotIndex === -1) return resolved;
+    const thumbFilename = filename.slice(0, dotIndex) + '_thumb' + filename.slice(dotIndex);
+    return resolved.slice(0, lastSlash + 1) + thumbFilename;
 }
 
 const ImageLightboxComponent = ({ items, style, multiTrigger, open: controlledOpen, onClose, index: controlledIndex, hidden, rounded, className, thumbWidth, thumbHeight, onOpen }, ref) => {

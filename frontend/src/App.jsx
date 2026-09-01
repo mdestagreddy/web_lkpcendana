@@ -5,6 +5,7 @@ import Layout from './components/Layout';
 import AdminLayout from './pages/admin/AdminLayout';
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorBoundary from './components/ErrorBoundary';
+import './App.css';
 
 const Home = lazy(() => import('./pages/public/Home'));
 const Programs = lazy(() => import('./pages/public/Programs'));
