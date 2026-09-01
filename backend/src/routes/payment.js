@@ -78,8 +78,9 @@ router.post('/payment/create-transaction', async (req, res) => {
             transaction_details: transactionDetails,
             customer_details: customerDetails,
             item_details: itemDetails,
-            redirect_url: redirect_url || `${baseUrl}/registration`,
-            callback_url: `${baseUrl}/api/public/payment/notification`,
+            callbacks: {
+                finish: redirect_url || `${baseUrl}/registration`,
+            },
         };
 
         const snap = getSnap();
