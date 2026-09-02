@@ -4,7 +4,7 @@ const db = require('../database/db');
 
 router.get('/', (req, res) => {
     const { limit, offset, status, program_id } = req.query;
-    let query = 'SELECT p.*, pr.title as program_title FROM payments p LEFT JOIN programs pr ON p.program_id = pr.id WHERE 1=1';
+    let query = 'SELECT p.* FROM payments p WHERE 1=1';
     const params = [];
 
     if (status) { query += ' AND p.status = ?'; params.push(status); }
