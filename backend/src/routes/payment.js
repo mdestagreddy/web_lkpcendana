@@ -51,7 +51,7 @@ router.post('/payment/create-transaction', async (req, res) => {
 
         const program = programs[0];
         const baseUrl = getBaseUrl(req);
-        const orderId = `REG-${Date.now().toString(36)}-${program_id}`;
+        const orderId = `REG-${Date.now()}-${program_id}`;
         const grossAmount = Math.round(parseFloat(amount));
 
         const transactionDetails = {
