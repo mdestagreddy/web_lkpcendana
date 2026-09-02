@@ -43,6 +43,45 @@ function getQueryParams() {
     };
 }
 
+function statusBadgeClass(status) {
+    switch (status) {
+        case 'success':
+            return 'badge-success';
+        case 'pending':
+            return 'badge-warning';
+        case 'failed':
+        case 'cancelled':
+            return 'badge-danger';
+        case 'challenge':
+            return 'badge-info';
+        default:
+            return 'badge-neutral';
+    }
+}
+
+function statusLabel(status) {
+    switch (status) {
+        case 'success':
+            return 'Berhasil';
+        case 'pending':
+            return 'Menunggu';
+        case 'failed':
+            return 'Gagal';
+        case 'cancelled':
+            return 'Dibatalkan';
+        case 'challenge':
+            return 'Challenge';
+        default:
+            return status;
+    }
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
 export default function Registration() {
     const [activeTab, setActiveTab] = useState('form');
     const [programs, setPrograms] = useState([]);
