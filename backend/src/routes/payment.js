@@ -154,6 +154,21 @@ router.post('/payment/notification', (req, res) => {
     );
 });
 
+router.get('/payment/finish', (req, res) => {
+    const { order_id, status_code, transaction_status } = req.query;
+    res.redirect(`/registration?payment=finish&order_id=${encodeURIComponent(order_id || '')}&status_code=${encodeURIComponent(status_code || '')}&transaction_status=${encodeURIComponent(transaction_status || '')}`);
+});
+
+router.get('/payment/unfinish', (req, res) => {
+    const { order_id, status_code, transaction_status } = req.query;
+    res.redirect(`/registration?payment=unfinish&order_id=${encodeURIComponent(order_id || '')}&status_code=${encodeURIComponent(status_code || '')}&transaction_status=${encodeURIComponent(transaction_status || '')}`);
+});
+
+router.get('/payment/error', (req, res) => {
+    const { order_id, status_code, transaction_status } = req.query;
+    res.redirect(`/registration?payment=error&order_id=${encodeURIComponent(order_id || '')}&status_code=${encodeURIComponent(status_code || '')}&transaction_status=${encodeURIComponent(transaction_status || '')}`);
+});
+
 router.get('/payment/status/:orderId', async (req, res) => {
     const { orderId } = req.params;
 

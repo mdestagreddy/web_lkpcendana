@@ -20,6 +20,51 @@
     font-size: 1rem;
 }
 
+.payment-message {
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.payment-message-success {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid #a7f3d0;
+}
+
+.payment-message-warning {
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+
+.payment-message-danger {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+[data-theme="dark"] .payment-message-success {
+    background: #052e16;
+    color: #86efac;
+    border-color: #166534;
+}
+
+[data-theme="dark"] .payment-message-warning {
+    background: #451a03;
+    color: #fcd34d;
+    border-color: #92400e;
+}
+
+[data-theme="dark"] .payment-message-danger {
+    background: #450a0a;
+    color: #fca5a5;
+    border-color: #991b1b;
+}
+
 .registration-tabs {
     display: flex;
     justify-content: center;

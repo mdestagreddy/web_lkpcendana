@@ -30,12 +30,24 @@ function parseNumericInput(rawValue) {
     return digits ? parseInt(digits, 10) : '';
 }
 
+function getQueryParams() {
+    if (typeof window === 'undefined') return {};
+    const params = new URLSearchParams(window.location.search);
+    return {
+        payment: params.get('payment'),
+        order_id: params.get('order_id'),
+        status_code: params.get('status_code'),
+        transaction_status: params.get('transaction_status'),
+    };
+}
+
 export default function Registration() {
     const [activeTab, setActiveTab] = useState('form');
     const [programs, setPrograms] = useState([]);
     const [loadingPrograms, setLoadingPrograms] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [snapScriptLoaded, setSnapScriptLoaded] = useState(false);
+    const [paymentMessage, setPaymentMessage] = useState(null);
 
     const [selectedProgramId, setSelectedProgramId] = useState('');
     const [customerName, setCustomerName] = useState('');
@@ -58,6 +70,21 @@ export default function Registration() {
             }
         };
         loadPrograms();
+    }, []);
+
+    useEffect(() => {
+        const { payment, order_id, transaction_status } = getQueryParams();
+        if (payment && order_id) {
+            if (payment === 'finish' && (transaction_status === 'capture' || transaction_status === 'settlement')) {
+                setPaymentMessage({ type: 'success', text: `Pembayaran berhasil untuk Order ID: ${order_id}` });
+            } else if (payment === 'finish' && transaction_status === 'pending') {
+                setPaymentMessage({ type: 'warning', text: `Menunggu pembayaran untuk Order ID: ${order_id}` });
+            } else if (payment === 'error') {
+                setPaymentMessage({ type: 'danger', text: `Pembayaran gagal untuk Order ID: ${order_id}` });
+            } else if (payment === 'unfinish') {
+                setPaymentMessage({ type: 'warning', text: `Pembayaran belum selesai untuk Order ID: ${order_id}` });
+            }
+        }
     }, []);
 
     useEffect(() => {
@@ -146,6 +173,12 @@ export default function Registration() {
             <div className="container">
                 <h1>Pendaftaran</h1>
                 <p className="registration-subtitle">Pilih formulir pendaftaran sesuai program yang Anda inginkan</p>
+
+                {paymentMessage && (
+                    <div className={`payment-message payment-message-${paymentMessage.type}`}>
+                        {paymentMessage.text}
+                    </div>
+                )}
 
                 <div className="registration-tabs">
                     <button
