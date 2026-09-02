@@ -463,35 +463,39 @@ export default function Registration() {
                                     <button
                                         type="button"
                                         className="btn-pay"
-                                        disabled={!window.snap || !ongoingTransaction.token || payingRef.current}
+                                        disabled={payingRef.current}
                                         onClick={() => {
                                             if (payingRef.current) return;
-                                            if (window.snap && ongoingTransaction.token) {
-                                                payingRef.current = true;
-                                                window.snap.pay(ongoingTransaction.token, {
-                                                    onSuccess: (paymentResult) => {
-                                                        payingRef.current = false;
-                                                        alert('Pembayaran berhasil!');
-                                                        console.log('Payment success:', paymentResult);
-                                                    },
-                                                    onPending: (paymentResult) => {
-                                                        payingRef.current = false;
-                                                        alert('Menunggu pembayaran Anda.');
-                                                        console.log('Payment pending:', paymentResult);
-                                                    },
-                                                    onError: (paymentResult) => {
-                                                        payingRef.current = false;
-                                                        alert('Pembayaran gagal.');
-                                                        console.log('Payment error:', paymentResult);
-                                                    },
-                                                    onClose: () => {
-                                                        payingRef.current = false;
-                                                        alert('Popup pembayaran ditutup.');
-                                                    },
-                                                });
-                                            } else if (ongoingTransaction.redirect_url) {
-                                                window.location.href = ongoingTransaction.redirect_url;
+                                            if (!window.snap) {
+                                                alert('Sistem pembayaran sedang dimuat. Silakan tunggu sebentar.');
+                                                return;
                                             }
+                                            if (!ongoingTransaction.token) {
+                                                alert('Token pembayaran tidak ditemukan. Silakan muat ulang halaman.');
+                                                return;
+                                            }
+                                            payingRef.current = true;
+                                            window.snap.pay(ongoingTransaction.token, {
+                                                onSuccess: (paymentResult) => {
+                                                    payingRef.current = false;
+                                                    alert('Pembayaran berhasil!');
+                                                    console.log('Payment success:', paymentResult);
+                                                },
+                                                onPending: (paymentResult) => {
+                                                    payingRef.current = false;
+                                                    alert('Menunggu pembayaran Anda.');
+                                                    console.log('Payment pending:', paymentResult);
+                                                },
+                                                onError: (paymentResult) => {
+                                                    payingRef.current = false;
+                                                    alert('Pembayaran gagal.');
+                                                    console.log('Payment error:', paymentResult);
+                                                },
+                                                onClose: () => {
+                                                    payingRef.current = false;
+                                                    alert('Popup pembayaran ditutup.');
+                                                },
+                                            });
                                         }}
                                     >
                                         Lanjutkan Pembayaran
