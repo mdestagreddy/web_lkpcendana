@@ -54,6 +54,7 @@ export default function Registration() {
     const [notificationPermission, setNotificationPermission] = useState('default');
     const [lastUpdated, setLastUpdated] = useState(null);
     const [orderIdToTrack, setOrderIdToTrack] = useState('');
+    const [ongoingTransaction, setOngoingTransaction] = useState(null);
     const previousStatusRef = useRef({});
     const toastTimerRef = useRef(null);
 
@@ -99,9 +100,21 @@ export default function Registration() {
     }, []);
 
     useEffect(() => {
+        const savedOrderId = typeof window !== 'undefined' ? localStorage.getItem('pending_payment_order_id') : null;
+        if (savedOrderId && !orderIdToTrack) {
+            setOrderIdToTrack(savedOrderId);
+            previousStatusRef.current[savedOrderId] = 'pending';
+        }
+    }, [orderIdToTrack]);
+
+    useEffect(() => {
         if (typeof window !== 'undefined' && 'Notification' in window) {
             setNotificationPermission(Notification.permission);
         }
+    }, []);
+
+    useEffect(() => {
+        requestNotificationPermission();
     }, []);
 
     function playNotificationSound() {
@@ -161,6 +174,8 @@ export default function Registration() {
             const currentStatus = data.status;
             const prevStatus = previousStatusRef.current[orderIdToTrack];
 
+            setOngoingTransaction(data);
+
             if (prevStatus && prevStatus !== currentStatus) {
                 if (currentStatus === 'success') {
                     const message = `Pembayaran berhasil untuk Order ID: ${orderIdToTrack}`;
@@ -168,12 +183,14 @@ export default function Registration() {
                     addToast(message, 'success');
                     playNotificationSound();
                     sendBrowserNotification('Pembayaran Berhasil', message);
+                    localStorage.removeItem('pending_payment_order_id');
                 } else if (currentStatus === 'failed' || currentStatus === 'cancelled') {
                     const message = `Pembayaran ${currentStatus === 'failed' ? 'gagal' : 'dibatalkan'} untuk Order ID: ${orderIdToTrack}`;
                     setPaymentMessage({ type: 'danger', text: message });
                     addToast(message, 'danger');
                     playNotificationSound();
                     sendBrowserNotification('Pembayaran Gagal', message);
+                    localStorage.removeItem('pending_payment_order_id');
                 } else if (currentStatus === 'challenge') {
                     const message = `Pembayaran challenge untuk Order ID: ${orderIdToTrack}`;
                     setPaymentMessage({ type: 'warning', text: message });
@@ -196,6 +213,7 @@ export default function Registration() {
 
     useEffect(() => {
         if (!orderIdToTrack) return;
+        localStorage.setItem('pending_payment_order_id', orderIdToTrack);
         checkPaymentStatus();
         const timer = setInterval(() => {
             checkPaymentStatus();
@@ -260,6 +278,16 @@ export default function Registration() {
             if (result.order_id) {
                 setOrderIdToTrack(result.order_id);
                 previousStatusRef.current[result.order_id] = 'pending';
+                localStorage.setItem('pending_payment_order_id', result.order_id);
+                setOngoingTransaction({
+                    order_id: result.order_id,
+                    program_title: programs.find(p => p.id === parseInt(selectedProgramId, 10))?.title || `Program #${selectedProgramId}`,
+                    amount: parseInt(amount, 10),
+                    created_at: new Date(),
+                    status: 'pending',
+                    token: result.token,
+                    redirect_url: result.redirect_url,
+                });
             }
 
             if (window.snap && result.token) {
@@ -361,81 +389,152 @@ export default function Registration() {
                             </div>
                         </div>
 
-                        <form className="payment-form" onSubmit={handlePay}>
-                            <div className="form-group">
-                                <label htmlFor="program">Program Pelatihan</label>
-                                <select
-                                    id="program"
-                                    value={selectedProgramId}
-                                    onChange={handleProgramChange}
-                                    required
-                                >
-                                    <option value="">-- Pilih Program --</option>
-                                    {loadingPrograms && <option value="">Memuat program...</option>}
-                                    {programs.map(program => (
-                                        <option key={program.id} value={program.id}>
-                                            {program.title} {program.price ? `- ${formatRupiah(program.price)}` : ''}
-                                        </option>
-                                    ))}
-                                </select>
+                        {ongoingTransaction && ongoingTransaction.status === 'pending' ? (
+                            <div className="ongoing-payment">
+                                <div className="ongoing-payment-header">
+                                    <h4>Transaksi Sedang Berjalan</h4>
+                                    <span className={`badge ${statusBadgeClass(ongoingTransaction.status)}`}>{statusLabel(ongoingTransaction.status)}</span>
+                                </div>
+                                <div className="ongoing-payment-body">
+                                    <div className="ongoing-payment-row">
+                                        <span>Order ID</span>
+                                        <span>{ongoingTransaction.order_id}</span>
+                                    </div>
+                                    <div className="ongoing-payment-row">
+                                        <span>Program</span>
+                                        <span>{ongoingTransaction.program_title || `Program #${ongoingTransaction.program_id}`}</span>
+                                    </div>
+                                    <div className="ongoing-payment-row">
+                                        <span>Nominal</span>
+                                        <span>{formatRupiah(ongoingTransaction.amount)}</span>
+                                    </div>
+                                    <div className="ongoing-payment-row">
+                                        <span>Dibuat</span>
+                                        <span>{formatDate(ongoingTransaction.created_at)}</span>
+                                    </div>
+                                </div>
+                                <div className="ongoing-payment-actions">
+                                    <button
+                                        type="button"
+                                        className="btn-pay"
+                                        disabled={!window.snap || !ongoingTransaction.token}
+                                        onClick={() => {
+                                            if (window.snap && ongoingTransaction.token) {
+                                                window.snap.pay(ongoingTransaction.token, {
+                                                    onSuccess: (paymentResult) => {
+                                                        alert('Pembayaran berhasil!');
+                                                        console.log('Payment success:', paymentResult);
+                                                    },
+                                                    onPending: (paymentResult) => {
+                                                        alert('Menunggu pembayaran Anda.');
+                                                        console.log('Payment pending:', paymentResult);
+                                                    },
+                                                    onError: (paymentResult) => {
+                                                        alert('Pembayaran gagal.');
+                                                        console.log('Payment error:', paymentResult);
+                                                    },
+                                                    onClose: () => {
+                                                        alert('Popup pembayaran ditutup.');
+                                                    },
+                                                });
+                                            } else if (ongoingTransaction.redirect_url) {
+                                                window.location.href = ongoingTransaction.redirect_url;
+                                            }
+                                        }}
+                                    >
+                                        Lanjutkan Pembayaran
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary"
+                                        onClick={() => {
+                                            localStorage.removeItem('pending_payment_order_id');
+                                            setOngoingTransaction(null);
+                                            setOrderIdToTrack('');
+                                            previousStatusRef.current = {};
+                                        }}
+                                    >
+                                        Batalkan Transaksi
+                                    </button>
+                                </div>
                             </div>
+                        ) : (
+                            <form className="payment-form" onSubmit={handlePay}>
+                                <div className="form-group">
+                                    <label htmlFor="program">Program Pelatihan</label>
+                                    <select
+                                        id="program"
+                                        value={selectedProgramId}
+                                        onChange={handleProgramChange}
+                                        required
+                                    >
+                                        <option value="">-- Pilih Program --</option>
+                                        {loadingPrograms && <option value="">Memuat program...</option>}
+                                        {programs.map(program => (
+                                            <option key={program.id} value={program.id}>
+                                                {program.title} {program.price ? `- ${formatRupiah(program.price)}` : ''}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                            <div className="form-group">
-                                <label htmlFor="amount">Nominal Pembayaran</label>
-                                <input
-                                    id="amount"
-                                    type="text"
-                                    inputMode="numeric"
-                                    value={amountDisplay}
-                                    onChange={handleAmountChange}
-                                    placeholder="Contoh: 2500000"
-                                    required
-                                />
-                                {amount && (
-                                    <input type="hidden" name="amount" value={amount} readOnly />
-                                )}
-                            </div>
+                                <div className="form-group">
+                                    <label htmlFor="amount">Nominal Pembayaran</label>
+                                    <input
+                                        id="amount"
+                                        type="text"
+                                        inputMode="numeric"
+                                        value={amountDisplay}
+                                        onChange={handleAmountChange}
+                                        placeholder="Contoh: 2500000"
+                                        required
+                                    />
+                                    {amount && (
+                                        <input type="hidden" name="amount" value={amount} readOnly />
+                                    )}
+                                </div>
 
-                            <div className="form-group">
-                                <label htmlFor="name">Nama Lengkap</label>
-                                <input
-                                    id="name"
-                                    type="text"
-                                    value={customerName}
-                                    onChange={(e) => setCustomerName(e.target.value)}
-                                    placeholder="Masukkan nama lengkap"
-                                    required
-                                />
-                            </div>
+                                <div className="form-group">
+                                    <label htmlFor="name">Nama Lengkap</label>
+                                    <input
+                                        id="name"
+                                        type="text"
+                                        value={customerName}
+                                        onChange={(e) => setCustomerName(e.target.value)}
+                                        placeholder="Masukkan nama lengkap"
+                                        required
+                                    />
+                                </div>
 
-                            <div className="form-group">
-                                <label htmlFor="email">Email</label>
-                                <input
-                                    id="email"
-                                    type="email"
-                                    value={customerEmail}
-                                    onChange={(e) => setCustomerEmail(e.target.value)}
-                                    placeholder="contoh@email.com"
-                                    required
-                                />
-                            </div>
+                                <div className="form-group">
+                                    <label htmlFor="email">Email</label>
+                                    <input
+                                        id="email"
+                                        type="email"
+                                        value={customerEmail}
+                                        onChange={(e) => setCustomerEmail(e.target.value)}
+                                        placeholder="contoh@email.com"
+                                        required
+                                    />
+                                </div>
 
-                            <div className="form-group">
-                                <label htmlFor="phone">Nomor Telepon</label>
-                                <input
-                                    id="phone"
-                                    type="tel"
-                                    value={customerPhone}
-                                    onChange={(e) => setCustomerPhone(e.target.value)}
-                                    placeholder="0812-3456-7890"
-                                    required
-                                />
-                            </div>
+                                <div className="form-group">
+                                    <label htmlFor="phone">Nomor Telepon</label>
+                                    <input
+                                        id="phone"
+                                        type="tel"
+                                        value={customerPhone}
+                                        onChange={(e) => setCustomerPhone(e.target.value)}
+                                        placeholder="0812-3456-7890"
+                                        required
+                                    />
+                                </div>
 
-                            <button type="submit" className="btn-pay" disabled={submitting}>
-                                {submitting ? 'Memproses...' : 'Bayar Sekarang'}
-                            </button>
-                        </form>
+                                <button type="submit" className="btn-pay" disabled={submitting}>
+                                    {submitting ? 'Memproses...' : 'Bayar Sekarang'}
+                                </button>
+                            </form>
+                        )}
                     </div>
                 )}
             </div>
