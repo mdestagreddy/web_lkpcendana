@@ -181,4 +181,16 @@ router.get('/payment/status/:orderId', async (req, res) => {
     }
 });
 
+router.post('/payment/recurring-notification', (req, res) => {
+    const notificationJson = req.body;
+    console.log('Recurring payment notification:', notificationJson);
+    res.status(200).json({ message: 'Recurring notification received' });
+});
+
+router.post('/payment/gopay-linking-notification', (req, res) => {
+    const notificationJson = req.body;
+    console.log('GoPay linking notification:', notificationJson);
+    res.status(200).json({ message: 'GoPay linking notification received' });
+});
+
 module.exports = router;
