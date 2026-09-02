@@ -96,6 +96,7 @@ export default function Registration() {
     const [ongoingTransaction, setOngoingTransaction] = useState(null);
     const previousStatusRef = useRef({});
     const toastTimerRef = useRef(null);
+    const payingRef = useRef(false);
 
     const [selectedProgramId, setSelectedProgramId] = useState('');
     const [customerName, setCustomerName] = useState('');
@@ -302,6 +303,7 @@ export default function Registration() {
             alert('Semua field wajib diisi');
             return;
         }
+        if (payingRef.current) return;
 
         setSubmitting(true);
         try {
@@ -330,20 +332,25 @@ export default function Registration() {
             }
 
             if (window.snap && result.token) {
+                payingRef.current = true;
                 window.snap.pay(result.token, {
                     onSuccess: (paymentResult) => {
+                        payingRef.current = false;
                         alert('Pembayaran berhasil!');
                         console.log('Payment success:', paymentResult);
                     },
                     onPending: (paymentResult) => {
+                        payingRef.current = false;
                         alert('Menunggu pembayaran Anda.');
                         console.log('Payment pending:', paymentResult);
                     },
                     onError: (paymentResult) => {
+                        payingRef.current = false;
                         alert('Pembayaran gagal.');
                         console.log('Payment error:', paymentResult);
                     },
                     onClose: () => {
+                        payingRef.current = false;
                         alert('Popup pembayaran ditutup.');
                     },
                 });
@@ -456,23 +463,29 @@ export default function Registration() {
                                     <button
                                         type="button"
                                         className="btn-pay"
-                                        disabled={!window.snap || !ongoingTransaction.token}
+                                        disabled={!window.snap || !ongoingTransaction.token || payingRef.current}
                                         onClick={() => {
+                                            if (payingRef.current) return;
                                             if (window.snap && ongoingTransaction.token) {
+                                                payingRef.current = true;
                                                 window.snap.pay(ongoingTransaction.token, {
                                                     onSuccess: (paymentResult) => {
+                                                        payingRef.current = false;
                                                         alert('Pembayaran berhasil!');
                                                         console.log('Payment success:', paymentResult);
                                                     },
                                                     onPending: (paymentResult) => {
+                                                        payingRef.current = false;
                                                         alert('Menunggu pembayaran Anda.');
                                                         console.log('Payment pending:', paymentResult);
                                                     },
                                                     onError: (paymentResult) => {
+                                                        payingRef.current = false;
                                                         alert('Pembayaran gagal.');
                                                         console.log('Payment error:', paymentResult);
                                                     },
                                                     onClose: () => {
+                                                        payingRef.current = false;
                                                         alert('Popup pembayaran ditutup.');
                                                     },
                                                 });
@@ -491,6 +504,7 @@ export default function Registration() {
                                             setOngoingTransaction(null);
                                             setOrderIdToTrack('');
                                             previousStatusRef.current = {};
+                                            payingRef.current = false;
                                         }}
                                     >
                                         Batalkan Transaksi
