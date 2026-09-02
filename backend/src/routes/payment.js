@@ -1,27 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
-const Midtrans = require('midtrans-client');
-
-let snap;
-let isProduction;
-
-function getSnap() {
-    if (!process.env.MIDTRANS_SERVER_KEY || !process.env.MIDTRANS_CLIENT_KEY) {
-        throw new Error('Midtrans credentials are not configured');
-    }
-
-    const currentIsProduction = process.env.MIDTRANS_IS_PRODUCTION === 'true';
-    if (!snap || snap._isProduction !== currentIsProduction) {
-        isProduction = currentIsProduction;
-        snap = new Midtrans.Snap({
-            isProduction,
-            serverKey: process.env.MIDTRANS_SERVER_KEY,
-            clientKey: process.env.MIDTRANS_CLIENT_KEY,
-        });
-    }
-    return snap;
-}
+const { getSnap } = require('../utils/midtrans');
 
 function getBaseUrl(req) {
     const proto = req.headers['x-forwarded-proto'] || req.protocol;
@@ -178,6 +158,52 @@ router.get('/payment/status/:orderId', async (req, res) => {
         res.json(results[0]);
     } catch (err) {
         res.status(500).json({ error: err.message });
+    }
+});
+
+router.get('/payment/sync/:orderId', async (req, res) => {
+    const { orderId } = req.params;
+
+    try {
+        const results = await queryAsync('SELECT * FROM payments WHERE order_id = ?', [orderId]);
+        if (results.length === 0) return res.status(404).json({ error: 'Pembayaran tidak ditemukan' });
+
+        const payment = results[0];
+        const snap = getSnap();
+        const transaction = await snap.transaction.status(orderId);
+
+        let status = 'pending';
+        const transactionStatus = transaction.transaction_status;
+        const fraudStatus = transaction.fraud_status;
+
+        if (transactionStatus === 'capture' || transactionStatus === 'settlement') {
+            if (fraudStatus === 'accept' || fraudStatus === undefined) {
+                status = 'success';
+            } else if (fraudStatus === 'challenge') {
+                status = 'challenge';
+            } else {
+                status = 'failed';
+            }
+        } else if (transactionStatus === 'pending') {
+            status = 'pending';
+        } else if (transactionStatus === 'deny') {
+            status = 'failed';
+        } else if (transactionStatus === 'cancel' || transactionStatus === 'expire') {
+            status = 'cancelled';
+        } else {
+            status = 'failed';
+        }
+
+        await queryAsync(
+            'UPDATE payments SET status = ?, midtrans_transaction_id = ?, updated_at = CURRENT_TIMESTAMP WHERE order_id = ?',
+            [status, transaction.transaction_id, orderId]
+        );
+
+        const updated = await queryAsync('SELECT * FROM payments WHERE order_id = ?', [orderId]);
+        res.json({ data: updated[0], midtrans: transaction });
+    } catch (err) {
+        console.error('Midtrans sync error:', err);
+        res.status(500).json({ error: 'Gagal sinkronisasi pembayaran' });
     }
 });
 

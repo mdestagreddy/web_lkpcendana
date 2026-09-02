@@ -500,19 +500,6 @@ export default function Registration() {
                                     >
                                         Lanjutkan Pembayaran
                                     </button>
-                                    <button
-                                        type="button"
-                                        className="btn btn-secondary"
-                                        onClick={() => {
-                                            localStorage.removeItem('pending_payment_order_id');
-                                            setOngoingTransaction(null);
-                                            setOrderIdToTrack('');
-                                            previousStatusRef.current = {};
-                                            payingRef.current = false;
-                                        }}
-                                    >
-                                        Batalkan Transaksi
-                                    </button>
                                 </div>
                             </div>
                         ) : (

@@ -568,5 +568,6 @@ export const adminApi = {
             body: JSON.stringify(data),
         }),
         getByOrderId: (orderId) => request(`/admin/payments/order/${encodeURIComponent(orderId)}`, { isAdmin: true }),
+        syncMidtrans: (id) => request(`/admin/payments/${id}/sync-midtrans`, { isAdmin: true }),
     },
 };

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../database/db');
+const { getSnap } = require('./payment');
 
 router.get('/', (req, res) => {
     const { limit, offset, status, program_id } = req.query;
@@ -62,6 +63,70 @@ router.get('/order/:orderId', (req, res) => {
         if (results.length === 0) return res.status(404).json({ error: 'Pembayaran tidak ditemukan' });
         res.json(results[0]);
     });
+});
+
+router.get('/:id/sync-midtrans', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const results = await new Promise((resolve, reject) => {
+            db.query('SELECT * FROM payments WHERE id = ?', [id], (err, rows) => {
+                if (err) return reject(err);
+                resolve(rows);
+            });
+        });
+
+        if (!results.length) return res.status(404).json({ error: 'Pembayaran tidak ditemukan' });
+
+        const payment = results[0];
+        const snap = getSnap();
+        const transaction = await snap.transaction.status(payment.order_id);
+
+        let status = 'pending';
+        const transactionStatus = transaction.transaction_status;
+        const fraudStatus = transaction.fraud_status;
+
+        if (transactionStatus === 'capture' || transactionStatus === 'settlement') {
+            if (fraudStatus === 'accept' || fraudStatus === undefined) {
+                status = 'success';
+            } else if (fraudStatus === 'challenge') {
+                status = 'challenge';
+            } else {
+                status = 'failed';
+            }
+        } else if (transactionStatus === 'pending') {
+            status = 'pending';
+        } else if (transactionStatus === 'deny') {
+            status = 'failed';
+        } else if (transactionStatus === 'cancel' || transactionStatus === 'expire') {
+            status = 'cancelled';
+        } else {
+            status = 'failed';
+        }
+
+        await new Promise((resolve, reject) => {
+            db.query(
+                'UPDATE payments SET status = ?, midtrans_transaction_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+                [status, transaction.transaction_id, id],
+                (err) => {
+                    if (err) return reject(err);
+                    resolve();
+                }
+            );
+        });
+
+        const updated = await new Promise((resolve, reject) => {
+            db.query('SELECT * FROM payments WHERE id = ?', [id], (err, rows) => {
+                if (err) return reject(err);
+                resolve(rows);
+            });
+        });
+
+        res.json({ data: updated[0], midtrans: transaction });
+    } catch (err) {
+        console.error('Midtrans sync error:', err);
+        res.status(500).json({ error: 'Gagal sinkronisasi pembayaran' });
+    }
 });
 
 module.exports = router;

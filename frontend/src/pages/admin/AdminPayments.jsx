@@ -72,6 +72,7 @@ export default function AdminPayments() {
     const [expandedId, setExpandedId] = useState(null);
     const [updatingId, setUpdatingId] = useState(null);
     const [selectedStatus, setSelectedStatus] = useState({});
+    const [syncingIds, setSyncingIds] = useState(new Set());
     const [newItemIds, setNewItemIds] = useState(new Set());
     const [lastUpdated, setLastUpdated] = useState(null);
     const [pendingCount, setPendingCount] = useState(0);
@@ -251,6 +252,19 @@ export default function AdminPayments() {
         }).catch(() => setUpdatingId(null));
     }
 
+    function syncPayment(id) {
+        setSyncingIds(prev => new Set([...prev, id]));
+        adminApi.payments.syncMidtrans(id).then(() => {
+            load();
+        }).finally(() => {
+            setSyncingIds(prev => {
+                const next = new Set(prev);
+                next.delete(id);
+                return next;
+            });
+        });
+    }
+
     return (
         <div className="admin-crud">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
@@ -312,6 +326,17 @@ export default function AdminPayments() {
                                     </div>
                                 </div>
                                 <div className="payment-item-actions">
+                                    <button
+                                        type="button"
+                                        className="btn btn-secondary"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            syncPayment(item.id);
+                                        }}
+                                        disabled={syncingIds.has(item.id)}
+                                    >
+                                        {syncingIds.has(item.id) ? 'Syncing...' : 'Sync Midtrans'}
+                                    </button>
                                     <span className="payment-order-id">{item.order_id}</span>
                                     {expandedId === item.id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                                 </div>
