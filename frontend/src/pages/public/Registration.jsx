@@ -1,5 +1,5 @@
 import { Monitor, Car, CreditCard } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import FlexIcon from '../../components/FlexIcon';
 import { publicApi } from '../../services/api';
 import './Registration.css';
@@ -18,6 +18,8 @@ const FORMS = [
         url: 'https://docs.google.com/forms/d/e/1FAIpQLScYnRQ4nsdHtshgIvF8D1KFx0tq2RMQNx3rsB6jUgfxJJlNXQ/viewform?embedded=true',
     },
 ];
+
+const POLL_INTERVAL_MS = 15000;
 
 function formatRupiah(value) {
     const number = parseInt(value, 10);
@@ -48,6 +50,12 @@ export default function Registration() {
     const [submitting, setSubmitting] = useState(false);
     const [snapScriptLoaded, setSnapScriptLoaded] = useState(false);
     const [paymentMessage, setPaymentMessage] = useState(null);
+    const [toasts, setToasts] = useState([]);
+    const [notificationPermission, setNotificationPermission] = useState('default');
+    const [lastUpdated, setLastUpdated] = useState(null);
+    const [orderIdToTrack, setOrderIdToTrack] = useState('');
+    const previousStatusRef = useRef({});
+    const toastTimerRef = useRef(null);
 
     const [selectedProgramId, setSelectedProgramId] = useState('');
     const [customerName, setCustomerName] = useState('');
@@ -84,8 +92,116 @@ export default function Registration() {
             } else if (payment === 'unfinish') {
                 setPaymentMessage({ type: 'warning', text: `Pembayaran belum selesai untuk Order ID: ${order_id}` });
             }
+
+            setOrderIdToTrack(order_id);
+            previousStatusRef.current[order_id] = transaction_status || 'pending';
         }
     }, []);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined' && 'Notification' in window) {
+            setNotificationPermission(Notification.permission);
+        }
+    }, []);
+
+    function playNotificationSound() {
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        } catch (err) {
+            console.error('Notification sound error:', err);
+        }
+    }
+
+    function sendBrowserNotification(title, body) {
+        if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+            try {
+                new Notification(title, {
+                    body,
+                    icon: '/favicon.ico',
+                    badge: '/favicon.ico',
+                    tag: 'payment-notification',
+                });
+            } catch (err) {
+                console.error('Browser notification error:', err);
+            }
+        }
+    }
+
+    function addToast(message, type = 'info') {
+        if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+        const id = Date.now();
+        setToasts(prev => [...prev, { id, message, type }]);
+        toastTimerRef.current = setTimeout(() => {
+            setToasts(prev => prev.filter(toast => toast.id !== id));
+        }, 5000);
+    }
+
+    function requestNotificationPermission() {
+        if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission().then(permission => {
+                setNotificationPermission(permission);
+            });
+        }
+    }
+
+    const checkPaymentStatus = useCallback(async () => {
+        if (!orderIdToTrack) return;
+        try {
+            const data = await publicApi.getPaymentStatus(orderIdToTrack);
+            const currentStatus = data.status;
+            const prevStatus = previousStatusRef.current[orderIdToTrack];
+
+            if (prevStatus && prevStatus !== currentStatus) {
+                if (currentStatus === 'success') {
+                    const message = `Pembayaran berhasil untuk Order ID: ${orderIdToTrack}`;
+                    setPaymentMessage({ type: 'success', text: message });
+                    addToast(message, 'success');
+                    playNotificationSound();
+                    sendBrowserNotification('Pembayaran Berhasil', message);
+                } else if (currentStatus === 'failed' || currentStatus === 'cancelled') {
+                    const message = `Pembayaran ${currentStatus === 'failed' ? 'gagal' : 'dibatalkan'} untuk Order ID: ${orderIdToTrack}`;
+                    setPaymentMessage({ type: 'danger', text: message });
+                    addToast(message, 'danger');
+                    playNotificationSound();
+                    sendBrowserNotification('Pembayaran Gagal', message);
+                } else if (currentStatus === 'challenge') {
+                    const message = `Pembayaran challenge untuk Order ID: ${orderIdToTrack}`;
+                    setPaymentMessage({ type: 'warning', text: message });
+                    addToast(message, 'warning');
+                    playNotificationSound();
+                    sendBrowserNotification('Pembayaran Challenge', message);
+                }
+            }
+
+            previousStatusRef.current[orderIdToTrack] = currentStatus;
+            setLastUpdated(new Date());
+        } catch (err) {
+            console.error('Failed to check payment status:', err);
+        }
+    }, [orderIdToTrack]);
+
+    useEffect(() => {
+        requestNotificationPermission();
+    }, []);
+
+    useEffect(() => {
+        if (!orderIdToTrack) return;
+        checkPaymentStatus();
+        const timer = setInterval(() => {
+            checkPaymentStatus();
+        }, POLL_INTERVAL_MS);
+        return () => clearInterval(timer);
+    }, [checkPaymentStatus, orderIdToTrack]);
 
     useEffect(() => {
         if (!snapScriptLoaded) {
@@ -140,6 +256,11 @@ export default function Registration() {
                 amount: parseInt(amount, 10),
                 redirect_url: window.location.href,
             });
+
+            if (result.order_id) {
+                setOrderIdToTrack(result.order_id);
+                previousStatusRef.current[result.order_id] = 'pending';
+            }
 
             if (window.snap && result.token) {
                 window.snap.pay(result.token, {
@@ -317,6 +438,14 @@ export default function Registration() {
                         </form>
                     </div>
                 )}
+            </div>
+
+            <div className="registration-toast-container">
+                {toasts.map(toast => (
+                    <div key={toast.id} className={`registration-toast registration-toast-${toast.type}`}>
+                        {toast.message}
+                    </div>
+                ))}
             </div>
         </div>
     );

@@ -186,6 +186,8 @@ export const publicApi = {
 
     getLoginCaptcha: () => request('/auth/captcha'),
 
+    getPaymentStatus: (orderId) => request(`/public/payment/status/${encodeURIComponent(orderId)}`),
+
     logout: () => request('/auth/logout', { method: 'POST' }),
 
     getReviews: (params = {}) => {
