@@ -313,6 +313,26 @@
     cursor: not-allowed;
 }
 
+.btn-secondary {
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-light);
+    background: #ffffff;
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+.btn-secondary:hover {
+    opacity: 0.92;
+}
+
+.btn-secondary:active {
+    transform: scale(0.98);
+}
+
 .ongoing-payment {
     margin: 1rem 1.5rem;
     padding: 1rem;
@@ -477,4 +497,14 @@
 [data-theme="dark"] .form-group select option {
     background: #1e293b;
     color: #f1f5f9;
+}
+
+[data-theme="dark"] .btn-secondary {
+    background: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+    background: #334155;
 }
