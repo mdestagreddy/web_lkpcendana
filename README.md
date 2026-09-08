@@ -27,7 +27,8 @@ web_lkpcendana/
 │   │   │   ├── rateLimit.js
 │   │   │   └── honeypot.js
 │   │   ├── utils/
-│   │   │   └── captcha.js
+│   │   │   ├── captcha.js
+│   │   │   └── midtrans.js
 │   │   └── routes/
 │   │       ├── public.js
 │   │       ├── admin.js
@@ -176,6 +177,7 @@ MIDTRANS_MERCHANT_ID=your_merchant_id
 ```env
 VITE_BACKEND=http://localhost:5000
 VITE_MIDTRANS_CLIENT_KEY=your_midtrans_client_key
+VITE_MIDTRANS_IS_PRODUCTION=false
 ```
 
 ## Database Setup
@@ -237,8 +239,8 @@ cd frontend && npm run lint
 - `/api/auth` - Authentication (login, register, forgot password, 2FA)
 - `/api/admin` - Admin routes (CRUD programs, gallery, users, posts, dll.)
 - `/api/upload` - Upload file (gambar)
-- `/api/payment` - Payment routes (create transaction, notification, status)
-- `/api/admin/payments` - Admin payment management
+- `/api/payment` - Payment routes (create transaction, notification, finish, unfinish, error, status, sync, recurring-notification, gopay-linking-notification)
+- `/api/admin/payments` - Admin payment management (list, detail, update, order lookup, sync Midtrans)
 - `/api/reviews` - Reviews publik
 - `/api/admin/reviews` - Admin reviews
 - `/uploads` - Static file serving
@@ -259,3 +261,10 @@ cd frontend && npm run lint
 - Oxlint for code quality
 - Midtrans payment integration with Snap JS
 - Program pricing and payment tracking
+- Ongoing transaction tracking with continue payment from Registration page
+- Payment status polling with auto-refresh every 15 seconds
+- Browser notifications and sound alerts for payment status changes
+- Toast notifications for new payments and status updates in admin
+- Admin can sync payment status directly from Midtrans
+- Payment callback redirects (finish/unfinish/error) with status messages
+- LocalStorage persistence for pending payment order IDs
